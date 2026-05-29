@@ -6,12 +6,12 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { FileText, ShieldCheck, Receipt, User, Building2 } from 'lucide-react';
+import { FileText, ShieldCheck, Receipt, User, Building2, Tag } from 'lucide-react';
 
 const accounts = [
-  { id: 'CORP-001', name: 'TechCorp Solutions', manager: 'Sarah Jenkins', status: 'Active' },
-  { id: 'CORP-002', name: 'Global Logistics Inc', manager: 'Michael Chen', status: 'Active' },
-  { id: 'CORP-003', name: 'Innovate Media', manager: 'Emma Wilson', status: 'Pending' },
+  { id: 'CORP-001', name: 'TechCorp Solutions', manager: 'Sarah Jenkins', status: 'Active', type: 'Corporate' },
+  { id: 'CORP-002', name: 'Global Logistics Inc', manager: 'Michael Chen', status: 'Active', type: 'Corporate' },
+  { id: 'CORP-003', name: 'Innovate Media', manager: 'Emma Wilson', status: 'Pending', type: 'STR' },
 ];
 
 const CorporateDirectories = () => {
@@ -32,9 +32,14 @@ const CorporateDirectories = () => {
                 className={`w-full text-left p-4 hover:bg-accent transition-colors ${selectedAccount.id === account.id ? 'bg-accent' : ''}`}
               >
                 <p className="font-semibold text-sm">{account.name}</p>
-                <p className="text-xs text-muted-foreground flex items-center gap-1 mt-1">
-                  <User className="w-3 h-3" /> {account.manager}
-                </p>
+                <div className="flex flex-col gap-1 mt-1">
+                  <p className="text-xs text-muted-foreground flex items-center gap-1">
+                    <User className="w-3 h-3" /> {account.manager}
+                  </p>
+                  <Badge variant="outline" className="w-fit text-[10px] h-4 px-1 font-normal">
+                    {account.type}
+                  </Badge>
+                </div>
               </button>
             ))}
           </div>
@@ -68,22 +73,29 @@ const CorporateDirectories = () => {
             </TabsList>
 
             <TabsContent value="details" className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 gap-6">
                 <div className="space-y-1">
-                  <p className="text-xs font-medium text-muted-foreground uppercase">Account Manager</p>
+                  <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Type of Account</p>
+                  <div className="flex items-center gap-2">
+                    <Tag className="w-4 h-4 text-primary" />
+                    <p className="text-sm font-semibold">{selectedAccount.type}</p>
+                  </div>
+                </div>
+                <div className="space-y-1">
+                  <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Account Manager</p>
                   <p className="text-sm">{selectedAccount.manager}</p>
                 </div>
                 <div className="space-y-1">
-                  <p className="text-xs font-medium text-muted-foreground uppercase">Email</p>
+                  <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Email</p>
                   <p className="text-sm">contact@{selectedAccount.name.toLowerCase().replace(/\s/g, '')}.com</p>
                 </div>
                 <div className="space-y-1">
-                  <p className="text-xs font-medium text-muted-foreground uppercase">Billing Address</p>
-                  <p className="text-sm">123 Business Ave, Suite 500, New York, NY</p>
-                </div>
-                <div className="space-y-1">
-                  <p className="text-xs font-medium text-muted-foreground uppercase">Employee Count</p>
+                  <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Employee Count</p>
                   <p className="text-sm">450</p>
+                </div>
+                <div className="space-y-1 col-span-2">
+                  <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Billing Address</p>
+                  <p className="text-sm">123 Business Ave, Suite 500, New York, NY</p>
                 </div>
               </div>
             </TabsContent>
