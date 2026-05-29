@@ -8,6 +8,10 @@ import LogsTable from '@/components/dashboard/LogsTable';
 import SystemAlerts from '@/components/dashboard/SystemAlerts';
 import Communications from '@/components/dashboard/Communications';
 import BookingsTable from '@/components/dashboard/BookingsTable';
+import CorporateDirectories from '@/components/corporate/CorporateDirectories';
+import TravelPolicy from '@/components/corporate/TravelPolicy';
+import ExpenseAuditing from '@/components/corporate/ExpenseAuditing';
+import CustomEnquiries from '@/components/corporate/CustomEnquiries';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 
 const AdminPage = () => {
@@ -21,6 +25,12 @@ const AdminPage = () => {
     if (path === '/dashboard/alerts') return <SystemAlerts />;
     if (path === '/dashboard/comms') return <Communications />;
     if (path === '/dashboard/bookings') return <BookingsTable />;
+
+    // Corporate Ecosystem Section
+    if (path === '/corporate/directories') return <CorporateDirectories />;
+    if (path === '/corporate/policy') return <TravelPolicy />;
+    if (path === '/corporate/auditing') return <ExpenseAuditing />;
+    if (path === '/corporate/enquiries') return <CustomEnquiries />;
 
     // Placeholder for other sections
     const pathParts = path.split('/').filter(Boolean);
