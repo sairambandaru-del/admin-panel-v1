@@ -13,18 +13,18 @@ import { showSuccess } from '@/utils/toast';
 import { cn } from "@/lib/utils";
 
 const properties = [
-  { id: 'skyline', label: 'Skyline Suites' },
-  { id: 'ocean', label: 'Ocean View Residences' },
-  { id: 'garden', label: 'Garden Villas' },
-  { id: 'urban', label: 'Urban Lofts' },
-  { id: 'mountain', label: 'Mountain Cabins' },
+  { id: 'skyline', label: 'Skyline Suites', basePrice: 1250 },
+  { id: 'ocean', label: 'Ocean View Residences', basePrice: 1400 },
+  { id: 'garden', label: 'Garden Villas', basePrice: 1800 },
+  { id: 'urban', label: 'Urban Lofts', basePrice: 950 },
+  { id: 'mountain', label: 'Mountain Cabins', basePrice: 1100 },
 ];
 
 const BookingQuotation = () => {
   const [quote, setQuote] = useState({
-    dates: '',
-    bedroomType: '',
-    location: '',
+    dates: 'May 20 - May 25',
+    bedroomType: '2 Bedroom',
+    location: 'Downtown',
     adjustment: '0',
     selectedProperties: [] as string[]
   });
@@ -43,6 +43,12 @@ const BookingQuotation = () => {
     showSuccess("Quotation generated successfully.");
   };
 
+  const calculateTotal = (base: number) => {
+    const adj = parseFloat(quote.adjustment) || 0;
+    const serviceFee = 50;
+    return base + serviceFee + (base * (adj / 100));
+  };
+
   return (
     <div className="grid gap-6 md:grid-cols-3">
       <Card className="md:col-span-1">
@@ -54,11 +60,17 @@ const BookingQuotation = () => {
           <form onSubmit={handleGenerate} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="dates">Stay Dates</Label>
-              <Input id="dates" placeholder="e.g. May 20 - May 25" required />
+              <Input 
+                id="dates" 
+                value={quote.dates} 
+                onChange={(e) => setQuote({...quote, dates: e.target.value})}
+                placeholder="e.g. May 20 - May 25" 
+                required 
+              />
             </div>
             <div className="space-y-2">
               <Label htmlFor="bedroom">Bedroom Type</Label>
-              <Select onValueChange={(v) => setQuote({...quote, bedroomType: v})}>
+              <Select onValueChange={(v) => setQuote({...quote, bedroomType: v})} defaultValue="2br">
                 <SelectTrigger id="bedroom">
                   <SelectValue placeholder="Select type" />
                 </SelectTrigger>
@@ -130,7 +142,12 @@ const BookingQuotation = () => {
             </div>
             <div className="space-y-2">
               <Label htmlFor="adjustment">Discount / Surcharge (%)</Label>
-              <Input id="adjustment" type="number" defaultValue="0" />
+              <Input 
+                id="adjustment" 
+                type="number" 
+                value={quote.adjustment}
+                onChange={(e) => setQuote({...quote, adjustment: e.target.value})}
+              />
             </div>
             <Button type="submit" className="w-full gap-2 mt-4">
               <Calculator className="w-4 h-4" /> Generate Quote
@@ -146,12 +163,13 @@ const BookingQuotation = () => {
             <CardDescription>Review and send the generated quote.</CardDescription>
           </div>
           <div className="flex gap-2">
-            <Button variant="outline" size="sm"><Plus className="w-4 h-4 mr-2" /> Add Item</Button>
-            <Button variant="outline" size="sm" className="text-destructive"><Trash2 className="w-4 h-4 mr-2" /> Clear</Button>
+            <Button variant="outline" size="sm" className="text-destructive" onClick={() => setQuote({...quote, selectedProperties: []})}>
+              <Trash2 className="w-4 h-4 mr-2" /> Clear
+            </Button>
           </div>
         </CardHeader>
         <CardContent>
-          <div className="border rounded-xl p-8 bg-muted/10 min-h-[400px] flex flex-col">
+          <div className="border rounded-xl p-8 bg-muted/10 min-h-[600px] flex flex-col">
             <div className="flex justify-between items-start border-b pb-6 mb-6">
               <div>
                 <h3 className="text-2xl font-bold text-primary">straizen</h3>
@@ -163,45 +181,85 @@ const BookingQuotation = () => {
               </div>
             </div>
 
-            <div className="flex-1 space-y-6">
-              <div className="grid grid-cols-2 gap-8">
+            <div className="space-y-8">
+              {/* Stay Details - Shown Once */}
+              <div className="grid grid-cols-2 gap-8 bg-background p-4 rounded-lg border border-dashed">
                 <div>
                   <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-2">Guest Details</p>
                   <p className="text-sm font-medium">Pending Selection</p>
                 </div>
                 <div>
                   <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-2">Stay Details</p>
-                  <p className="text-sm font-medium">May 20 - May 25 (5 Nights)</p>
+                  <p className="text-sm font-medium">{quote.dates || 'Dates not set'}</p>
+                  <p className="text-xs text-muted-foreground mt-1">{quote.bedroomType} • {quote.location}</p>
                 </div>
               </div>
 
-              <div className="space-y-2">
-                <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-2">Items</p>
-                <div className="flex justify-between items-center py-2 border-b text-sm">
-                  <span>
-                    {quote.selectedProperties.length > 0 
-                      ? properties.filter(p => quote.selectedProperties.includes(p.id)).map(p => p.label).join(", ")
-                      : "Skyline Suite 101 (2 Bedroom)"}
-                  </span>
-                  <span className="font-semibold">$1,250.00</span>
-                </div>
-                <div className="flex justify-between items-center py-2 border-b text-sm">
-                  <span>Service Fee</span>
-                  <span className="font-semibold">$50.00</span>
-                </div>
+              {/* Property Tables */}
+              <div className="space-y-6">
+                {quote.selectedProperties.length > 0 ? (
+                  quote.selectedProperties.map((propId) => {
+                    const property = properties.find(p => p.id === propId);
+                    if (!property) return null;
+                    const total = calculateTotal(property.basePrice);
+
+                    return (
+                      <div key={propId} className="space-y-3">
+                        <div className="flex items-center gap-2">
+                          <div className="h-px flex-1 bg-border" />
+                          <span className="text-[10px] font-bold uppercase tracking-widest text-primary">{property.label}</span>
+                          <div className="h-px flex-1 bg-border" />
+                        </div>
+                        <div className="rounded-lg border bg-background overflow-hidden">
+                          <table className="w-full text-sm">
+                            <thead className="bg-muted/50 border-b">
+                              <tr>
+                                <th className="text-left p-3 font-medium">Description</th>
+                                <th className="text-right p-3 font-medium">Amount</th>
+                              </tr>
+                            </thead>
+                            <tbody className="divide-y">
+                              <tr>
+                                <td className="p-3">Base Rate ({quote.bedroomType})</td>
+                                <td className="p-3 text-right font-semibold">${property.basePrice.toFixed(2)}</td>
+                              </tr>
+                              <tr>
+                                <td className="p-3">Service Fee</td>
+                                <td className="p-3 text-right font-semibold">$50.00</td>
+                              </tr>
+                              {parseFloat(quote.adjustment) !== 0 && (
+                                <tr>
+                                  <td className="p-3">Adjustment ({quote.adjustment}%)</td>
+                                  <td className="p-3 text-right font-semibold">
+                                    ${(property.basePrice * (parseFloat(quote.adjustment) / 100)).toFixed(2)}
+                                  </td>
+                                </tr>
+                              )}
+                              <tr className="bg-primary/5">
+                                <td className="p-3 font-bold">Total for {property.label}</td>
+                                <td className="p-3 text-right font-bold text-primary">${total.toFixed(2)}</td>
+                              </tr>
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+                    );
+                  })
+                ) : (
+                  <div className="h-40 flex flex-col items-center justify-center border-2 border-dashed rounded-lg text-muted-foreground">
+                    <Plus className="w-8 h-8 mb-2 opacity-20" />
+                    <p className="text-sm">Select properties to generate preview tables</p>
+                  </div>
+                )}
               </div>
             </div>
 
-            <div className="mt-auto pt-6 border-t">
-              <div className="flex justify-between items-center mb-6">
-                <span className="text-lg font-bold">Total Amount</span>
-                <span className="text-2xl font-bold text-primary">$1,300.00</span>
-              </div>
+            <div className="mt-auto pt-8 border-t">
               <div className="flex gap-3">
-                <Button className="flex-1 gap-2">
-                  <Send className="w-4 h-4" /> Send to Guest
+                <Button className="flex-1 gap-2" disabled={quote.selectedProperties.length === 0}>
+                  <Send className="w-4 h-4" /> Send Quotation
                 </Button>
-                <Button variant="outline" className="gap-2">
+                <Button variant="outline" className="gap-2" disabled={quote.selectedProperties.length === 0}>
                   <FileText className="w-4 h-4" /> Download PDF
                 </Button>
               </div>
