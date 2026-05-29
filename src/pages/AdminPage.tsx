@@ -24,6 +24,8 @@ import VendorSOA from '@/components/vendors/VendorSOA';
 import Invoicing from '@/components/finance/Invoicing';
 import Payouts from '@/components/finance/Payouts';
 import Disputes from '@/components/finance/Disputes';
+import SettingsUsers from '@/components/settings/SettingsUsers';
+import SettingsAccounts from '@/components/settings/SettingsAccounts';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 
 const AdminPage = () => {
@@ -61,6 +63,10 @@ const AdminPage = () => {
     if (path === '/finance/invoicing') return <Invoicing />;
     if (path === '/finance/payouts') return <Payouts />;
     if (path === '/finance/disputes') return <Disputes />;
+
+    // Settings Section
+    if (path === '/settings/users') return <SettingsUsers />;
+    if (path === '/settings/accounts') return <SettingsAccounts />;
 
     // Placeholder for other sections
     const pathParts = path.split('/').filter(Boolean);
@@ -105,7 +111,7 @@ const AdminPage = () => {
     if (path.startsWith('/inventory')) return "Track unit availability, status, and PMS synchronization.";
     if (path.startsWith('/vendors')) return "Manage vendor registry, services, and performance.";
     if (path.startsWith('/finance')) return "Financial reporting, invoicing, and payout management.";
-    if (path.startsWith('/settings')) return "System configuration and user management.";
+    if (path.startsWith('/settings')) return "System configuration, corporate boundaries, and user permissions.";
     return "Manage your platform here.";
   };
 
