@@ -1,4 +1,3 @@
-character to > to prevent any future JSX compilation issues.">
 "use client";
 
 import React, { useState, useEffect } from 'react';
