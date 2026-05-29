@@ -8,20 +8,51 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Plus, FileText, Download, Search } from 'lucide-react';
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { 
+  Dialog, 
+  DialogContent, 
+  DialogDescription, 
+  DialogFooter, 
+  DialogHeader, 
+  DialogTitle, 
+  DialogTrigger 
+} from "@/components/ui/dialog";
 import { showSuccess } from '@/utils/toast';
 
 const Invoicing = () => {
   const [activeTab, setActiveTab] = useState('corporate');
-
-  const handleRaiseInvoice = () => {
-    showSuccess(`New ${activeTab.toUpperCase()} invoice raised successfully.`);
-  };
-
-  const invoices = [
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [invoices, setInvoices] = useState([
     { id: 'INV-2024-001', entity: 'TechCorp Solutions', date: '2024-05-20', amount: 4500.00, status: 'Paid', type: 'corporate' },
     { id: 'INV-2024-002', entity: 'Elite Housekeeping', date: '2024-05-18', amount: 1200.00, status: 'Pending', type: 'vendor' },
     { id: 'INV-2024-003', entity: 'Skyline Suite 402', date: '2024-05-15', amount: 850.00, status: 'Overdue', type: 'str' },
-  ];
+  ]);
+
+  const [formData, setFormData] = useState({
+    entity: '',
+    amount: '',
+    type: 'corporate',
+    date: new Date().toISOString().split('T')[0]
+  });
+
+  const handleRaiseInvoice = (e: React.FormEvent) => {
+    e.preventDefault();
+    const newInvoice = {
+      id: `INV-2024-00${invoices.length + 1}`,
+      entity: formData.entity,
+      date: formData.date,
+      amount: parseFloat(formData.amount),
+      status: 'Pending',
+      type: formData.type
+    };
+
+    setInvoices([newInvoice, ...invoices]);
+    setIsDialogOpen(false);
+    setFormData({ entity: '', amount: '', type: 'corporate', date: new Date().toISOString().split('T')[0] });
+    showSuccess(`Invoice ${newInvoice.id} raised for ${newInvoice.entity}.`);
+  };
 
   const filteredInvoices = invoices.filter(inv => inv.type === activeTab);
 
@@ -32,9 +63,78 @@ const Invoicing = () => {
           <Search className="w-4 h-4 text-muted-foreground" />
           <Input placeholder="Search invoices..." className="h-9" />
         </div>
-        <Button onClick={handleRaiseInvoice} className="gap-2">
-          <Plus className="w-4 h-4" /> Raise Invoice
-        </Button>
+        
+        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+          <DialogTrigger asChild>
+            <Button className="gap-2">
+              <Plus className="w-4 h-4" /> Raise Invoice
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-[425px]">
+            <form onSubmit={handleRaiseInvoice}>
+              <DialogHeader>
+                <DialogTitle>Raise New Invoice</DialogTitle>
+                <DialogDescription>
+                  Fill in the details below to create a new invoice and assign it to an account.
+                </DialogDescription>
+              </DialogHeader>
+              <div className="grid gap-4 py-4">
+                <div className="grid gap-2">
+                  <Label htmlFor="entity">Account / Entity Name</Label>
+                  <Input 
+                    id="entity" 
+                    placeholder="e.g. TechCorp Solutions" 
+                    value={formData.entity}
+                    onChange={(e) => setFormData({...formData, entity: e.target.value})}
+                    required 
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="grid gap-2">
+                    <Label htmlFor="type">Invoice Type</Label>
+                    <Select 
+                      value={formData.type} 
+                      onValueChange={(value) => setFormData({...formData, type: value})}
+                    >
+                      <SelectTrigger id="type">
+                        <SelectValue placeholder="Select type" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="corporate">Corporate</SelectItem>
+                        <SelectItem value="vendor">Vendor</SelectItem>
+                        <SelectItem value="str">STR</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="amount">Amount ($)</Label>
+                    <Input 
+                      id="amount" 
+                      type="number" 
+                      placeholder="0.00" 
+                      value={formData.amount}
+                      onChange={(e) => setFormData({...formData, amount: e.target.value})}
+                      required 
+                    />
+                  </div>
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="date">Invoice Date</Label>
+                  <Input 
+                    id="date" 
+                    type="date" 
+                    value={formData.date}
+                    onChange={(e) => setFormData({...formData, date: e.target.value})}
+                    required 
+                  />
+                </div>
+              </div>
+              <DialogFooter>
+                <Button type="submit" className="w-full">Create Invoice</Button>
+              </DialogFooter>
+            </form>
+          </DialogContent>
+        </Dialog>
       </div>
 
       <Tabs defaultValue="corporate" onValueChange={setActiveTab}>
