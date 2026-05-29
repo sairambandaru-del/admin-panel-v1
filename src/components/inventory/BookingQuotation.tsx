@@ -43,6 +43,18 @@ const BookingQuotation = () => {
     showSuccess("Quotation generated successfully.");
   };
 
+  const handleSendQuotation = () => {
+    showSuccess("Quotation has been sent to the guest's email.");
+  };
+
+  const handleDownloadPDF = () => {
+    showSuccess("Generating PDF...");
+    // Simulate a short delay for PDF generation
+    setTimeout(() => {
+      showSuccess("Quotation PDF downloaded successfully.");
+    }, 1000);
+  };
+
   const calculateTotal = (base: number) => {
     const adj = parseFloat(quote.adjustment) || 0;
     const serviceFee = 50;
@@ -256,10 +268,19 @@ const BookingQuotation = () => {
 
             <div className="mt-auto pt-8 border-t">
               <div className="flex gap-3">
-                <Button className="flex-1 gap-2" disabled={quote.selectedProperties.length === 0}>
+                <Button 
+                  className="flex-1 gap-2" 
+                  disabled={quote.selectedProperties.length === 0}
+                  onClick={handleSendQuotation}
+                >
                   <Send className="w-4 h-4" /> Send Quotation
                 </Button>
-                <Button variant="outline" className="gap-2" disabled={quote.selectedProperties.length === 0}>
+                <Button 
+                  variant="outline" 
+                  className="gap-2" 
+                  disabled={quote.selectedProperties.length === 0}
+                  onClick={handleDownloadPDF}
+                >
                   <FileText className="w-4 h-4" /> Download PDF
                 </Button>
               </div>
