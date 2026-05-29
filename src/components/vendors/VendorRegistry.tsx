@@ -1,3 +1,4 @@
+symbol as > in VendorRegistry.tsx">
 "use client";
 
 import React, { useState, useEffect } from 'react';
@@ -6,7 +7,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { ShieldCheck, Receipt, User, Building2, Mail, Phone } from 'lucide-react';
+import { ShieldCheck, Receipt, User, Building2, Mail } from 'lucide-react';
 import { usePlatformData, Account } from '@/context/PlatformDataContext';
 
 const VendorRegistry = () => {
