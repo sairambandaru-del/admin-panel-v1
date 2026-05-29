@@ -20,11 +20,27 @@ import {
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { User, Plus, Edit2, ShieldAlert, Power, HelpCircle } from 'lucide-react';
 import { showSuccess, showError } from '@/utils/toast';
-import { usePlatformData, PlatformUser } from '@/context/PlatformDataContext';
-import { AVAILABLE_MODULES } from './SettingsAccounts';
+import { initialAccounts, AVAILABLE_MODULES, Account } from './SettingsAccounts';
+
+interface PlatformUser {
+  id: string;
+  name: string;
+  email: string;
+  role: string;
+  accountId: string; // Belongs to an Account
+  status: 'Active' | 'Inactive';
+  customPermissions: string[]; // Must be a subset of account.allowedModules
+}
+
+const initialUsers: PlatformUser[] = [
+  { id: 'USR-01', name: 'Sarah Jenkins', email: 'sarah@techcorp.com', role: 'Account Admin', accountId: 'ACC-01', status: 'Active', customPermissions: ['dashboard', 'corporate'] },
+  { id: 'USR-02', name: 'David Miller', email: 'david.m@elitehouse.com', role: 'Staff Coordinator', accountId: 'ACC-02', status: 'Active', customPermissions: ['dashboard', 'vendors'] },
+  { id: 'USR-03', name: 'Emma Wilson', email: 'emma@skyline.com', role: 'Finance Analyst', accountId: 'ACC-03', status: 'Active', customPermissions: ['dashboard', 'finance'] },
+];
 
 const SettingsUsers = () => {
-  const { accounts, users, addUser, updateUser, toggleUserStatus } = usePlatformData();
+  const [users, setUsers] = useState<PlatformUser[]>(initialUsers);
+  const [accounts] = useState<Account[]>(initialAccounts);
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [isEditOpen, setIsEditOpen] = useState(false);
 
@@ -45,6 +61,7 @@ const SettingsUsers = () => {
   };
 
   const handleAccountChange = (accId: string) => {
+    // Automatically reset custom permissions to only the primary default if switching accounts
     const accModules = getSelectedAccountModules(accId);
     setFormData(prev => ({
       ...prev,
@@ -55,6 +72,7 @@ const SettingsUsers = () => {
 
   const handleTogglePermission = (permissionId: string) => {
     setFormData(prev => {
+      // Security Check: Is this permission allowed by the parent account?
       const parentModules = getSelectedAccountModules(prev.accountId);
       if (!parentModules.includes(permissionId)) {
         showError("Permission blocked: This capability is disabled for the parent Account.");
@@ -72,15 +90,19 @@ const SettingsUsers = () => {
 
   const handleCreate = (e: React.FormEvent) => {
     e.preventDefault();
-    const created = addUser({
+    const newUser: PlatformUser = {
+      id: `USR-0${users.length + 1}`,
       name: formData.name,
       email: formData.email,
       role: formData.role,
       accountId: formData.accountId,
+      status: 'Active',
       customPermissions: formData.customPermissions
-    });
+    };
 
+    setUsers([...users, newUser]);
     setIsCreateOpen(false);
+    // Reset Form
     setFormData({
       name: '',
       email: '',
@@ -88,12 +110,18 @@ const SettingsUsers = () => {
       accountId: accounts[0]?.id || '',
       customPermissions: []
     });
-    showSuccess(`User "${created.name}" successfully provisioned.`);
+    showSuccess(`User "${newUser.name}" successfully provisioned.`);
   };
 
-  const handleToggleStatus = (id: string, name: string) => {
-    toggleUserStatus(id);
-    showSuccess(`Status changed for user "${name}".`);
+  const handleToggleStatus = (id: string) => {
+    setUsers(prev => prev.map(u => {
+      if (u.id === id) {
+        const nextStatus = u.status === 'Active' ? 'Inactive' : 'Active';
+        showSuccess(`User account status updated to ${nextStatus}.`);
+        return { ...u, status: nextStatus };
+      }
+      return u;
+    }));
   };
 
   const handleEditClick = (user: PlatformUser) => {
@@ -112,14 +140,19 @@ const SettingsUsers = () => {
     e.preventDefault();
     if (!editingUser) return;
 
-    updateUser({
-      ...editingUser,
-      name: formData.name,
-      email: formData.email,
-      role: formData.role,
-      accountId: formData.accountId,
-      customPermissions: formData.customPermissions
-    });
+    setUsers(prev => prev.map(u => {
+      if (u.id === editingUser.id) {
+        return {
+          ...u,
+          name: formData.name,
+          email: formData.email,
+          role: formData.role,
+          accountId: formData.accountId,
+          customPermissions: formData.customPermissions
+        };
+      }
+      return u;
+    }));
 
     setIsEditOpen(false);
     setEditingUser(null);
@@ -136,7 +169,7 @@ const SettingsUsers = () => {
 
         <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
           <DialogTrigger asChild>
-            <Button className="gap-2" disabled={accounts.length === 0}>
+            <Button className="gap-2">
               <Plus className="w-4 h-4" /> Create User
             </Button>
           </DialogTrigger>
@@ -301,7 +334,7 @@ const SettingsUsers = () => {
                         <Button 
                           variant="ghost" 
                           size="icon" 
-                          onClick={() => handleToggleStatus(user.id, user.name)} 
+                          onClick={() => handleToggleStatus(user.id)} 
                           title={user.status === 'Active' ? "Deactivate User" : "Activate User"}
                           className={user.status === 'Active' ? "text-destructive hover:text-destructive" : "text-green-600 hover:text-green-600"}
                         >

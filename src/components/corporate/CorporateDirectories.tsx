@@ -1,40 +1,21 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { ShieldCheck, Receipt, User, Building2, Tag } from 'lucide-react';
-import { usePlatformData, Account } from '@/context/PlatformDataContext';
+import { FileText, ShieldCheck, Receipt, User, Building2, Tag } from 'lucide-react';
+
+const accounts = [
+  { id: 'CORP-001', name: 'TechCorp Solutions', manager: 'Sarah Jenkins', status: 'Active', type: 'Corporate' },
+  { id: 'CORP-002', name: 'Global Logistics Inc', manager: 'Michael Chen', status: 'Active', type: 'Corporate' },
+  { id: 'CORP-003', name: 'Innovate Media', manager: 'Emma Wilson', status: 'Pending', type: 'STR' },
+];
 
 const CorporateDirectories = () => {
-  const { accounts } = usePlatformData();
-  
-  // Filter for Corporate and STR type accounts
-  const corpAccounts = accounts.filter(acc => acc.type === 'Corporate' || acc.type === 'STR');
-  
-  const [selectedAccount, setSelectedAccount] = useState<Account | null>(null);
-
-  // Set default selection when data changes
-  useEffect(() => {
-    if (corpAccounts.length > 0) {
-      // Retain selection if valid, otherwise pick first
-      const exists = corpAccounts.find(a => a.id === selectedAccount?.id);
-      if (!exists) setSelectedAccount(corpAccounts[0]);
-    } else {
-      setSelectedAccount(null);
-    }
-  }, [accounts]);
-
-  if (!selectedAccount) {
-    return (
-      <Card className="p-8 text-center border-dashed">
-        <p className="text-muted-foreground">No Corporate or STR accounts found. Create one in Settings > Accounts.</p>
-      </Card>
-    );
-  }
+  const [selectedAccount, setSelectedAccount] = useState(accounts[0]);
 
   return (
     <div className="grid gap-6 md:grid-cols-4">
@@ -43,12 +24,12 @@ const CorporateDirectories = () => {
           <CardTitle className="text-lg">Accounts</CardTitle>
         </CardHeader>
         <CardContent className="p-0">
-          <div className="divide-y max-h-[500px] overflow-y-auto">
-            {corpAccounts.map((account) => (
+          <div className="divide-y">
+            {accounts.map((account) => (
               <button
                 key={account.id}
                 onClick={() => setSelectedAccount(account)}
-                className={`w-full text-left p-4 hover:bg-accent transition-colors ${selectedAccount.id === account.id ? 'bg-accent font-medium' : ''}`}
+                className={`w-full text-left p-4 hover:bg-accent transition-colors ${selectedAccount.id === account.id ? 'bg-accent' : ''}`}
               >
                 <p className="font-semibold text-sm">{account.name}</p>
                 <div className="flex flex-col gap-1 mt-1">
@@ -72,7 +53,7 @@ const CorporateDirectories = () => {
               <CardTitle>{selectedAccount.name}</CardTitle>
               <p className="text-sm text-muted-foreground">ID: {selectedAccount.id}</p>
             </div>
-            <Badge variant={selectedAccount.status === 'Active' ? 'default' : 'destructive'}>
+            <Badge variant={selectedAccount.status === 'Active' ? 'default' : 'secondary'}>
               {selectedAccount.status}
             </Badge>
           </div>
@@ -109,8 +90,8 @@ const CorporateDirectories = () => {
                   <p className="text-sm">contact@{selectedAccount.name.toLowerCase().replace(/\s/g, '')}.com</p>
                 </div>
                 <div className="space-y-1">
-                  <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Primary Domain</p>
-                  <p className="text-sm font-mono">{selectedAccount.domain}</p>
+                  <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Employee Count</p>
+                  <p className="text-sm">450</p>
                 </div>
                 <div className="space-y-1 col-span-2">
                   <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Billing Address</p>
