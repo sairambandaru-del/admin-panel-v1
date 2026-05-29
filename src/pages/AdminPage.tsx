@@ -21,6 +21,9 @@ import VendorRegistry from '@/components/vendors/VendorRegistry';
 import VendorServices from '@/components/vendors/VendorServices';
 import VendorPerformance from '@/components/vendors/VendorPerformance';
 import VendorSOA from '@/components/vendors/VendorSOA';
+import Invoicing from '@/components/finance/Invoicing';
+import Payouts from '@/components/finance/Payouts';
+import Disputes from '@/components/finance/Disputes';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 
 const AdminPage = () => {
@@ -53,6 +56,11 @@ const AdminPage = () => {
     if (path === '/vendors/services') return <VendorServices />;
     if (path === '/vendors/performance') return <VendorPerformance />;
     if (path === '/vendors/accounts') return <VendorSOA />;
+
+    // Finance Section
+    if (path === '/finance/invoicing') return <Invoicing />;
+    if (path === '/finance/payouts') return <Payouts />;
+    if (path === '/finance/disputes') return <Disputes />;
 
     // Placeholder for other sections
     const pathParts = path.split('/').filter(Boolean);
