@@ -1,4 +1,3 @@
-symbols as > in VendorRegistry.tsx to avoid any JSX compilation errors.">
 "use client";
 
 import React, { useState, useEffect } from 'react';
