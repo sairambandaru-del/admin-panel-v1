@@ -26,7 +26,9 @@ const VendorRegistry = () => {
   if (!selectedVendor) {
     return (
       <Card className="p-8 text-center border-dashed">
-        <p className="text-muted-foreground">No Vendor accounts found. Create one in Settings > Accounts with ecosystem type set to Vendor Provider.</p>
+        <p className="text-muted-foreground">
+          {"No Vendor accounts found. Create one in Settings > Accounts with ecosystem type set to Vendor Provider."}
+        </p>
       </Card>
     );
   }
