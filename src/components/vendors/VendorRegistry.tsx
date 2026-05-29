@@ -1,21 +1,35 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { ShieldCheck, Receipt, User, Building2, FileText, Mail, Phone } from 'lucide-react';
-
-const vendors = [
-  { id: 'VND-001', name: 'Elite Housekeeping', manager: 'David Miller', status: 'Verified', type: 'Service Provider' },
-  { id: 'VND-002', name: 'Swift Car Rentals', manager: 'Elena Rodriguez', status: 'Verified', type: 'Logistics' },
-  { id: 'VND-003', name: 'Gourmet Catering Co', manager: 'Marcus Chen', status: 'Pending', type: 'Food & Beverage' },
-];
+import { ShieldCheck, Receipt, User, Building2, Mail, Phone } from 'lucide-react';
+import { usePlatformData, Account } from '@/context/PlatformDataContext';
 
 const VendorRegistry = () => {
-  const [selectedVendor, setSelectedVendor] = useState(vendors[0]);
+  const { accounts } = usePlatformData();
+  const vendorAccounts = accounts.filter(acc => acc.type === 'Vendor');
+  const [selectedVendor, setSelectedVendor] = useState<Account | null>(null);
+
+  useEffect(() => {
+    if (vendorAccounts.length > 0) {
+      const exists = vendorAccounts.find(v => v.id === selectedVendor?.id);
+      if (!exists) setSelectedVendor(vendorAccounts[0]);
+    } else {
+      setSelectedVendor(null);
+    }
+  }, [accounts]);
+
+  if (!selectedVendor) {
+    return (
+      <Card className="p-8 text-center border-dashed">
+        <p className="text-muted-foreground">No Vendor accounts found. Create one in Settings > Accounts with ecosystem type set to Vendor Provider.</p>
+      </Card>
+    );
+  }
 
   return (
     <div className="grid gap-6 md:grid-cols-4">
@@ -24,12 +38,12 @@ const VendorRegistry = () => {
           <CardTitle className="text-lg">Vendor Accounts</CardTitle>
         </CardHeader>
         <CardContent className="p-0">
-          <div className="divide-y">
-            {vendors.map((vendor) => (
+          <div className="divide-y max-h-[500px] overflow-y-auto">
+            {vendorAccounts.map((vendor) => (
               <button
                 key={vendor.id}
                 onClick={() => setSelectedVendor(vendor)}
-                className={`w-full text-left p-4 hover:bg-accent transition-colors ${selectedVendor.id === vendor.id ? 'bg-accent' : ''}`}
+                className={`w-full text-left p-4 hover:bg-accent transition-colors ${selectedVendor.id === vendor.id ? 'bg-accent font-medium' : ''}`}
               >
                 <p className="font-semibold text-sm">{vendor.name}</p>
                 <div className="flex flex-col gap-1 mt-1">
@@ -53,8 +67,8 @@ const VendorRegistry = () => {
               <CardTitle>{selectedVendor.name}</CardTitle>
               <p className="text-sm text-muted-foreground">Vendor ID: {selectedVendor.id}</p>
             </div>
-            <Badge variant={selectedVendor.status === 'Verified' ? 'default' : 'secondary'}>
-              {selectedVendor.status}
+            <Badge variant={selectedVendor.status === 'Active' ? 'default' : 'destructive'}>
+              {selectedVendor.status === 'Active' ? 'Verified' : 'Deactivated'}
             </Badge>
           </div>
         </CardHeader>
@@ -80,7 +94,7 @@ const VendorRegistry = () => {
                 </div>
                 <div className="space-y-1">
                   <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Category</p>
-                  <p className="text-sm">{selectedVendor.type}</p>
+                  <p className="text-sm">{selectedVendor.type} Provider</p>
                 </div>
                 <div className="space-y-1">
                   <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Contact Email</p>
@@ -90,11 +104,8 @@ const VendorRegistry = () => {
                   </div>
                 </div>
                 <div className="space-y-1">
-                  <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Phone Number</p>
-                  <div className="flex items-center gap-2 text-sm">
-                    <Phone className="w-3.5 h-3.5 text-primary" />
-                    +1 (555) 000-1234
-                  </div>
+                  <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Company Domain</p>
+                  <p className="text-sm font-mono text-primary">{selectedVendor.domain}</p>
                 </div>
               </div>
               <div className="pt-4 border-t">

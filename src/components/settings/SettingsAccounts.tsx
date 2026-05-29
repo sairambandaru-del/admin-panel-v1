@@ -18,17 +18,9 @@ import {
   DialogTrigger 
 } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Building2, Plus, Edit2, Shield, Power } from 'lucide-react';
+import { Building2, Plus, Edit2, Power } from 'lucide-react';
 import { showSuccess } from '@/utils/toast';
-
-export interface Account {
-  id: string;
-  name: string;
-  type: 'STR' | 'Corporate' | 'Vendor';
-  domain: string;
-  allowedModules: string[];
-  status: 'Active' | 'Inactive';
-}
+import { usePlatformData, Account } from '@/context/PlatformDataContext';
 
 export const AVAILABLE_MODULES = [
   { id: 'dashboard', label: 'Dashboard & KPIs' },
@@ -38,15 +30,8 @@ export const AVAILABLE_MODULES = [
   { id: 'finance', label: 'Financial Reporting' }
 ];
 
-// Seed some initial accounts
-export const initialAccounts: Account[] = [
-  { id: 'ACC-01', name: 'TechCorp Solutions', type: 'Corporate', domain: 'techcorp.com', allowedModules: ['dashboard', 'corporate'], status: 'Active' },
-  { id: 'ACC-02', name: 'Elite Housekeeping', type: 'Vendor', domain: 'elitehouse.com', allowedModules: ['dashboard', 'vendors'], status: 'Active' },
-  { id: 'ACC-03', name: 'Skyline Holdings', type: 'STR', domain: 'skyline.com', allowedModules: ['dashboard', 'inventory', 'finance'], status: 'Active' },
-];
-
 const SettingsAccounts = () => {
-  const [accounts, setAccounts] = useState<Account[]>(initialAccounts);
+  const { accounts, addAccount, updateAccount, toggleAccountStatus } = usePlatformData();
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [isEditOpen, setIsEditOpen] = useState(false);
   
@@ -54,27 +39,25 @@ const SettingsAccounts = () => {
     name: '',
     type: 'Corporate' as Account['type'],
     domain: '',
-    allowedModules: ['dashboard'] as string[]
+    allowedModules: ['dashboard'] as string[],
+    manager: ''
   });
 
   const [editingAccount, setEditingAccount] = useState<Account | null>(null);
 
   const handleCreate = (e: React.FormEvent) => {
     e.preventDefault();
-    const newAccount: Account = {
-      id: `ACC-0${accounts.length + 1}`,
+    const created = addAccount({
       name: formData.name,
       type: formData.type,
       domain: formData.domain,
       allowedModules: formData.allowedModules,
-      status: 'Active'
-    };
+      manager: formData.manager || 'Unassigned'
+    });
 
-    setAccounts([...accounts, newAccount]);
     setIsCreateOpen(false);
-    // Reset
-    setFormData({ name: '', type: 'Corporate', domain: '', allowedModules: ['dashboard'] });
-    showSuccess(`Account "${newAccount.name}" created with custom access rights.`);
+    setFormData({ name: '', type: 'Corporate', domain: '', allowedModules: ['dashboard'], manager: '' });
+    showSuccess(`Account "${created.name}" created and synced globally.`);
   };
 
   const handleToggleModule = (moduleId: string) => {
@@ -86,15 +69,9 @@ const SettingsAccounts = () => {
     }));
   };
 
-  const handleToggleStatus = (id: string) => {
-    setAccounts(prev => prev.map(acc => {
-      if (acc.id === id) {
-        const nextStatus = acc.status === 'Active' ? 'Inactive' : 'Active';
-        showSuccess(`Account "${acc.name}" status set to ${nextStatus}.`);
-        return { ...acc, status: nextStatus };
-      }
-      return acc;
-    }));
+  const handleToggleStatus = (id: string, name: string) => {
+    toggleAccountStatus(id);
+    showSuccess(`Account status updated for "${name}".`);
   };
 
   const handleEditClick = (account: Account) => {
@@ -103,7 +80,8 @@ const SettingsAccounts = () => {
       name: account.name,
       type: account.type,
       domain: account.domain,
-      allowedModules: account.allowedModules
+      allowedModules: account.allowedModules,
+      manager: account.manager
     });
     setIsEditOpen(true);
   };
@@ -112,22 +90,18 @@ const SettingsAccounts = () => {
     e.preventDefault();
     if (!editingAccount) return;
 
-    setAccounts(prev => prev.map(acc => {
-      if (acc.id === editingAccount.id) {
-        return {
-          ...acc,
-          name: formData.name,
-          type: formData.type,
-          domain: formData.domain,
-          allowedModules: formData.allowedModules
-        };
-      }
-      return acc;
-    }));
+    updateAccount({
+      ...editingAccount,
+      name: formData.name,
+      type: formData.type,
+      domain: formData.domain,
+      allowedModules: formData.allowedModules,
+      manager: formData.manager
+    });
 
     setIsEditOpen(false);
     setEditingAccount(null);
-    showSuccess(`Account details updated successfully.`);
+    showSuccess(`Account details updated and synced.`);
   };
 
   return (
@@ -160,6 +134,16 @@ const SettingsAccounts = () => {
                     value={formData.name} 
                     onChange={e => setFormData({...formData, name: e.target.value})} 
                     placeholder="e.g. Acme Corp" 
+                    required 
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="manager">Account Manager Name</Label>
+                  <Input 
+                    id="manager" 
+                    value={formData.manager} 
+                    onChange={e => setFormData({...formData, manager: e.target.value})} 
+                    placeholder="e.g. Jane Wilson" 
                     required 
                   />
                 </div>
@@ -225,6 +209,7 @@ const SettingsAccounts = () => {
               <TableRow>
                 <TableHead>Account Name</TableHead>
                 <TableHead>Type</TableHead>
+                <TableHead>Account Manager</TableHead>
                 <TableHead>Domain</TableHead>
                 <TableHead>Access Scopes Allowed</TableHead>
                 <TableHead>Status</TableHead>
@@ -248,6 +233,7 @@ const SettingsAccounts = () => {
                       {account.type}
                     </Badge>
                   </TableCell>
+                  <TableCell className="font-medium text-sm">{account.manager}</TableCell>
                   <TableCell className="font-mono text-xs">{account.domain}</TableCell>
                   <TableCell>
                     <div className="flex flex-wrap gap-1 max-w-[320px]">
@@ -271,7 +257,7 @@ const SettingsAccounts = () => {
                       <Button 
                         variant="ghost" 
                         size="icon" 
-                        onClick={() => handleToggleStatus(account.id)} 
+                        onClick={() => handleToggleStatus(account.id, account.name)} 
                         title={account.status === 'Active' ? "Deactivate Account" : "Activate Account"}
                         className={account.status === 'Active' ? "text-destructive hover:text-destructive" : "text-green-600 hover:text-green-600"}
                       >
@@ -304,6 +290,15 @@ const SettingsAccounts = () => {
                     id="edit-name" 
                     value={formData.name} 
                     onChange={e => setFormData({...formData, name: e.target.value})} 
+                    required 
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="edit-manager">Account Manager Name</Label>
+                  <Input 
+                    id="edit-manager" 
+                    value={formData.manager} 
+                    onChange={e => setFormData({...formData, manager: e.target.value})} 
                     required 
                   />
                 </div>
