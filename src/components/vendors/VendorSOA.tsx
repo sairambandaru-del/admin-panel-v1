@@ -27,6 +27,7 @@ const VendorSOA = () => {
             <Table>
               <TableHeader>
                 <TableRow>
+                  <TableHead>Vendor</TableHead>
                   <TableHead>Statement Period</TableHead>
                   <TableHead>Total Earnings</TableHead>
                   <TableHead>Commission (15%)</TableHead>
@@ -37,6 +38,7 @@ const VendorSOA = () => {
               </TableHeader>
               <TableBody>
                 <TableRow>
+                  <TableCell className="text-xs font-medium">Elite Housekeeping</TableCell>
                   <TableCell className="font-medium">May 2024</TableCell>
                   <TableCell>$12,450.00</TableCell>
                   <TableCell>$1,867.50</TableCell>
@@ -45,6 +47,7 @@ const VendorSOA = () => {
                   <TableCell className="text-right"><Button variant="ghost" size="sm">View Details</Button></TableCell>
                 </TableRow>
                 <TableRow>
+                  <TableCell className="text-xs font-medium">Swift Car Rentals</TableCell>
                   <TableCell className="font-medium">April 2024</TableCell>
                   <TableCell>$15,200.00</TableCell>
                   <TableCell>$2,280.00</TableCell>
@@ -53,6 +56,7 @@ const VendorSOA = () => {
                   <TableCell className="text-right"><Button variant="ghost" size="sm">View Details</Button></TableCell>
                 </TableRow>
                 <TableRow>
+                  <TableCell className="text-xs font-medium">Gourmet Catering Co</TableCell>
                   <TableCell className="font-medium">March 2024</TableCell>
                   <TableCell>$11,800.00</TableCell>
                   <TableCell>$1,770.00</TableCell>

@@ -108,6 +108,7 @@ const VendorRegistry = () => {
                 <Table>
                   <TableHeader>
                     <TableRow>
+                      <TableHead>Vendor</TableHead>
                       <TableHead>Document Type</TableHead>
                       <TableHead>Status</TableHead>
                       <TableHead>Uploaded Date</TableHead>
@@ -116,18 +117,21 @@ const VendorRegistry = () => {
                   </TableHeader>
                   <TableBody>
                     <TableRow>
+                      <TableCell className="text-xs font-medium">{selectedVendor.name}</TableCell>
                       <TableCell className="font-medium">Trade License</TableCell>
                       <TableCell><Badge variant="default">Verified</Badge></TableCell>
                       <TableCell>2024-01-15</TableCell>
                       <TableCell className="text-right"><Button variant="ghost" size="sm">View</Button></TableCell>
                     </TableRow>
                     <TableRow>
+                      <TableCell className="text-xs font-medium">{selectedVendor.name}</TableCell>
                       <TableCell className="font-medium">Insurance Certificate</TableCell>
                       <TableCell><Badge variant="default">Verified</Badge></TableCell>
                       <TableCell>2024-02-10</TableCell>
                       <TableCell className="text-right"><Button variant="ghost" size="sm">View</Button></TableCell>
                     </TableRow>
                     <TableRow>
+                      <TableCell className="text-xs font-medium">{selectedVendor.name}</TableCell>
                       <TableCell className="font-medium">Tax Registration</TableCell>
                       <TableCell><Badge variant="secondary">Pending Review</Badge></TableCell>
                       <TableCell>2024-05-18</TableCell>
@@ -140,7 +144,7 @@ const VendorRegistry = () => {
 
             <TabsContent value="soa" className="space-y-4">
               <div className="flex justify-between items-center">
-                <h4 className="font-semibold">Financial Summary</h4>
+                <h4 className="font-semibold">Financial Summary - {selectedVendor.name}</h4>
                 <Button size="sm" variant="outline">Export PDF</Button>
               </div>
               <div className="grid grid-cols-3 gap-4 mb-4">

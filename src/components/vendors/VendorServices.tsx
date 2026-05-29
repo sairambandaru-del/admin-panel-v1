@@ -39,8 +39,8 @@ const categories = [
 const VendorServices = () => {
   const [category, setCategory] = useState('str');
   const [enquiries, setEnquiries] = useState([
-    { id: 'ENQ-101', guest: 'Alice Brown', service: 'Deep Cleaning', date: '2024-05-22', status: 'Pending' },
-    { id: 'ENQ-102', guest: 'Mark Wilson', service: 'Airport Transfer', date: '2024-05-23', status: 'Pending' },
+    { id: 'ENQ-101', vendor: 'Elite Housekeeping', guest: 'Alice Brown', service: 'Deep Cleaning', date: '2024-05-22', status: 'Pending' },
+    { id: 'ENQ-102', vendor: 'Swift Car Rentals', guest: 'Mark Wilson', service: 'Airport Transfer', date: '2024-05-23', status: 'Pending' },
   ]);
 
   const handleEnquiry = (id: string, action: 'Accepted' | 'Rejected') => {
@@ -92,6 +92,7 @@ const VendorServices = () => {
                 <Table>
                   <TableHeader>
                     <TableRow>
+                      <TableHead>Vendor</TableHead>
                       <TableHead>Date</TableHead>
                       <TableHead>Booking ID</TableHead>
                       <TableHead>Service</TableHead>
@@ -100,12 +101,14 @@ const VendorServices = () => {
                   </TableHeader>
                   <TableBody>
                     <TableRow>
+                      <TableCell className="text-xs font-medium">Elite Housekeeping</TableCell>
                       <TableCell>2024-05-15</TableCell>
                       <TableCell className="font-mono text-xs">BK-9921</TableCell>
                       <TableCell>Standard Service</TableCell>
                       <TableCell className="text-right font-bold">$120.00</TableCell>
                     </TableRow>
                     <TableRow>
+                      <TableCell className="text-xs font-medium">Swift Car Rentals</TableCell>
                       <TableCell>2024-05-14</TableCell>
                       <TableCell className="font-mono text-xs">BK-9918</TableCell>
                       <TableCell>Premium Add-on</TableCell>
@@ -128,6 +131,7 @@ const VendorServices = () => {
                 <Table>
                   <TableHeader>
                     <TableRow>
+                      <TableHead>Vendor</TableHead>
                       <TableHead>Payout ID</TableHead>
                       <TableHead>Date</TableHead>
                       <TableHead>Method</TableHead>
@@ -137,6 +141,7 @@ const VendorServices = () => {
                   </TableHeader>
                   <TableBody>
                     <TableRow>
+                      <TableCell className="text-xs font-medium">Elite Housekeeping</TableCell>
                       <TableCell className="font-bold">PAY-882</TableCell>
                       <TableCell>2024-05-01</TableCell>
                       <TableCell>Bank Transfer</TableCell>
@@ -174,6 +179,7 @@ const VendorServices = () => {
                 <Table>
                   <TableHeader>
                     <TableRow>
+                      <TableHead>Vendor</TableHead>
                       <TableHead>ID</TableHead>
                       <TableHead>Issue</TableHead>
                       <TableHead>Priority</TableHead>
@@ -182,6 +188,7 @@ const VendorServices = () => {
                   </TableHeader>
                   <TableBody>
                     <TableRow>
+                      <TableCell className="text-xs font-medium">Gourmet Catering Co</TableCell>
                       <TableCell className="font-bold">ESC-004</TableCell>
                       <TableCell>Service Delay Complaint</TableCell>
                       <TableCell><Badge variant="destructive">High</Badge></TableCell>
@@ -205,6 +212,7 @@ const VendorServices = () => {
                 <Table>
                   <TableHeader>
                     <TableRow>
+                      <TableHead>Vendor</TableHead>
                       <TableHead>Enquiry ID</TableHead>
                       <TableHead>Guest</TableHead>
                       <TableHead>Service Requested</TableHead>
@@ -216,6 +224,7 @@ const VendorServices = () => {
                   <TableBody>
                     {enquiries.map((enq) => (
                       <TableRow key={enq.id}>
+                        <TableCell className="text-xs font-medium">{enq.vendor}</TableCell>
                         <TableCell className="font-bold">{enq.id}</TableCell>
                         <TableCell>{enq.guest}</TableCell>
                         <TableCell>{enq.service}</TableCell>
