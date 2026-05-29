@@ -6,8 +6,19 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { FileText, Calculator, Send, Plus, Trash2 } from 'lucide-react';
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Checkbox } from "@/components/ui/checkbox";
+import { FileText, Calculator, Send, Plus, Trash2, ChevronDown, Check } from 'lucide-react';
 import { showSuccess } from '@/utils/toast';
+import { cn } from "@/lib/utils";
+
+const properties = [
+  { id: 'skyline', label: 'Skyline Suites' },
+  { id: 'ocean', label: 'Ocean View Residences' },
+  { id: 'garden', label: 'Garden Villas' },
+  { id: 'urban', label: 'Urban Lofts' },
+  { id: 'mountain', label: 'Mountain Cabins' },
+];
 
 const BookingQuotation = () => {
   const [quote, setQuote] = useState({
@@ -15,8 +26,17 @@ const BookingQuotation = () => {
     bedroomType: '',
     location: '',
     adjustment: '0',
-    property: ''
+    selectedProperties: [] as string[]
   });
+
+  const handlePropertyToggle = (propertyId: string) => {
+    setQuote(prev => ({
+      ...prev,
+      selectedProperties: prev.selectedProperties.includes(propertyId)
+        ? prev.selectedProperties.filter(id => id !== propertyId)
+        : [...prev.selectedProperties, propertyId]
+    }));
+  };
 
   const handleGenerate = (e: React.FormEvent) => {
     e.preventDefault();
@@ -64,17 +84,49 @@ const BookingQuotation = () => {
               </Select>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="property">Property</Label>
-              <Select onValueChange={(v) => setQuote({...quote, property: v})}>
-                <SelectTrigger id="property">
-                  <SelectValue placeholder="Select property" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="skyline">Skyline Suites</SelectItem>
-                  <SelectItem value="ocean">Ocean View Residences</SelectItem>
-                  <SelectItem value="garden">Garden Villas</SelectItem>
-                </SelectContent>
-              </Select>
+              <Label>Properties</Label>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button 
+                    variant="outline" 
+                    role="combobox" 
+                    className="w-full justify-between font-normal hover:bg-background"
+                  >
+                    <span className="truncate">
+                      {quote.selectedProperties.length === 0 
+                        ? "Select properties" 
+                        : `${quote.selectedProperties.length} selected`}
+                    </span>
+                    <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-0" align="start">
+                  <div className="p-2 space-y-1">
+                    {properties.map((prop) => (
+                      <div 
+                        key={prop.id}
+                        className="flex items-center space-x-2 p-2 rounded-sm hover:bg-accent cursor-pointer"
+                        onClick={() => handlePropertyToggle(prop.id)}
+                      >
+                        <Checkbox 
+                          id={prop.id} 
+                          checked={quote.selectedProperties.includes(prop.id)}
+                          onCheckedChange={() => handlePropertyToggle(prop.id)}
+                        />
+                        <Label 
+                          htmlFor={prop.id} 
+                          className="flex-1 cursor-pointer text-sm font-normal"
+                        >
+                          {prop.label}
+                        </Label>
+                        {quote.selectedProperties.includes(prop.id) && (
+                          <Check className="h-4 w-4 text-primary" />
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </PopoverContent>
+              </Popover>
             </div>
             <div className="space-y-2">
               <Label htmlFor="adjustment">Discount / Surcharge (%)</Label>
@@ -126,7 +178,11 @@ const BookingQuotation = () => {
               <div className="space-y-2">
                 <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-2">Items</p>
                 <div className="flex justify-between items-center py-2 border-b text-sm">
-                  <span>Skyline Suite 101 (2 Bedroom)</span>
+                  <span>
+                    {quote.selectedProperties.length > 0 
+                      ? properties.filter(p => quote.selectedProperties.includes(p.id)).map(p => p.label).join(", ")
+                      : "Skyline Suite 101 (2 Bedroom)"}
+                  </span>
                   <span className="font-semibold">$1,250.00</span>
                 </div>
                 <div className="flex justify-between items-center py-2 border-b text-sm">
