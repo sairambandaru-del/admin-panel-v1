@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Plus, FileText, Download, Search } from 'lucide-react';
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, SelectGroup, SelectLabel } from "@/components/ui/select";
 import { 
   Dialog, 
   DialogContent, 
@@ -20,6 +20,12 @@ import {
   DialogTrigger 
 } from "@/components/ui/dialog";
 import { showSuccess } from '@/utils/toast';
+
+const ACCOUNTS = {
+  corporate: ['TechCorp Solutions', 'Global Logistics', 'Innovate Inc', 'Future Systems'],
+  vendor: ['Elite Housekeeping', 'Swift Car Rentals', 'Gourmet Catering Co', 'Laundry Pros'],
+  str: ['Skyline Suite 402', 'Ocean View 105', 'Mountain Retreat 202', 'Urban Loft 3B']
+};
 
 const Invoicing = () => {
   const [activeTab, setActiveTab] = useState('corporate');
@@ -75,19 +81,41 @@ const Invoicing = () => {
               <DialogHeader>
                 <DialogTitle>Raise New Invoice</DialogTitle>
                 <DialogDescription>
-                  Fill in the details below to create a new invoice and assign it to an account.
+                  Select an account and fill in the details to create a new invoice.
                 </DialogDescription>
               </DialogHeader>
               <div className="grid gap-4 py-4">
                 <div className="grid gap-2">
                   <Label htmlFor="entity">Account / Entity Name</Label>
-                  <Input 
-                    id="entity" 
-                    placeholder="e.g. TechCorp Solutions" 
-                    value={formData.entity}
-                    onChange={(e) => setFormData({...formData, entity: e.target.value})}
-                    required 
-                  />
+                  <Select 
+                    value={formData.entity} 
+                    onValueChange={(value) => setFormData({...formData, entity: value})}
+                    required
+                  >
+                    <SelectTrigger id="entity">
+                      <SelectValue placeholder="Select an account" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectGroup>
+                        <SelectLabel>Corporate</SelectLabel>
+                        {ACCOUNTS.corporate.map(acc => (
+                          <SelectItem key={acc} value={acc}>{acc}</SelectItem>
+                        ))}
+                      </SelectGroup>
+                      <SelectGroup>
+                        <SelectLabel>Vendor</SelectLabel>
+                        {ACCOUNTS.vendor.map(acc => (
+                          <SelectItem key={acc} value={acc}>{acc}</SelectItem>
+                        ))}
+                      </SelectGroup>
+                      <SelectGroup>
+                        <SelectLabel>STR</SelectLabel>
+                        {ACCOUNTS.str.map(acc => (
+                          <SelectItem key={acc} value={acc}>{acc}</SelectItem>
+                        ))}
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="grid gap-2">
