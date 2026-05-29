@@ -18,23 +18,44 @@ import {
   DialogTitle, 
   DialogTrigger 
 } from "@/components/ui/dialog";
-import { AlertCircle, CheckCircle2, Clock, Plus, MessageSquare } from 'lucide-react';
+import { AlertCircle, CheckCircle2, Clock, Plus, MessageSquare, Ticket } from 'lucide-react';
 import { showSuccess } from '@/utils/toast';
+
+// Mock database of active/past bookings
+const BOOKINGS = [
+  { id: 'BK-9021', guestName: 'Robert Fox', unit: 'Skyline Suite 402', bookingAmount: 450.00 },
+  { id: 'BK-8834', guestName: 'Jane Cooper', unit: 'Ocean View 105', bookingAmount: 600.00 },
+  { id: 'BK-7712', guestName: 'Cody Fisher', unit: 'Mountain Retreat 202', bookingAmount: 350.00 },
+  { id: 'BK-5543', guestName: 'Esther Howard', unit: 'Urban Loft 3B', bookingAmount: 200.00 },
+  { id: 'BK-4412', guestName: 'Leslie Alexander', unit: 'Beachside Villa 12', bookingAmount: 1200.00 }
+];
 
 const Disputes = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [disputes, setDisputes] = useState([
-    { id: 'DSP-101', guest: 'Robert Fox', issue: 'AC Leakage Damage', amount: 150.00, status: 'Open', priority: 'High', date: '2024-05-20' },
-    { id: 'DSP-102', guest: 'Jane Cooper', issue: 'Late Check-in Refund', amount: 50.00, status: 'In Progress', priority: 'Medium', date: '2024-05-19' },
-    { id: 'DSP-103', guest: 'Cody Fisher', issue: 'Missing Amenities', amount: 25.00, status: 'Resolved', priority: 'Low', date: '2024-05-15' },
+    { id: 'DSP-101', bookingId: 'BK-9021', guest: 'Robert Fox', issue: 'AC Leakage Damage', amount: 150.00, status: 'Open', priority: 'High', date: '2024-05-20' },
+    { id: 'DSP-102', bookingId: 'BK-8834', guest: 'Jane Cooper', issue: 'Late Check-in Refund', amount: 50.00, status: 'In Progress', priority: 'Medium', date: '2024-05-19' },
+    { id: 'DSP-103', bookingId: 'BK-7712', guest: 'Cody Fisher', issue: 'Missing Amenities', amount: 25.00, status: 'Resolved', priority: 'Low', date: '2024-05-15' },
   ]);
 
   const [formData, setFormData] = useState({
+    bookingId: '',
     guest: '',
     issue: '',
     amount: '',
     priority: 'Medium'
   });
+
+  const handleBookingSelect = (bookingId: string) => {
+    const selectedBooking = BOOKINGS.find(b => b.id === bookingId);
+    if (selectedBooking) {
+      setFormData({
+        ...formData,
+        bookingId: selectedBooking.id,
+        guest: selectedBooking.guestName,
+      });
+    }
+  };
 
   const handleResolve = (id: string) => {
     setDisputes(prev => prev.map(d => d.id === id ? { ...d, status: 'Resolved' } : d));
@@ -43,8 +64,11 @@ const Disputes = () => {
 
   const handleCreateTicket = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!formData.bookingId) return;
+
     const newTicket = {
       id: `DSP-${100 + disputes.length + 1}`,
+      bookingId: formData.bookingId,
       guest: formData.guest,
       issue: formData.issue,
       amount: parseFloat(formData.amount) || 0,
@@ -55,8 +79,8 @@ const Disputes = () => {
 
     setDisputes([newTicket, ...disputes]);
     setIsDialogOpen(false);
-    setFormData({ guest: '', issue: '', amount: '', priority: 'Medium' });
-    showSuccess(`Ticket ${newTicket.id} created successfully.`);
+    setFormData({ bookingId: '', guest: '', issue: '', amount: '', priority: 'Medium' });
+    showSuccess(`Ticket ${newTicket.id} raised successfully for booking ${newTicket.bookingId}.`);
   };
 
   return (
@@ -75,20 +99,43 @@ const Disputes = () => {
               <DialogHeader>
                 <DialogTitle>Create Dispute Ticket</DialogTitle>
                 <DialogDescription>
-                  Raise a new ticket for guest issues or refund requests.
+                  Select a booking to pull guest details and raise a refund ticket.
                 </DialogDescription>
               </DialogHeader>
               <div className="grid gap-4 py-4">
                 <div className="grid gap-2">
-                  <Label htmlFor="guest">Guest Name</Label>
-                  <Input 
-                    id="guest" 
-                    placeholder="e.g. Robert Fox" 
-                    value={formData.guest}
-                    onChange={(e) => setFormData({...formData, guest: e.target.value})}
-                    required 
-                  />
+                  <Label htmlFor="booking">Select Booking ID</Label>
+                  <Select 
+                    value={formData.bookingId} 
+                    onValueChange={handleBookingSelect}
+                    required
+                  >
+                    <SelectTrigger id="booking">
+                      <SelectValue placeholder="Choose a booking..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {BOOKINGS.map((b) => (
+                        <SelectItem key={b.id} value={b.id}>
+                          {b.id} - {b.guestName} ({b.unit})
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
+
+                {formData.guest && (
+                  <div className="rounded-lg bg-muted p-3 text-sm space-y-1">
+                    <p className="text-muted-foreground text-xs font-semibold uppercase tracking-wider">Booking Details</p>
+                    <p className="font-medium text-foreground">Guest: {formData.guest}</p>
+                    <p className="text-muted-foreground">
+                      Unit: {BOOKINGS.find(b => b.id === formData.bookingId)?.unit}
+                    </p>
+                    <p className="text-muted-foreground">
+                      Total Booked Value: ${BOOKINGS.find(b => b.id === formData.bookingId)?.bookingAmount.toFixed(2)}
+                    </p>
+                  </div>
+                )}
+
                 <div className="grid gap-2">
                   <Label htmlFor="issue">Issue Description</Label>
                   <Textarea 
@@ -130,7 +177,9 @@ const Disputes = () => {
                 </div>
               </div>
               <DialogFooter>
-                <Button type="submit" className="w-full">Create Ticket</Button>
+                <Button type="submit" className="w-full" disabled={!formData.bookingId}>
+                  Create Ticket
+                </Button>
               </DialogFooter>
             </form>
           </DialogContent>
@@ -148,6 +197,7 @@ const Disputes = () => {
               <TableHeader>
                 <TableRow>
                   <TableHead>Ticket ID</TableHead>
+                  <TableHead>Booking ID</TableHead>
                   <TableHead>Guest</TableHead>
                   <TableHead>Issue Description</TableHead>
                   <TableHead>Amount</TableHead>
@@ -160,6 +210,7 @@ const Disputes = () => {
                 {disputes.map((d) => (
                   <TableRow key={d.id}>
                     <TableCell className="font-bold">{d.id}</TableCell>
+                    <TableCell className="font-medium text-muted-foreground">{d.bookingId}</TableCell>
                     <TableCell>{d.guest}</TableCell>
                     <TableCell>
                       <div className="flex flex-col">
