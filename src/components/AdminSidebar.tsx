@@ -29,7 +29,8 @@ import {
   Star,
   Receipt,
   CreditCard,
-  AlertCircle
+  AlertCircle,
+  Sparkles
 } from 'lucide-react';
 import { cn } from "@/lib/utils";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -118,20 +119,27 @@ const AdminSidebar = () => {
   const location = useLocation();
 
   return (
-    <div className="flex flex-col h-screen w-64 border-r bg-card text-card-foreground">
-      <div className="p-6 border-b">
-        <h1 className="text-xl font-bold tracking-tight text-primary">Company Admin</h1>
+    <div className="flex flex-col h-screen w-64 border-r bg-sidebar text-sidebar-foreground">
+      <div className="p-6 border-b border-sidebar-border">
+        <div className="flex items-center gap-2">
+          <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
+            <Sparkles className="w-5 h-5 text-primary-foreground" />
+          </div>
+          <h1 className="text-xl font-bold tracking-tight">
+            str<span className="text-primary">ai</span>zen
+          </h1>
+        </div>
       </div>
       <ScrollArea className="flex-1 px-3 py-4">
         <nav className="space-y-2">
           {navigation.map((section) => (
             <Collapsible key={section.title} defaultOpen={location.pathname.startsWith(section.href)}>
-              <CollapsibleTrigger className="flex items-center justify-between w-full p-2 rounded-lg hover:bg-accent transition-colors group">
+              <CollapsibleTrigger className="flex items-center justify-between w-full p-2 rounded-lg hover:bg-sidebar-accent transition-colors group">
                 <div className="flex items-center gap-3">
-                  {section.icon && <section.icon className="w-5 h-5 text-muted-foreground group-hover:text-primary" />}
-                  <span className="font-medium">{section.title}</span>
+                  {section.icon && <section.icon className="w-5 h-5 text-sidebar-foreground/70 group-hover:text-primary" />}
+                  <span className="font-medium text-sm">{section.title}</span>
                 </div>
-                <ChevronRight className="w-4 h-4 text-muted-foreground transition-transform duration-200 group-data-[state=open]:rotate-90" />
+                <ChevronRight className="w-4 h-4 text-sidebar-foreground/50 transition-transform duration-200 group-data-[state=open]:rotate-90" />
               </CollapsibleTrigger>
               <CollapsibleContent className="pl-9 mt-1 space-y-1">
                 {section.items?.map((item) => (
@@ -139,13 +147,13 @@ const AdminSidebar = () => {
                     key={item.href}
                     to={item.href}
                     className={cn(
-                      "flex items-center gap-3 p-2 rounded-md text-sm transition-colors",
+                      "flex items-center gap-3 p-2 rounded-md text-xs transition-colors",
                       location.pathname === item.href 
-                        ? "bg-primary text-primary-foreground font-medium" 
-                        : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
+                        ? "bg-primary text-primary-foreground font-semibold" 
+                        : "text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-foreground"
                     )}
                   >
-                    {item.icon && <item.icon className="w-4 h-4" />}
+                    {item.icon && <item.icon className="w-3.5 h-3.5" />}
                     {item.title}
                   </Link>
                 ))}
@@ -154,8 +162,8 @@ const AdminSidebar = () => {
           ))}
         </nav>
       </ScrollArea>
-      <div className="p-4 border-t text-xs text-muted-foreground text-center">
-        v1.0.0 Admin Panel
+      <div className="p-4 border-t border-sidebar-border text-[10px] text-sidebar-foreground/40 text-center uppercase tracking-widest">
+        straizen admin v1.0
       </div>
     </div>
   );
