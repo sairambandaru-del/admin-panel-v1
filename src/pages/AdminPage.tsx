@@ -12,6 +12,11 @@ import CorporateDirectories from '@/components/corporate/CorporateDirectories';
 import TravelPolicy from '@/components/corporate/TravelPolicy';
 import ExpenseAuditing from '@/components/corporate/ExpenseAuditing';
 import CustomEnquiries from '@/components/corporate/CustomEnquiries';
+import AvailabilityCalendar from '@/components/inventory/AvailabilityCalendar';
+import BookingReport from '@/components/inventory/BookingReport';
+import UnitStatus from '@/components/inventory/UnitStatus';
+import PMSSync from '@/components/inventory/PMSSync';
+import BookingQuotation from '@/components/inventory/BookingQuotation';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 
 const AdminPage = () => {
@@ -31,6 +36,13 @@ const AdminPage = () => {
     if (path === '/corporate/policy') return <TravelPolicy />;
     if (path === '/corporate/auditing') return <ExpenseAuditing />;
     if (path === '/corporate/enquiries') return <CustomEnquiries />;
+
+    // Unit Inventory Section
+    if (path === '/inventory/calendar') return <AvailabilityCalendar />;
+    if (path === '/inventory/bookings') return <BookingReport />;
+    if (path === '/inventory/status') return <UnitStatus />;
+    if (path === '/inventory/pms') return <PMSSync />;
+    if (path === '/inventory/quotation') return <BookingQuotation />;
 
     // Placeholder for other sections
     const pathParts = path.split('/').filter(Boolean);
