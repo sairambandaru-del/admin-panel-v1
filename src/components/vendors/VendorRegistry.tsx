@@ -21,7 +21,7 @@ const VendorRegistry = () => {
     } else {
       setSelectedVendor(null);
     }
-  }, [accounts]);
+  }, [accounts, vendorAccounts, selectedVendor]);
 
   if (!selectedVendor) {
     return (
