@@ -17,6 +17,10 @@ import BookingReport from '@/components/inventory/BookingReport';
 import UnitStatus from '@/components/inventory/UnitStatus';
 import PMSSync from '@/components/inventory/PMSSync';
 import BookingQuotation from '@/components/inventory/BookingQuotation';
+import VendorRegistry from '@/components/vendors/VendorRegistry';
+import VendorServices from '@/components/vendors/VendorServices';
+import VendorPerformance from '@/components/vendors/VendorPerformance';
+import VendorSOA from '@/components/vendors/VendorSOA';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 
 const AdminPage = () => {
@@ -43,6 +47,12 @@ const AdminPage = () => {
     if (path === '/inventory/status') return <UnitStatus />;
     if (path === '/inventory/pms') return <PMSSync />;
     if (path === '/inventory/quotation') return <BookingQuotation />;
+
+    // Vendors Section
+    if (path === '/vendors/registry') return <VendorRegistry />;
+    if (path === '/vendors/services') return <VendorServices />;
+    if (path === '/vendors/performance') return <VendorPerformance />;
+    if (path === '/vendors/accounts') return <VendorSOA />;
 
     // Placeholder for other sections
     const pathParts = path.split('/').filter(Boolean);
