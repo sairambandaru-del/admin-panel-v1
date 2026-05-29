@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { FileText, Calculator, Send, Plus, Trash2 } from 'lucide-react';
+import { FileText, Calculator, Send, Plus, Trash2, DollarSign } from 'lucide-react';
 import { showSuccess } from '@/utils/toast';
 
 const BookingQuotation = () => {
@@ -15,6 +15,7 @@ const BookingQuotation = () => {
     bedroomType: '',
     location: '',
     adjustment: '0',
+    fixedCharge: '0',
     property: ''
   });
 
@@ -76,9 +77,25 @@ const BookingQuotation = () => {
                 </SelectContent>
               </Select>
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="adjustment">Discount / Surcharge (%)</Label>
-              <Input id="adjustment" type="number" defaultValue="0" />
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="adjustment">Adjustment (%)</Label>
+                <Input 
+                  id="adjustment" 
+                  type="number" 
+                  defaultValue="0" 
+                  onChange={(e) => setQuote({...quote, adjustment: e.target.value})}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="fixedCharge">Fixed Charge ($)</Label>
+                <Input 
+                  id="fixedCharge" 
+                  type="number" 
+                  defaultValue="0" 
+                  onChange={(e) => setQuote({...quote, fixedCharge: e.target.value})}
+                />
+              </div>
             </div>
             <Button type="submit" className="w-full gap-2 mt-4">
               <Calculator className="w-4 h-4" /> Generate Quote
@@ -133,13 +150,21 @@ const BookingQuotation = () => {
                   <span>Service Fee</span>
                   <span className="font-semibold">$50.00</span>
                 </div>
+                {parseFloat(quote.fixedCharge) !== 0 && (
+                  <div className="flex justify-between items-center py-2 border-b text-sm">
+                    <span>Additional Fixed Charge</span>
+                    <span className="font-semibold">${parseFloat(quote.fixedCharge).toFixed(2)}</span>
+                  </div>
+                )}
               </div>
             </div>
 
             <div className="mt-auto pt-6 border-t">
               <div className="flex justify-between items-center mb-6">
                 <span className="text-lg font-bold">Total Amount</span>
-                <span className="text-2xl font-bold text-primary">$1,300.00</span>
+                <span className="text-2xl font-bold text-primary">
+                  ${(1300 + parseFloat(quote.fixedCharge)).toFixed(2)}
+                </span>
               </div>
               <div className="flex gap-3">
                 <Button className="flex-1 gap-2">
