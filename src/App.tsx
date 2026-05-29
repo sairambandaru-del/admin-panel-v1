@@ -2,11 +2,10 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import AdminPage from "./pages/AdminPage";
-import VendorServices from "./pages/vendors/VendorServices";
 
 const queryClient = new QueryClient();
 
@@ -19,15 +18,22 @@ const App = () => (
         <Routes>
           <Route path="/" element={<Index />} />
           
-          {/* Specific Vendor Routes */}
-          <Route path="/vendors/services" element={<VendorServices />} />
-          
-          {/* Generic Admin Routes */}
+          {/* Dashboard Routes */}
           <Route path="/dashboard/*" element={<AdminPage />} />
+          
+          {/* Corporate Routes */}
           <Route path="/corporate/*" element={<AdminPage />} />
+          
+          {/* Inventory Routes */}
           <Route path="/inventory/*" element={<AdminPage />} />
+          
+          {/* Vendor Routes */}
           <Route path="/vendors/*" element={<AdminPage />} />
+          
+          {/* Finance Routes */}
           <Route path="/finance/*" element={<AdminPage />} />
+          
+          {/* Settings Routes */}
           <Route path="/settings/*" element={<AdminPage />} />
 
           <Route path="*" element={<NotFound />} />
