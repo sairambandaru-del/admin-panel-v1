@@ -13,10 +13,10 @@ import { showSuccess } from '@/utils/toast';
 
 interface Booking {
   id: string;
-  status: 'Completed' | 'Confirmed' | 'In Progress' | 'Cancelled';
-  startDate: string; // Start date and time stamp
-  endDate: string; // End date and time stamp
-  bookingDate: string; // Booking date
+  status: 'Enquiry' | 'Confirmed' | 'Checked in' | 'Checked out' | 'Cancelled' | 'Completed';
+  startDate: string;
+  endDate: string;
+  bookingDate: string;
   guestName: string;
   contactNumber: string;
   emailId: string;
@@ -28,7 +28,7 @@ interface Booking {
 const initialBookings: Booking[] = [
   {
     id: 'BK-5501',
-    status: 'Completed',
+    status: 'Checked out',
     startDate: '2024-05-02 14:00',
     endDate: '2024-05-05 11:00',
     bookingDate: '2024-04-15',
@@ -67,7 +67,7 @@ const initialBookings: Booking[] = [
   },
   {
     id: 'BK-5504',
-    status: 'In Progress',
+    status: 'Completed',
     startDate: '2024-05-08 12:00',
     endDate: '2024-05-14 12:00',
     bookingDate: '2024-04-25',
@@ -103,8 +103,66 @@ const initialBookings: Booking[] = [
     serviceCategory: 'Wellness',
     amount: 150.00,
     unit: 'Spa & Massage Session'
+  },
+  {
+    id: 'BK-5507',
+    status: 'Enquiry',
+    startDate: '2024-05-22 14:00',
+    endDate: '2024-05-25 11:00',
+    bookingDate: '2024-05-10',
+    guestName: 'Sophia Loren',
+    contactNumber: '+1 (555) 444-5555',
+    emailId: 'sophia@cinema.it',
+    serviceCategory: 'Short Term Rentals',
+    amount: 980.00,
+    unit: 'Skyline Suite 101'
+  },
+  {
+    id: 'BK-5508',
+    status: 'Checked in',
+    startDate: '2024-05-18 14:00',
+    endDate: '2024-05-23 11:00',
+    bookingDate: '2024-05-05',
+    guestName: 'Liam Neeson',
+    contactNumber: '+1 (555) 999-8888',
+    emailId: 'liam@taken.com',
+    serviceCategory: 'Short Term Rentals',
+    amount: 1500.00,
+    unit: 'Ocean View 102'
+  },
+  {
+    id: 'BK-5509',
+    status: 'Enquiry',
+    startDate: '2024-05-28 10:00',
+    endDate: '2024-05-28 14:00',
+    bookingDate: '2024-05-12',
+    guestName: 'Bruce Wayne',
+    contactNumber: '+1 (555) 100-2000',
+    emailId: 'bruce@waynecorp.com',
+    serviceCategory: 'Leisure Activities',
+    amount: 350.00,
+    unit: 'Helicopter City Tour'
   }
 ];
+
+export const getStatusBadge = (status: string) => {
+  switch (status) {
+    case 'Enquiry':
+      return <Badge variant="outline" className="bg-amber-50 text-amber-700 border-amber-200 hover:bg-amber-50 font-medium">Enquiry</Badge>;
+    case 'Confirmed':
+      return <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-50 font-medium">Confirmed</Badge>;
+    case 'Checked in':
+      return <Badge variant="outline" className="bg-indigo-50 text-indigo-700 border-indigo-200 hover:bg-indigo-50 font-medium">Checked In</Badge>;
+    case 'Checked out':
+      return <Badge variant="outline" className="bg-purple-50 text-purple-700 border-purple-200 hover:bg-purple-50 font-medium">Checked Out</Badge>;
+    case 'Cancelled':
+      return <Badge variant="outline" className="bg-rose-50 text-rose-700 border-rose-200 hover:bg-rose-50 font-medium">Cancelled</Badge>;
+    case 'Completed':
+      return <Badge variant="outline" className="bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-50 font-medium">Completed</Badge>;
+    default:
+      return <Badge>{status}</Badge>;
+  }
+};
 
 const BookingReport = () => {
   const [bookings] = useState<Booking[]>(initialBookings);
@@ -112,6 +170,12 @@ const BookingReport = () => {
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [categoryFilter, setCategoryFilter] = useState<string>('all');
   const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null);
+
+  // Reset status filter if it's not valid for the newly selected category
+  const handleCategoryChange = (newCategory: string) => {
+    setCategoryFilter(newCategory);
+    setStatusFilter('all');
+  };
 
   // Smart Search & Filter Logic
   const filteredBookings = bookings.filter((booking) => {
@@ -145,6 +209,17 @@ const BookingReport = () => {
 
   const uniqueCategories = Array.from(new Set(bookings.map(b => b.serviceCategory)));
 
+  // Determine available statuses for the selected category
+  const getAvailableStatuses = () => {
+    if (categoryFilter === 'Short Term Rentals') {
+      return ['Enquiry', 'Confirmed', 'Checked in', 'Checked out', 'Cancelled'];
+    } else if (categoryFilter !== 'all') {
+      return ['Enquiry', 'Confirmed', 'Cancelled', 'Completed'];
+    }
+    // If 'all' categories are selected, show union of all statuses
+    return ['Enquiry', 'Confirmed', 'Checked in', 'Checked out', 'Completed', 'Cancelled'];
+  };
+
   return (
     <div className="space-y-6">
       {/* Search and Filter Controls */}
@@ -160,25 +235,9 @@ const BookingReport = () => {
         </div>
         
         <div className="flex flex-wrap gap-3 w-full md:w-auto">
-          {/* Status Filter */}
-          <div className="w-[150px]">
-            <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger className="h-10">
-                <SelectValue placeholder="Filter Status" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Statuses</SelectItem>
-                <SelectItem value="Completed">Completed</SelectItem>
-                <SelectItem value="Confirmed">Confirmed</SelectItem>
-                <SelectItem value="In Progress">In Progress</SelectItem>
-                <SelectItem value="Cancelled">Cancelled</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
           {/* Category Filter */}
           <div className="w-[180px]">
-            <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+            <Select value={categoryFilter} onValueChange={handleCategoryChange}>
               <SelectTrigger className="h-10">
                 <SelectValue placeholder="Filter Category" />
               </SelectTrigger>
@@ -186,6 +245,21 @@ const BookingReport = () => {
                 <SelectItem value="all">All Categories</SelectItem>
                 {uniqueCategories.map(cat => (
                   <SelectItem key={cat} value={cat}>{cat}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Status Filter (Dynamic based on Category) */}
+          <div className="w-[150px]">
+            <Select value={statusFilter} onValueChange={setStatusFilter}>
+              <SelectTrigger className="h-10">
+                <SelectValue placeholder="Filter Status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Statuses</SelectItem>
+                {getAvailableStatuses().map(status => (
+                  <SelectItem key={status} value={status}>{status}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
@@ -245,13 +319,7 @@ const BookingReport = () => {
                   >
                     <TableCell className="font-bold text-primary">{booking.id}</TableCell>
                     <TableCell>
-                      <Badge variant={
-                        booking.status === 'Completed' ? 'default' : 
-                        booking.status === 'Confirmed' ? 'secondary' : 
-                        booking.status === 'In Progress' ? 'outline' : 'destructive'
-                      }>
-                        {booking.status}
-                      </Badge>
+                      {getStatusBadge(booking.status)}
                     </TableCell>
                     <TableCell>
                       <Badge variant="outline" className="bg-primary/5 text-primary border-primary/20">
@@ -367,13 +435,9 @@ const BookingReport = () => {
                   </div>
                   <div>
                     <p className="text-xs text-muted-foreground">Status</p>
-                    <Badge className="mt-1" variant={
-                      selectedBooking.status === 'Completed' ? 'default' : 
-                      selectedBooking.status === 'Confirmed' ? 'secondary' : 
-                      selectedBooking.status === 'In Progress' ? 'outline' : 'destructive'
-                    }>
-                      {selectedBooking.status}
-                    </Badge>
+                    <div className="mt-1">
+                      {getStatusBadge(selectedBooking.status)}
+                    </div>
                   </div>
                 </div>
               </div>

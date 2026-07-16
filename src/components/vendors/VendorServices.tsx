@@ -29,6 +29,7 @@ import {
   FileText
 } from 'lucide-react';
 import { showSuccess, showError } from '@/utils/toast';
+import { getStatusBadge } from '../inventory/BookingReport';
 
 const categories = [
   { id: 'all', label: 'All Categories' },
@@ -59,7 +60,7 @@ interface Booking {
   bookingDate: string;
   startDate: string;
   endDate: string;
-  status: 'Completed' | 'Confirmed' | 'Pending' | 'Cancelled';
+  status: 'Enquiry' | 'Confirmed' | 'Checked in' | 'Checked out' | 'Cancelled' | 'Completed';
   amount: number;
 }
 
@@ -103,7 +104,7 @@ const initialBookings: Booking[] = [
     bookingDate: '2024-05-13 09:00 AM',
     startDate: '2024-05-18 06:00 PM',
     endDate: '2024-05-18 10:00 PM',
-    status: 'Pending',
+    status: 'Enquiry',
     amount: 850.00
   },
   {
@@ -131,8 +132,36 @@ const initialBookings: Booking[] = [
     bookingDate: '2024-05-10 04:30 PM',
     startDate: '2024-05-20 03:00 PM',
     endDate: '2024-05-25 11:00 AM',
-    status: 'Confirmed',
+    status: 'Checked in',
     amount: 1250.00
+  },
+  {
+    id: 'BK-9951',
+    vendor: 'Skyline Apartments',
+    guestName: 'John Smith',
+    guestPhone: '+1 (555) 044-9933',
+    guestEmail: 'john.s@example.com',
+    serviceCategory: 'str',
+    serviceName: 'Cozy Studio Stay',
+    bookingDate: '2024-05-08 02:30 PM',
+    startDate: '2024-05-12 03:00 PM',
+    endDate: '2024-05-15 11:00 AM',
+    status: 'Checked out',
+    amount: 650.00
+  },
+  {
+    id: 'BK-9952',
+    vendor: 'Skyline Apartments',
+    guestName: 'Clara Oswald',
+    guestPhone: '+1 (555) 044-1122',
+    guestEmail: 'clara@tardis.com',
+    serviceCategory: 'str',
+    serviceName: 'Victorian Suite Stay',
+    bookingDate: '2024-05-15 05:30 PM',
+    startDate: '2024-05-25 03:00 PM',
+    endDate: '2024-05-28 11:00 AM',
+    status: 'Enquiry',
+    amount: 850.00
   },
   {
     id: 'BK-9962',
@@ -165,6 +194,12 @@ const VendorServices = () => {
     setEnquiries(prev => prev.map(enq => enq.id === id ? { ...enq, status: action } : enq));
     if (action === 'Accepted') showSuccess(`Enquiry ${id} accepted.`);
     else showError(`Enquiry ${id} rejected.`);
+  };
+
+  // Reset status filter if it's not valid for the newly selected category
+  const handleCategoryChange = (newCategory: string) => {
+    setCategory(newCategory);
+    setStatusFilter('all');
   };
 
   // Smart Search & Filter Logic
@@ -200,6 +235,17 @@ const VendorServices = () => {
     showSuccess("Exporting and downloading all bookings as CSV...");
   };
 
+  // Determine available statuses for the selected category
+  const getAvailableStatuses = () => {
+    if (category === 'str') {
+      return ['Enquiry', 'Confirmed', 'Checked in', 'Checked out', 'Cancelled'];
+    } else if (category !== 'all') {
+      return ['Enquiry', 'Confirmed', 'Cancelled', 'Completed'];
+    }
+    // If 'all' categories are selected, show union of all statuses
+    return ['Enquiry', 'Confirmed', 'Checked in', 'Checked out', 'Completed', 'Cancelled'];
+  };
+
   return (
     <div className="space-y-6">
       {/* Category Selector Header */}
@@ -213,7 +259,7 @@ const VendorServices = () => {
             <p className="text-xs text-muted-foreground">Select a category to manage vendor operations</p>
           </div>
         </div>
-        <Select value={category} onValueChange={setCategory}>
+        <Select value={category} onValueChange={handleCategoryChange}>
           <SelectTrigger className="w-[240px]">
             <SelectValue placeholder="Select category" />
           </SelectTrigger>
@@ -244,17 +290,16 @@ const VendorServices = () => {
                   <CardDescription>View, search, and manage all guest bookings and download invoices.</CardDescription>
                 </div>
                 <div className="flex flex-wrap items-center gap-2">
-                  {/* Status Filter */}
+                  {/* Status Filter (Dynamic based on Category) */}
                   <Select value={statusFilter} onValueChange={setStatusFilter}>
                     <SelectTrigger className="w-[150px] h-9 text-xs">
                       <SelectValue placeholder="Filter by Status" />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="all">All Statuses</SelectItem>
-                      <SelectItem value="Completed">Completed</SelectItem>
-                      <SelectItem value="Confirmed">Confirmed</SelectItem>
-                      <SelectItem value="Pending">Pending</SelectItem>
-                      <SelectItem value="Cancelled">Cancelled</SelectItem>
+                      {getAvailableStatuses().map(status => (
+                        <SelectItem key={status} value={status}>{status}</SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
 
@@ -310,13 +355,7 @@ const VendorServices = () => {
                           {booking.id}
                         </TableCell>
                         <TableCell>
-                          <Badge variant={
-                            booking.status === 'Completed' ? 'default' :
-                            booking.status === 'Confirmed' ? 'secondary' :
-                            booking.status === 'Pending' ? 'outline' : 'destructive'
-                          }>
-                            {booking.status}
-                          </Badge>
+                          {getStatusBadge(booking.status)}
                         </TableCell>
                         <TableCell className="font-medium text-xs">{booking.guestName}</TableCell>
                         <TableCell className="text-xs">{booking.guestPhone}</TableCell>
@@ -387,13 +426,9 @@ const VendorServices = () => {
                         <h4 className="font-bold text-sm text-primary uppercase tracking-wider">Invoice Preview</h4>
                         <p className="text-[10px] text-muted-foreground">Generated on {selectedBooking.bookingDate}</p>
                       </div>
-                      <Badge variant={
-                        selectedBooking.status === 'Completed' ? 'default' :
-                        selectedBooking.status === 'Confirmed' ? 'secondary' :
-                        selectedBooking.status === 'Pending' ? 'outline' : 'destructive'
-                      }>
-                        {selectedBooking.status}
-                      </Badge>
+                      <div>
+                        {getStatusBadge(selectedBooking.status)}
+                      </div>
                     </div>
 
                     <div className="grid grid-cols-2 gap-4 pt-2 border-t text-xs">
@@ -462,7 +497,7 @@ const VendorServices = () => {
 
                   {/* Pricing Summary */}
                   <div className="space-y-3">
-                    <h4 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Pricing Summary</h4>
+                    <h4 className="text-xs font-bold uppercase tracking-wider">Pricing Summary</h4>
                     <div className="border rounded-xl p-4 bg-card text-xs space-y-2">
                       <div className="flex justify-between">
                         <span className="text-muted-foreground">Subtotal</span>
