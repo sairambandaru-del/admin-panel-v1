@@ -19,9 +19,8 @@ import {
   CheckCircle,
   LayoutGrid,
   List,
-  ArrowRight,
-  ArrowLeft,
-  ChevronRight
+  ChevronRight,
+  Shirt
 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -362,6 +361,20 @@ const BookingReport = () => {
         </div>
         
         <div className="flex flex-wrap gap-3 w-full md:w-auto items-center">
+          {/* Laundry Kanban Quick Switch Button */}
+          <Button
+            variant={categoryFilter === 'Laundry' && viewMode === 'kanban' ? 'default' : 'outline'}
+            className="h-10 gap-2 border-primary/30 hover:border-primary"
+            onClick={() => {
+              setCategoryFilter('Laundry');
+              setViewMode('kanban');
+              showSuccess("Switched to Laundry Kanban Board");
+            }}
+          >
+            <Shirt className="w-4 h-4 text-primary" />
+            Laundry Kanban
+          </Button>
+
           {/* View Mode Toggle */}
           <div className="flex bg-muted p-1 rounded-lg border">
             <Button 
