@@ -18,7 +18,6 @@ import {
   X,
   TrendingUp,
   Search,
-  Filter,
   Download,
   Eye,
   Calendar,
@@ -197,6 +196,10 @@ const VendorServices = () => {
     showSuccess(`Downloading invoice for booking ${booking.id}...`);
   };
 
+  const handleDownloadAllBookings = () => {
+    showSuccess("Exporting and downloading all bookings as CSV...");
+  };
+
   return (
     <div className="space-y-6">
       {/* Category Selector Header */}
@@ -254,6 +257,16 @@ const VendorServices = () => {
                       <SelectItem value="Cancelled">Cancelled</SelectItem>
                     </SelectContent>
                   </Select>
+
+                  {/* Download All Button */}
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="h-9 gap-2 text-xs"
+                    onClick={handleDownloadAllBookings}
+                  >
+                    <Download className="w-4 h-4" /> Download All
+                  </Button>
                 </div>
               </div>
 
