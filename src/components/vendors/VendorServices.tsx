@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { 
-  DollarSign, 
+  ClipboardList, 
   CreditCard, 
   AlertCircle, 
   MessageSquare, 
@@ -73,19 +73,19 @@ const VendorServices = () => {
         </Select>
       </div>
 
-      <Tabs defaultValue="earnings">
+      <Tabs defaultValue="bookings">
         <TabsList className="grid w-full grid-cols-5 mb-6">
-          <TabsTrigger value="earnings" className="gap-2"><DollarSign className="w-4 h-4" /> Earnings</TabsTrigger>
+          <TabsTrigger value="bookings" className="gap-2"><ClipboardList className="w-4 h-4" /> Bookings</TabsTrigger>
           <TabsTrigger value="payouts" className="gap-2"><CreditCard className="w-4 h-4" /> Payouts</TabsTrigger>
           <TabsTrigger value="disputes" className="gap-2"><AlertCircle className="w-4 h-4" /> Disputes</TabsTrigger>
           <TabsTrigger value="escalations" className="gap-2"><MessageSquare className="w-4 h-4" /> Escalations</TabsTrigger>
           <TabsTrigger value="enquiries" className="gap-2"><HelpCircle className="w-4 h-4" /> Enquiries</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="earnings">
+        <TabsContent value="bookings">
           <Card>
             <CardHeader>
-              <CardTitle>Earnings Report - {categories.find(c => c.id === category)?.label}</CardTitle>
+              <CardTitle>Bookings Report - {categories.find(c => c.id === category)?.label}</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="rounded-md border">
