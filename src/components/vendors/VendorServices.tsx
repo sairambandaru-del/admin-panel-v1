@@ -26,7 +26,8 @@ import {
   Phone,
   Clock,
   Tag,
-  FileText
+  FileText,
+  CheckCircle
 } from 'lucide-react';
 import { showSuccess, showError } from '@/utils/toast';
 import { getStatusBadge } from '../inventory/BookingReport';
@@ -60,7 +61,7 @@ interface Booking {
   bookingDate: string;
   startDate: string;
   endDate: string;
-  status: 'Enquiry' | 'Confirmed' | 'Checked in' | 'Checked out' | 'Cancelled' | 'Completed';
+  status: string;
   amount: number;
 }
 
@@ -78,6 +79,20 @@ const initialBookings: Booking[] = [
     endDate: '2024-05-15 01:00 PM',
     status: 'Completed',
     amount: 120.00
+  },
+  {
+    id: 'BK-9922',
+    vendor: 'Elite Housekeeping',
+    guestName: 'Robert Fox',
+    guestPhone: '+1 (555) 234-5678',
+    guestEmail: 'robert.fox@gmail.com',
+    serviceCategory: 'housekeeping',
+    serviceName: 'Standard Turn-down Service',
+    bookingDate: '2024-05-18 09:00 AM',
+    startDate: '2024-05-22 10:00 AM',
+    endDate: '2024-05-22 12:00 PM',
+    status: 'Enquiry',
+    amount: 90.00
   },
   {
     id: 'BK-9918',
@@ -136,46 +151,32 @@ const initialBookings: Booking[] = [
     amount: 1250.00
   },
   {
-    id: 'BK-9951',
-    vendor: 'Skyline Apartments',
-    guestName: 'John Smith',
-    guestPhone: '+1 (555) 044-9933',
-    guestEmail: 'john.s@example.com',
-    serviceCategory: 'str',
-    serviceName: 'Cozy Studio Stay',
-    bookingDate: '2024-05-08 02:30 PM',
-    startDate: '2024-05-12 03:00 PM',
-    endDate: '2024-05-15 11:00 AM',
-    status: 'Checked out',
-    amount: 650.00
+    id: 'BK-9970',
+    vendor: 'InstaCart Grocery',
+    guestName: 'John Doe',
+    guestPhone: '+1 (555) 099-1122',
+    guestEmail: 'john.doe@gmail.com',
+    serviceCategory: 'grocery',
+    serviceName: 'Fresh Produce & Dairy Delivery',
+    bookingDate: '2024-05-20 08:00 AM',
+    startDate: '2024-05-20 10:00 AM',
+    endDate: '2024-05-20 11:00 AM',
+    status: 'Packing the cart',
+    amount: 145.00
   },
   {
-    id: 'BK-9952',
-    vendor: 'Skyline Apartments',
+    id: 'BK-9980',
+    vendor: 'MedCall Pro',
     guestName: 'Clara Oswald',
     guestPhone: '+1 (555) 044-1122',
     guestEmail: 'clara@tardis.com',
-    serviceCategory: 'str',
-    serviceName: 'Victorian Suite Stay',
-    bookingDate: '2024-05-15 05:30 PM',
-    startDate: '2024-05-25 03:00 PM',
-    endDate: '2024-05-28 11:00 AM',
-    status: 'Enquiry',
-    amount: 850.00
-  },
-  {
-    id: 'BK-9962',
-    vendor: 'Swift Car Rentals',
-    guestName: 'James Smith',
-    guestPhone: '+1 (555) 011-2233',
-    guestEmail: 'james.smith@example.com',
-    serviceCategory: 'car',
-    serviceName: 'Sedan Airport Transfer',
-    bookingDate: '2024-05-12 08:00 AM',
-    startDate: '2024-05-13 05:00 AM',
-    endDate: '2024-05-13 06:30 AM',
-    status: 'Cancelled',
-    amount: 75.00
+    serviceCategory: 'doctor',
+    serviceName: 'Emergency Doctor Consultation',
+    bookingDate: '2024-05-21 11:30 AM',
+    startDate: '2024-05-21 12:00 PM',
+    endDate: '2024-05-21 01:00 PM',
+    status: 'Consultation active',
+    amount: 350.00
   }
 ];
 
@@ -196,6 +197,16 @@ const VendorServices = () => {
     else showError(`Enquiry ${id} rejected.`);
   };
 
+  const handleConfirmHousekeeping = (bookingId: string) => {
+    setBookings(prev => prev.map(b => 
+      b.id === bookingId ? { ...b, status: 'Confirmed' } : b
+    ));
+    if (selectedBooking && selectedBooking.id === bookingId) {
+      setSelectedBooking(prev => prev ? { ...prev, status: 'Confirmed' } : null);
+    }
+    showSuccess(`Housekeeping booking ${bookingId} has been confirmed by the STR company.`);
+  };
+
   // Reset status filter if it's not valid for the newly selected category
   const handleCategoryChange = (newCategory: string) => {
     setCategory(newCategory);
@@ -205,13 +216,9 @@ const VendorServices = () => {
   // Smart Search & Filter Logic
   const filteredBookings = useMemo(() => {
     return bookings.filter(booking => {
-      // Category Filter
       const matchesCategory = category === 'all' || booking.serviceCategory === category;
-      
-      // Status Filter
       const matchesStatus = statusFilter === 'all' || booking.status === statusFilter;
 
-      // Smart Search (matches any field value)
       const searchLower = searchQuery.toLowerCase();
       const matchesSearch = !searchQuery || 
         booking.id.toLowerCase().includes(searchLower) ||
@@ -239,11 +246,18 @@ const VendorServices = () => {
   const getAvailableStatuses = () => {
     if (category === 'str') {
       return ['Enquiry', 'Confirmed', 'Checked in', 'Checked out', 'Cancelled'];
+    } else if (category === 'housekeeping') {
+      return ['Enquiry', 'Confirmed', 'Scheduled', 'In progressed', 'Completed', 'Cancelled'];
+    } else if (category === 'food') {
+      return ['Order placed', 'Accepted', 'Preparing', 'Ready for pickup', 'Out for delivery', 'Delivered', 'Cancelled'];
+    } else if (category === 'grocery') {
+      return ['Order placed', 'Packing the cart', 'Out for delivery', 'Delivered', 'Cancelled'];
+    } else if (category === 'doctor') {
+      return ['Enquiry', 'Arrived', 'Consultation active', 'treatment & documentation', 'Completed', 'Follow-up', 'Cancelled'];
     } else if (category !== 'all') {
       return ['Enquiry', 'Confirmed', 'Cancelled', 'Completed'];
     }
-    // If 'all' categories are selected, show union of all statuses
-    return ['Enquiry', 'Confirmed', 'Checked in', 'Checked out', 'Completed', 'Cancelled'];
+    return ['Enquiry', 'Confirmed', 'Checked in', 'Checked out', 'Completed', 'Cancelled', 'Scheduled', 'In progressed', 'Order placed', 'Accepted', 'Preparing', 'Ready for pickup', 'Out for delivery', 'Delivered', 'Packing the cart', 'Arrived', 'Consultation active', 'treatment & documentation', 'Follow-up'];
   };
 
   return (
@@ -419,6 +433,24 @@ const VendorServices = () => {
 
                 {/* Drawer Content / Invoice Preview */}
                 <div className="flex-1 overflow-y-auto p-6 space-y-6">
+                  {/* Special STR Confirmation Action for Housekeeping */}
+                  {selectedBooking.serviceCategory === 'housekeeping' && selectedBooking.status === 'Enquiry' && (
+                    <div className="bg-primary/10 border border-primary/30 p-4 rounded-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                      <div className="space-y-1">
+                        <p className="text-xs font-bold text-primary uppercase tracking-wider">STR Company Action Required</p>
+                        <p className="text-xs text-muted-foreground">This housekeeping booking must be confirmed by the STR company before scheduling.</p>
+                      </div>
+                      <Button 
+                        size="sm" 
+                        className="gap-1.5 shrink-0"
+                        onClick={() => handleConfirmHousekeeping(selectedBooking.id)}
+                      >
+                        <CheckCircle className="w-4 h-4" />
+                        Confirm Booking (as STR)
+                      </Button>
+                    </div>
+                  )}
+
                   {/* Invoice Header */}
                   <div className="border p-4 rounded-xl bg-card space-y-4">
                     <div className="flex justify-between items-start">

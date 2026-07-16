@@ -5,15 +5,15 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { Search, Download, Filter, Calendar, User, Mail, Phone, Tag, Clock, FileText } from 'lucide-react';
+import { Search, Download, Filter, Calendar, User, Mail, Phone, Tag, Clock, FileText, CheckCircle } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { showSuccess } from '@/utils/toast';
 
-interface Booking {
+export interface Booking {
   id: string;
-  status: 'Enquiry' | 'Confirmed' | 'Checked in' | 'Checked out' | 'Cancelled' | 'Completed';
+  status: string;
   startDate: string;
   endDate: string;
   bookingDate: string;
@@ -53,6 +53,58 @@ const initialBookings: Booking[] = [
     unit: 'Ocean View 102'
   },
   {
+    id: 'BK-5510',
+    status: 'Enquiry',
+    startDate: '2024-05-22 09:00',
+    endDate: '2024-05-22 12:00',
+    bookingDate: '2024-05-18',
+    guestName: 'Alice Brown',
+    contactNumber: '+1 (555) 019-2834',
+    emailId: 'alice.b@gmail.com',
+    serviceCategory: 'House Keeping',
+    amount: 150.00,
+    unit: 'Deep Cleaning Service'
+  },
+  {
+    id: 'BK-5511',
+    status: 'Order placed',
+    startDate: '2024-05-20 19:00',
+    endDate: '2024-05-20 19:45',
+    bookingDate: '2024-05-20',
+    guestName: 'Mark Wilson',
+    contactNumber: '+1 (555) 024-9911',
+    emailId: 'mark.w@gmail.com',
+    serviceCategory: 'Food Delivery',
+    amount: 85.00,
+    unit: 'Gourmet Burger Combo'
+  },
+  {
+    id: 'BK-5512',
+    status: 'Packing the cart',
+    startDate: '2024-05-21 10:00',
+    endDate: '2024-05-21 11:30',
+    bookingDate: '2024-05-21',
+    guestName: 'Sarah Jenkins',
+    contactNumber: '+1 (555) 088-1234',
+    emailId: 'sarah.j@gmail.com',
+    serviceCategory: 'Grocery',
+    amount: 220.00,
+    unit: 'Weekly Essentials Cart'
+  },
+  {
+    id: 'BK-5513',
+    status: 'Consultation active',
+    startDate: '2024-05-21 14:00',
+    endDate: '2024-05-21 15:00',
+    bookingDate: '2024-05-21',
+    guestName: 'David Miller',
+    contactNumber: '+1 (555) 077-5678',
+    emailId: 'david.m@gmail.com',
+    serviceCategory: 'Doctor on Call',
+    amount: 450.00,
+    unit: 'General Practitioner Visit'
+  },
+  {
     id: 'BK-5503',
     status: 'Confirmed',
     startDate: '2024-05-01 09:00',
@@ -79,19 +131,6 @@ const initialBookings: Booking[] = [
     unit: 'Dedicated Desk A'
   },
   {
-    id: 'BK-5505',
-    status: 'Completed',
-    startDate: '2024-05-12 14:00',
-    endDate: '2024-05-18 11:00',
-    bookingDate: '2024-05-01',
-    guestName: 'Jenny Wilson',
-    contactNumber: '+1 (555) 456-7890',
-    emailId: 'jenny.w@innovate.com',
-    serviceCategory: 'In House Catering',
-    amount: 450.00,
-    unit: 'Executive Dinner Package'
-  },
-  {
     id: 'BK-5506',
     status: 'Cancelled',
     startDate: '2024-05-15 10:00',
@@ -103,50 +142,12 @@ const initialBookings: Booking[] = [
     serviceCategory: 'Wellness',
     amount: 150.00,
     unit: 'Spa & Massage Session'
-  },
-  {
-    id: 'BK-5507',
-    status: 'Enquiry',
-    startDate: '2024-05-22 14:00',
-    endDate: '2024-05-25 11:00',
-    bookingDate: '2024-05-10',
-    guestName: 'Sophia Loren',
-    contactNumber: '+1 (555) 444-5555',
-    emailId: 'sophia@cinema.it',
-    serviceCategory: 'Short Term Rentals',
-    amount: 980.00,
-    unit: 'Skyline Suite 101'
-  },
-  {
-    id: 'BK-5508',
-    status: 'Checked in',
-    startDate: '2024-05-18 14:00',
-    endDate: '2024-05-23 11:00',
-    bookingDate: '2024-05-05',
-    guestName: 'Liam Neeson',
-    contactNumber: '+1 (555) 999-8888',
-    emailId: 'liam@taken.com',
-    serviceCategory: 'Short Term Rentals',
-    amount: 1500.00,
-    unit: 'Ocean View 102'
-  },
-  {
-    id: 'BK-5509',
-    status: 'Enquiry',
-    startDate: '2024-05-28 10:00',
-    endDate: '2024-05-28 14:00',
-    bookingDate: '2024-05-12',
-    guestName: 'Bruce Wayne',
-    contactNumber: '+1 (555) 100-2000',
-    emailId: 'bruce@waynecorp.com',
-    serviceCategory: 'Leisure Activities',
-    amount: 350.00,
-    unit: 'Helicopter City Tour'
   }
 ];
 
 export const getStatusBadge = (status: string) => {
   switch (status) {
+    // General & STR
     case 'Enquiry':
       return <Badge variant="outline" className="bg-amber-50 text-amber-700 border-amber-200 hover:bg-amber-50 font-medium">Enquiry</Badge>;
     case 'Confirmed':
@@ -159,13 +160,46 @@ export const getStatusBadge = (status: string) => {
       return <Badge variant="outline" className="bg-rose-50 text-rose-700 border-rose-200 hover:bg-rose-50 font-medium">Cancelled</Badge>;
     case 'Completed':
       return <Badge variant="outline" className="bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-50 font-medium">Completed</Badge>;
+
+    // House Keeping Specific
+    case 'Scheduled':
+      return <Badge variant="outline" className="bg-sky-50 text-sky-700 border-sky-200 hover:bg-sky-50 font-medium">Scheduled</Badge>;
+    case 'In progressed':
+      return <Badge variant="outline" className="bg-violet-50 text-violet-700 border-violet-200 hover:bg-violet-50 font-medium">In Progressed</Badge>;
+
+    // Food Delivery & Grocery Specific
+    case 'Order placed':
+      return <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-50 font-medium">Order Placed</Badge>;
+    case 'Accepted':
+      return <Badge variant="outline" className="bg-teal-50 text-teal-700 border-teal-200 hover:bg-teal-50 font-medium">Accepted</Badge>;
+    case 'Preparing':
+      return <Badge variant="outline" className="bg-orange-50 text-orange-700 border-orange-200 hover:bg-orange-50 font-medium">Preparing</Badge>;
+    case 'Ready for pickup':
+      return <Badge variant="outline" className="bg-indigo-50 text-indigo-700 border-indigo-200 hover:bg-indigo-50 font-medium">Ready for Pickup</Badge>;
+    case 'Out for delivery':
+      return <Badge variant="outline" className="bg-fuchsia-50 text-fuchsia-700 border-fuchsia-200 hover:bg-fuchsia-50 font-medium">Out for Delivery</Badge>;
+    case 'Delivered':
+      return <Badge variant="outline" className="bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-50 font-medium">Delivered</Badge>;
+    case 'Packing the cart':
+      return <Badge variant="outline" className="bg-amber-100 text-amber-800 border-amber-300 hover:bg-amber-100 font-medium">Packing Cart</Badge>;
+
+    // Doctor on Call Specific
+    case 'Arrived':
+      return <Badge variant="outline" className="bg-teal-50 text-teal-700 border-teal-200 hover:bg-teal-50 font-medium">Arrived</Badge>;
+    case 'Consultation active':
+      return <Badge variant="outline" className="bg-rose-50 text-rose-700 border-rose-200 hover:bg-rose-50 font-medium">Consultation Active</Badge>;
+    case 'treatment & documentation':
+      return <Badge variant="outline" className="bg-purple-50 text-purple-700 border-purple-200 hover:bg-purple-50 font-medium">Treatment & Doc</Badge>;
+    case 'Follow-up':
+      return <Badge variant="outline" className="bg-cyan-50 text-cyan-700 border-cyan-200 hover:bg-cyan-50 font-medium">Follow-up</Badge>;
+
     default:
       return <Badge>{status}</Badge>;
   }
 };
 
 const BookingReport = () => {
-  const [bookings] = useState<Booking[]>(initialBookings);
+  const [bookings, setBookings] = useState<Booking[]>(initialBookings);
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [categoryFilter, setCategoryFilter] = useState<string>('all');
@@ -179,7 +213,6 @@ const BookingReport = () => {
 
   // Smart Search & Filter Logic
   const filteredBookings = bookings.filter((booking) => {
-    // Smart Search: check if query matches any field value
     const matchesSearch = searchQuery === '' || [
       booking.id,
       booking.guestName,
@@ -194,10 +227,7 @@ const BookingReport = () => {
       booking.amount.toString()
     ].some(val => val.toLowerCase().includes(searchQuery.toLowerCase()));
 
-    // Status Filter
     const matchesStatus = statusFilter === 'all' || booking.status === statusFilter;
-
-    // Category Filter
     const matchesCategory = categoryFilter === 'all' || booking.serviceCategory === categoryFilter;
 
     return matchesSearch && matchesStatus && matchesCategory;
@@ -207,17 +237,34 @@ const BookingReport = () => {
     showSuccess(`Downloading invoice for ${booking.guestName} (${booking.id})...`);
   };
 
+  const handleConfirmHousekeeping = (bookingId: string) => {
+    setBookings(prev => prev.map(b => 
+      b.id === bookingId ? { ...b, status: 'Confirmed' } : b
+    ));
+    if (selectedBooking && selectedBooking.id === bookingId) {
+      setSelectedBooking(prev => prev ? { ...prev, status: 'Confirmed' } : null);
+    }
+    showSuccess(`Housekeeping booking ${bookingId} has been confirmed by the STR company.`);
+  };
+
   const uniqueCategories = Array.from(new Set(bookings.map(b => b.serviceCategory)));
 
   // Determine available statuses for the selected category
   const getAvailableStatuses = () => {
     if (categoryFilter === 'Short Term Rentals') {
       return ['Enquiry', 'Confirmed', 'Checked in', 'Checked out', 'Cancelled'];
+    } else if (categoryFilter === 'House Keeping') {
+      return ['Enquiry', 'Confirmed', 'Scheduled', 'In progressed', 'Completed', 'Cancelled'];
+    } else if (categoryFilter === 'Food Delivery') {
+      return ['Order placed', 'Accepted', 'Preparing', 'Ready for pickup', 'Out for delivery', 'Delivered', 'Cancelled'];
+    } else if (categoryFilter === 'Grocery') {
+      return ['Order placed', 'Packing the cart', 'Out for delivery', 'Delivered', 'Cancelled'];
+    } else if (categoryFilter === 'Doctor on Call') {
+      return ['Enquiry', 'Arrived', 'Consultation active', 'treatment & documentation', 'Completed', 'Follow-up', 'Cancelled'];
     } else if (categoryFilter !== 'all') {
       return ['Enquiry', 'Confirmed', 'Cancelled', 'Completed'];
     }
-    // If 'all' categories are selected, show union of all statuses
-    return ['Enquiry', 'Confirmed', 'Checked in', 'Checked out', 'Completed', 'Cancelled'];
+    return ['Enquiry', 'Confirmed', 'Checked in', 'Checked out', 'Completed', 'Cancelled', 'Scheduled', 'In progressed', 'Order placed', 'Accepted', 'Preparing', 'Ready for pickup', 'Out for delivery', 'Delivered', 'Packing the cart', 'Arrived', 'Consultation active', 'treatment & documentation', 'Follow-up'];
   };
 
   return (
@@ -363,6 +410,24 @@ const BookingReport = () => {
             </DialogHeader>
 
             <div className="space-y-6 py-4">
+              {/* Special STR Confirmation Action for Housekeeping */}
+              {selectedBooking.serviceCategory === 'House Keeping' && selectedBooking.status === 'Enquiry' && (
+                <div className="bg-primary/10 border border-primary/30 p-4 rounded-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                  <div className="space-y-1">
+                    <p className="text-xs font-bold text-primary uppercase tracking-wider">STR Company Action Required</p>
+                    <p className="text-xs text-muted-foreground">This housekeeping booking must be confirmed by the STR company before scheduling.</p>
+                  </div>
+                  <Button 
+                    size="sm" 
+                    className="gap-1.5 shrink-0"
+                    onClick={() => handleConfirmHousekeeping(selectedBooking.id)}
+                  >
+                    <CheckCircle className="w-4 h-4" />
+                    Confirm Booking (as STR)
+                  </Button>
+                </div>
+              )}
+
               {/* Guest Details Section */}
               <div className="bg-muted/30 p-4 rounded-xl border space-y-3">
                 <h4 className="text-xs font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
