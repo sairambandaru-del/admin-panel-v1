@@ -52,7 +52,7 @@ const ExpenseAuditing = () => {
                     <TableCell className="font-bold">{inv.id}</TableCell>
                     <TableCell>{inv.employee}</TableCell>
                     <TableCell>{inv.trip}</TableCell>
-                    <TableCell>${inv.amount.toFixed(2)}</TableCell>
+                    <TableCell>AED {inv.amount.toFixed(2)}</TableCell>
                     <TableCell>
                       {inv.policyMatch ? (
                         <Badge variant="outline" className="text-green-600 border-green-200 bg-green-50">

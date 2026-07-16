@@ -233,23 +233,23 @@ const BookingQuotation = () => {
                             <tbody className="divide-y">
                               <tr>
                                 <td className="p-3">Base Rate ({quote.bedroomType})</td>
-                                <td className="p-3 text-right font-semibold">${property.basePrice.toFixed(2)}</td>
+                                <td className="p-3 text-right font-semibold">AED {property.basePrice.toFixed(2)}</td>
                               </tr>
                               <tr>
                                 <td className="p-3">Service Fee</td>
-                                <td className="p-3 text-right font-semibold">$50.00</td>
+                                <td className="p-3 text-right font-semibold">AED 50.00</td>
                               </tr>
                               {parseFloat(quote.adjustment) !== 0 && (
                                 <tr>
                                   <td className="p-3">Adjustment ({quote.adjustment}%)</td>
                                   <td className="p-3 text-right font-semibold">
-                                    ${(property.basePrice * (parseFloat(quote.adjustment) / 100)).toFixed(2)}
+                                    AED {(property.basePrice * (parseFloat(quote.adjustment) / 100)).toFixed(2)}
                                   </td>
                                 </tr>
                               )}
                               <tr className="bg-primary/5">
                                 <td className="p-3 font-bold">Total for {property.label}</td>
-                                <td className="p-3 text-right font-bold text-primary">${total.toFixed(2)}</td>
+                                <td className="p-3 text-right font-bold text-primary">AED {total.toFixed(2)}</td>
                               </tr>
                             </tbody>
                           </table>

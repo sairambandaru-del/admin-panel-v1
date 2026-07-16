@@ -34,7 +34,7 @@ const UnitStatus = () => {
             <DollarSign className="h-4 w-4 text-primary" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">$285.50</div>
+            <div className="text-2xl font-bold">AED 285.50</div>
             <p className="text-xs text-muted-foreground">+5.2% from last week</p>
           </CardContent>
         </Card>
@@ -79,7 +79,7 @@ const UnitStatus = () => {
                     </div>
                   </TableCell>
                   <TableCell>{unit.type}</TableCell>
-                  <TableCell className="font-semibold text-primary">${unit.price}</TableCell>
+                  <TableCell className="font-semibold text-primary">AED {unit.price}</TableCell>
                   <TableCell>
                     <Badge variant="outline" className="font-normal">{unit.pms}</Badge>
                   </TableCell>

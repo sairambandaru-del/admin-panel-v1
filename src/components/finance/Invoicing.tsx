@@ -135,7 +135,7 @@ const Invoicing = () => {
                     </Select>
                   </div>
                   <div className="grid gap-2">
-                    <Label htmlFor="amount">Amount ($)</Label>
+                    <Label htmlFor="amount">Amount (AED)</Label>
                     <Input 
                       id="amount" 
                       type="number" 
@@ -198,7 +198,7 @@ const Invoicing = () => {
                           <TableCell className="font-bold">{inv.id}</TableCell>
                           <TableCell>{inv.entity}</TableCell>
                           <TableCell>{inv.date}</TableCell>
-                          <TableCell>${inv.amount.toFixed(2)}</TableCell>
+                          <TableCell>AED {inv.amount.toFixed(2)}</TableCell>
                           <TableCell>
                             <Badge variant={
                               inv.status === 'Paid' ? 'default' : 

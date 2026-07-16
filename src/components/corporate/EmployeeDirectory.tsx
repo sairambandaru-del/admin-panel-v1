@@ -414,7 +414,7 @@ const EmployeeDirectory = () => {
                         <p className="text-xs text-muted-foreground">Limit the maximum cost for accommodation.</p>
                       </div>
                       <div className="flex items-center gap-2">
-                        <span className="text-sm font-medium">$</span>
+                        <span className="text-sm font-medium">AED</span>
                         <Input className="w-24 h-8" defaultValue={selectedEmployee.policy.maxBudget.toString()} />
                       </div>
                     </div>
@@ -484,7 +484,7 @@ const EmployeeDirectory = () => {
                               </div>
                             </div>
                             <div className="text-right shrink-0 pl-2">
-                              <p className="font-bold text-sm text-primary">${trip.cost}</p>
+                              <p className="font-bold text-sm text-primary">AED {trip.cost}</p>
                               <Badge variant={trip.status === 'Active' ? 'default' : trip.status === 'Upcoming' ? 'secondary' : 'outline'} className="text-[9px] px-1.5 py-0 mt-1">
                                 {trip.status}
                               </Badge>
@@ -550,7 +550,7 @@ const EmployeeDirectory = () => {
                                     <div className="text-[10px] text-muted-foreground">{booking.provider} • {booking.date}</div>
                                   </TableCell>
                                   <TableCell className="py-3 text-right font-semibold text-xs">
-                                    ${booking.cost.toFixed(2)}
+                                    AED {booking.cost.toFixed(2)}
                                   </TableCell>
                                   <TableCell className="py-3 text-right">
                                     <Button 
@@ -568,7 +568,7 @@ const EmployeeDirectory = () => {
                               <TableRow className="bg-primary/5 font-bold">
                                 <TableCell colSpan={2} className="py-3 text-xs">Total Trip Cost</TableCell>
                                 <TableCell className="py-3 text-right text-primary text-xs">
-                                  ${activeTrip.cost.toFixed(2)}
+                                  AED {activeTrip.cost.toFixed(2)}
                                 </TableCell>
                                 <TableCell className="py-3" />
                               </TableRow>
@@ -611,7 +611,7 @@ const EmployeeDirectory = () => {
                         <TableCell className="font-bold">{req.id}</TableCell>
                         <TableCell className="font-semibold">{req.destination}</TableCell>
                         <TableCell>{req.dates}</TableCell>
-                        <TableCell className="font-semibold text-primary">${req.cost}</TableCell>
+                        <TableCell className="font-semibold text-primary">AED {req.cost}</TableCell>
                         <TableCell className="max-w-[200px] truncate" title={req.reason}>
                           {req.reason}
                         </TableCell>

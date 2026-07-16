@@ -33,7 +33,7 @@ const Payouts = () => {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold flex items-center gap-2">
-              $19,500.00
+              AED 19,500.00
               <ArrowUpRight className="w-4 h-4 text-green-500" />
             </div>
           </CardContent>
@@ -44,7 +44,7 @@ const Payouts = () => {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold flex items-center gap-2">
-              $1,950.00
+              AED 1,950.00
               <ArrowDownRight className="w-4 h-4 text-red-500" />
             </div>
           </CardContent>
@@ -55,7 +55,7 @@ const Payouts = () => {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold flex items-center gap-2">
-              $17,550.00
+              AED 17,550.00
               <Wallet className="w-4 h-4 text-green-600" />
             </div>
           </CardContent>
@@ -94,9 +94,9 @@ const Payouts = () => {
                         <TableRow key={p.id}>
                           <TableCell className="font-bold">{p.id}</TableCell>
                           <TableCell>{p.entity}</TableCell>
-                          <TableCell className="text-green-600 font-medium">+${p.income.toFixed(2)}</TableCell>
-                          <TableCell className="text-red-600 font-medium">-${p.expenses.toFixed(2)}</TableCell>
-                          <TableCell className="font-bold text-primary">${(p.income - p.expenses).toFixed(2)}</TableCell>
+                          <TableCell className="text-green-600 font-medium">+AED {p.income.toFixed(2)}</TableCell>
+                          <TableCell className="text-red-600 font-medium">-AED {p.expenses.toFixed(2)}</TableCell>
+                          <TableCell className="font-bold text-primary">AED {(p.income - p.expenses).toFixed(2)}</TableCell>
                           <TableCell className="text-right">
                             <Button size="sm" variant="outline" onClick={() => handleProcessPayout(p.id)}>
                               Process Payout

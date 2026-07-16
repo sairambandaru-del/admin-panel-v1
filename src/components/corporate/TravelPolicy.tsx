@@ -76,7 +76,7 @@ const TravelPolicy = () => {
                           <p className="text-xs text-muted-foreground">Limit the maximum cost for accommodation.</p>
                         </div>
                         <div className="flex items-center gap-2">
-                          <span className="text-sm font-medium">$</span>
+                          <span className="text-sm font-medium">AED</span>
                           <Input className="w-24 h-8" defaultValue="250" />
                         </div>
                       </div>
@@ -105,7 +105,7 @@ const TravelPolicy = () => {
                           <p className="text-xs text-muted-foreground">Approve trips below this total amount.</p>
                         </div>
                         <div className="flex items-center gap-2">
-                          <span className="text-sm font-medium">$</span>
+                          <span className="text-sm font-medium">AED</span>
                           <Input className="w-24 h-8" defaultValue="1500" />
                         </div>
                       </div>

@@ -264,7 +264,7 @@ const BookingReport = () => {
                     <TableCell className="text-xs whitespace-nowrap">{booking.startDate}</TableCell>
                     <TableCell className="text-xs whitespace-nowrap">{booking.endDate}</TableCell>
                     <TableCell className="text-xs whitespace-nowrap">{booking.bookingDate}</TableCell>
-                    <TableCell className="text-right font-bold text-primary">${booking.amount.toFixed(2)}</TableCell>
+                    <TableCell className="text-right font-bold text-primary">AED {booking.amount.toFixed(2)}</TableCell>
                   </TableRow>
                 ))}
                 {filteredBookings.length === 0 && (
@@ -382,7 +382,7 @@ const BookingReport = () => {
               <div className="border-t pt-4 flex justify-between items-center">
                 <div>
                   <p className="text-xs text-muted-foreground">Total Amount Billed</p>
-                  <p className="text-2xl font-bold text-primary">${selectedBooking.amount.toFixed(2)}</p>
+                  <p className="text-2xl font-bold text-primary">AED {selectedBooking.amount.toFixed(2)}</p>
                 </div>
                 <Button 
                   className="gap-2"

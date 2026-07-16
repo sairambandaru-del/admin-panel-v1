@@ -40,27 +40,27 @@ const VendorSOA = () => {
                 <TableRow>
                   <TableCell className="text-xs font-medium">Elite Housekeeping</TableCell>
                   <TableCell className="font-medium">May 2024</TableCell>
-                  <TableCell>$12,450.00</TableCell>
-                  <TableCell>$1,867.50</TableCell>
-                  <TableCell className="font-bold text-primary">$10,582.50</TableCell>
+                  <TableCell>AED 12,450.00</TableCell>
+                  <TableCell>AED 1,867.50</TableCell>
+                  <TableCell className="font-bold text-primary">AED 10,582.50</TableCell>
                   <TableCell><Badge variant="secondary">Processing</Badge></TableCell>
                   <TableCell className="text-right"><Button variant="ghost" size="sm">View Details</Button></TableCell>
                 </TableRow>
                 <TableRow>
                   <TableCell className="text-xs font-medium">Swift Car Rentals</TableCell>
                   <TableCell className="font-medium">April 2024</TableCell>
-                  <TableCell>$15,200.00</TableCell>
-                  <TableCell>$2,280.00</TableCell>
-                  <TableCell className="font-bold text-primary">$12,920.00</TableCell>
+                  <TableCell>AED 15,200.00</TableCell>
+                  <TableCell>AED 2,280.00</TableCell>
+                  <TableCell className="font-bold text-primary">AED 12,920.00</TableCell>
                   <TableCell><Badge variant="default">Paid</Badge></TableCell>
                   <TableCell className="text-right"><Button variant="ghost" size="sm">View Details</Button></TableCell>
                 </TableRow>
                 <TableRow>
                   <TableCell className="text-xs font-medium">Gourmet Catering Co</TableCell>
                   <TableCell className="font-medium">March 2024</TableCell>
-                  <TableCell>$11,800.00</TableCell>
-                  <TableCell>$1,770.00</TableCell>
-                  <TableCell className="font-bold text-primary">$10,030.00</TableCell>
+                  <TableCell>AED 11,800.00</TableCell>
+                  <TableCell>AED 1,770.00</TableCell>
+                  <TableCell className="font-bold text-primary">AED 10,030.00</TableCell>
                   <TableCell><Badge variant="default">Paid</Badge></TableCell>
                   <TableCell className="text-right"><Button variant="ghost" size="sm">View Details</Button></TableCell>
                 </TableRow>

@@ -131,7 +131,7 @@ const Disputes = () => {
                       Unit: {BOOKINGS.find(b => b.id === formData.bookingId)?.unit}
                     </p>
                     <p className="text-muted-foreground">
-                      Total Booked Value: ${BOOKINGS.find(b => b.id === formData.bookingId)?.bookingAmount.toFixed(2)}
+                      Total Booked Value: AED {BOOKINGS.find(b => b.id === formData.bookingId)?.bookingAmount.toFixed(2)}
                     </p>
                   </div>
                 )}
@@ -148,7 +148,7 @@ const Disputes = () => {
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="grid gap-2">
-                    <Label htmlFor="amount">Refund Amount ($)</Label>
+                    <Label htmlFor="amount">Refund Amount (AED)</Label>
                     <Input 
                       id="amount" 
                       type="number" 
@@ -218,7 +218,7 @@ const Disputes = () => {
                         <span className="text-[10px] text-muted-foreground">{d.date}</span>
                       </div>
                     </TableCell>
-                    <TableCell>${d.amount.toFixed(2)}</TableCell>
+                    <TableCell>AED {d.amount.toFixed(2)}</TableCell>
                     <TableCell>
                       <Badge variant={d.priority === 'High' ? 'destructive' : 'secondary'}>
                         {d.priority}
