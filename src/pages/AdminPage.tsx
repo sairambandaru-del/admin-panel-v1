@@ -9,6 +9,7 @@ import SystemAlerts from '@/components/dashboard/SystemAlerts';
 import Communications from '@/components/dashboard/Communications';
 import BookingsTable from '@/components/dashboard/BookingsTable';
 import CorporateDirectories from '@/components/corporate/CorporateDirectories';
+import EmployeeDirectory from '@/components/corporate/EmployeeDirectory';
 import TravelPolicy from '@/components/corporate/TravelPolicy';
 import ExpenseAuditing from '@/components/corporate/ExpenseAuditing';
 import CustomEnquiries from '@/components/corporate/CustomEnquiries';
@@ -42,6 +43,7 @@ const AdminPage = () => {
 
     // Corporate Ecosystem Section
     if (path === '/corporate/directories') return <CorporateDirectories />;
+    if (path === '/corporate/employees') return <EmployeeDirectory />;
     if (path === '/corporate/policy') return <TravelPolicy />;
     if (path === '/corporate/auditing') return <ExpenseAuditing />;
     if (path === '/corporate/enquiries') return <CustomEnquiries />;

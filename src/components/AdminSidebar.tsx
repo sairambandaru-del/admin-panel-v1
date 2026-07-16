@@ -66,6 +66,7 @@ const navigation: NavItem[] = [
     icon: Building2,
     items: [
       { title: "Directories", href: "/corporate/directories", icon: BookOpen },
+      { title: "Employee Directory", href: "/corporate/employees", icon: Users },
       { title: "Travel Policy", href: "/corporate/policy", icon: ShieldCheck },
       { title: "Auditing & Approval", href: "/corporate/auditing", icon: ClipboardCheck },
       { title: "Custom Enquiries", href: "/corporate/enquiries", icon: HelpCircle },
