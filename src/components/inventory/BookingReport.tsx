@@ -105,6 +105,32 @@ const initialBookings: Booking[] = [
     unit: 'General Practitioner Visit'
   },
   {
+    id: 'BK-5514',
+    status: 'Menu finalized',
+    startDate: '2024-05-24 18:00',
+    endDate: '2024-05-24 22:00',
+    bookingDate: '2024-05-19',
+    guestName: 'Emma Watson',
+    contactNumber: '+1 (555) 044-8822',
+    emailId: 'emma.w@example.com',
+    serviceCategory: 'Chef on Call',
+    amount: 1200.00,
+    unit: 'Private 5-Course French Dinner'
+  },
+  {
+    id: 'BK-5515',
+    status: 'In progress',
+    startDate: '2024-05-20 08:00',
+    endDate: '2024-05-23 18:00',
+    bookingDate: '2024-05-15',
+    guestName: 'Liam Neeson',
+    contactNumber: '+1 (555) 999-8888',
+    emailId: 'liam@taken.com',
+    serviceCategory: 'Car Rentals',
+    amount: 950.00,
+    unit: 'Range Rover Sport'
+  },
+  {
     id: 'BK-5503',
     status: 'Confirmed',
     startDate: '2024-05-01 09:00',
@@ -193,6 +219,16 @@ export const getStatusBadge = (status: string) => {
     case 'Follow-up':
       return <Badge variant="outline" className="bg-cyan-50 text-cyan-700 border-cyan-200 hover:bg-cyan-50 font-medium">Follow-up</Badge>;
 
+    // Chef on Call & In-house Catering Specific
+    case 'Menu finalized':
+      return <Badge variant="outline" className="bg-teal-50 text-teal-700 border-teal-200 hover:bg-teal-50 font-medium">Menu Finalized</Badge>;
+    case 'Inprogress':
+      return <Badge variant="outline" className="bg-violet-50 text-violet-700 border-violet-200 hover:bg-violet-50 font-medium">In Progress</Badge>;
+
+    // Car Rental & Transportation Specific
+    case 'In progress':
+      return <Badge variant="outline" className="bg-violet-50 text-violet-700 border-violet-200 hover:bg-violet-50 font-medium">In Progress</Badge>;
+
     default:
       return <Badge>{status}</Badge>;
   }
@@ -261,10 +297,14 @@ const BookingReport = () => {
       return ['Order placed', 'Packing the cart', 'Out for delivery', 'Delivered', 'Cancelled'];
     } else if (categoryFilter === 'Doctor on Call') {
       return ['Enquiry', 'Arrived', 'Consultation active', 'treatment & documentation', 'Completed', 'Follow-up', 'Cancelled'];
+    } else if (categoryFilter === 'Chef on Call' || categoryFilter === 'In House Catering') {
+      return ['Enquiry', 'Confirmed', 'Menu finalized', 'Inprogress', 'Completed', 'Cancelled'];
+    } else if (categoryFilter === 'Car Rentals' || categoryFilter === 'Transportation') {
+      return ['Enquiry', 'Confirmed', 'In progress', 'Completed', 'Cancelled'];
     } else if (categoryFilter !== 'all') {
       return ['Enquiry', 'Confirmed', 'Cancelled', 'Completed'];
     }
-    return ['Enquiry', 'Confirmed', 'Checked in', 'Checked out', 'Completed', 'Cancelled', 'Scheduled', 'In progressed', 'Order placed', 'Accepted', 'Preparing', 'Ready for pickup', 'Out for delivery', 'Delivered', 'Packing the cart', 'Arrived', 'Consultation active', 'treatment & documentation', 'Follow-up'];
+    return ['Enquiry', 'Confirmed', 'Checked in', 'Checked out', 'Completed', 'Cancelled', 'Scheduled', 'In progressed', 'Order placed', 'Accepted', 'Preparing', 'Ready for pickup', 'Out for delivery', 'Delivered', 'Packing the cart', 'Arrived', 'Consultation active', 'treatment & documentation', 'Follow-up', 'Menu finalized', 'Inprogress', 'In progress'];
   };
 
   return (

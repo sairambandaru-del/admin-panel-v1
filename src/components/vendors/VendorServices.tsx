@@ -123,6 +123,20 @@ const initialBookings: Booking[] = [
     amount: 850.00
   },
   {
+    id: 'BK-9931',
+    vendor: 'Gourmet Catering Co',
+    guestName: 'Emma Watson',
+    guestPhone: '+1 (555) 044-8822',
+    guestEmail: 'emma.w@example.com',
+    serviceCategory: 'catering',
+    serviceName: 'Private 5-Course French Dinner',
+    bookingDate: '2024-05-19 11:00 AM',
+    startDate: '2024-05-24 06:00 PM',
+    endDate: '2024-05-24 10:00 PM',
+    status: 'Menu finalized',
+    amount: 1200.00
+  },
+  {
     id: 'BK-9945',
     vendor: 'Wellness Retreats',
     guestName: 'David Miller',
@@ -177,6 +191,20 @@ const initialBookings: Booking[] = [
     endDate: '2024-05-21 01:00 PM',
     status: 'Consultation active',
     amount: 350.00
+  },
+  {
+    id: 'BK-9985',
+    vendor: 'Swift Car Rentals',
+    guestName: 'Liam Neeson',
+    guestPhone: '+1 (555) 999-8888',
+    guestEmail: 'liam@taken.com',
+    serviceCategory: 'car',
+    serviceName: 'Range Rover Sport Rental',
+    bookingDate: '2024-05-15 09:00 AM',
+    startDate: '2024-05-20 08:00 AM',
+    endDate: '2024-05-23 06:00 PM',
+    status: 'In progress',
+    amount: 950.00
   }
 ];
 
@@ -254,10 +282,14 @@ const VendorServices = () => {
       return ['Order placed', 'Packing the cart', 'Out for delivery', 'Delivered', 'Cancelled'];
     } else if (category === 'doctor') {
       return ['Enquiry', 'Arrived', 'Consultation active', 'treatment & documentation', 'Completed', 'Follow-up', 'Cancelled'];
+    } else if (category === 'chef' || category === 'catering') {
+      return ['Enquiry', 'Confirmed', 'Menu finalized', 'Inprogress', 'Completed', 'Cancelled'];
+    } else if (category === 'car' || category === 'transport') {
+      return ['Enquiry', 'Confirmed', 'In progress', 'Completed', 'Cancelled'];
     } else if (category !== 'all') {
       return ['Enquiry', 'Confirmed', 'Cancelled', 'Completed'];
     }
-    return ['Enquiry', 'Confirmed', 'Checked in', 'Checked out', 'Completed', 'Cancelled', 'Scheduled', 'In progressed', 'Order placed', 'Accepted', 'Preparing', 'Ready for pickup', 'Out for delivery', 'Delivered', 'Packing the cart', 'Arrived', 'Consultation active', 'treatment & documentation', 'Follow-up'];
+    return ['Enquiry', 'Confirmed', 'Checked in', 'Checked out', 'Completed', 'Cancelled', 'Scheduled', 'In progressed', 'Order placed', 'Accepted', 'Preparing', 'Ready for pickup', 'Out for delivery', 'Delivered', 'Packing the cart', 'Arrived', 'Consultation active', 'treatment & documentation', 'Follow-up', 'Menu finalized', 'Inprogress', 'In progress'];
   };
 
   return (
