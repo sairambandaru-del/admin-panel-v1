@@ -30,7 +30,7 @@ import {
   CheckCircle
 } from 'lucide-react';
 import { showSuccess, showError } from '@/utils/toast';
-import { getStatusBadge } from '../inventory/BookingReport';
+import { getStatusBadge, LAUNDRY_STATUSES } from '../inventory/BookingReport';
 
 const categories = [
   { id: 'all', label: 'All Categories' },
@@ -123,20 +123,6 @@ const initialBookings: Booking[] = [
     amount: 850.00
   },
   {
-    id: 'BK-9931',
-    vendor: 'Gourmet Catering Co',
-    guestName: 'Emma Watson',
-    guestPhone: '+1 (555) 044-8822',
-    guestEmail: 'emma.w@example.com',
-    serviceCategory: 'catering',
-    serviceName: 'Private 5-Course French Dinner',
-    bookingDate: '2024-05-19 11:00 AM',
-    startDate: '2024-05-24 06:00 PM',
-    endDate: '2024-05-24 10:00 PM',
-    status: 'Menu finalized',
-    amount: 1200.00
-  },
-  {
     id: 'BK-9945',
     vendor: 'Wellness Retreats',
     guestName: 'David Miller',
@@ -193,18 +179,18 @@ const initialBookings: Booking[] = [
     amount: 350.00
   },
   {
-    id: 'BK-9985',
-    vendor: 'Swift Car Rentals',
-    guestName: 'Liam Neeson',
-    guestPhone: '+1 (555) 999-8888',
-    guestEmail: 'liam@taken.com',
-    serviceCategory: 'car',
-    serviceName: 'Range Rover Sport Rental',
-    bookingDate: '2024-05-15 09:00 AM',
-    startDate: '2024-05-20 08:00 AM',
-    endDate: '2024-05-23 06:00 PM',
-    status: 'In progress',
-    amount: 950.00
+    id: 'BK-9990',
+    vendor: 'Laundry Pros',
+    guestName: 'Michael Jordan',
+    guestPhone: '+1 (555) 230-9944',
+    guestEmail: 'mj23@bulls.com',
+    serviceCategory: 'laundry',
+    serviceName: 'Premium Dry Cleaning',
+    bookingDate: '2024-05-20 08:00 AM',
+    startDate: '2024-05-21 10:00 AM',
+    endDate: '2024-05-23 05:00 PM',
+    status: 'order accepted',
+    amount: 180.00
   }
 ];
 
@@ -225,13 +211,18 @@ const VendorServices = () => {
     else showError(`Enquiry ${id} rejected.`);
   };
 
-  const handleConfirmHousekeeping = (bookingId: string) => {
+  const handleUpdateStatus = (bookingId: string, newStatus: string) => {
     setBookings(prev => prev.map(b => 
-      b.id === bookingId ? { ...b, status: 'Confirmed' } : b
+      b.id === bookingId ? { ...b, status: newStatus } : b
     ));
     if (selectedBooking && selectedBooking.id === bookingId) {
-      setSelectedBooking(prev => prev ? { ...prev, status: 'Confirmed' } : null);
+      setSelectedBooking(prev => prev ? { ...prev, status: newStatus } : null);
     }
+    showSuccess(`Booking ${bookingId} status updated to "${newStatus}".`);
+  };
+
+  const handleConfirmHousekeeping = (bookingId: string) => {
+    handleUpdateStatus(bookingId, 'Confirmed');
     showSuccess(`Housekeeping booking ${bookingId} has been confirmed by the STR company.`);
   };
 
@@ -286,10 +277,12 @@ const VendorServices = () => {
       return ['Enquiry', 'Confirmed', 'Menu finalized', 'Inprogress', 'Completed', 'Cancelled'];
     } else if (category === 'car' || category === 'transport') {
       return ['Enquiry', 'Confirmed', 'In progress', 'Completed', 'Cancelled'];
+    } else if (category === 'laundry') {
+      return LAUNDRY_STATUSES;
     } else if (category !== 'all') {
       return ['Enquiry', 'Confirmed', 'Cancelled', 'Completed'];
     }
-    return ['Enquiry', 'Confirmed', 'Checked in', 'Checked out', 'Completed', 'Cancelled', 'Scheduled', 'In progressed', 'Order placed', 'Accepted', 'Preparing', 'Ready for pickup', 'Out for delivery', 'Delivered', 'Packing the cart', 'Arrived', 'Consultation active', 'treatment & documentation', 'Follow-up', 'Menu finalized', 'Inprogress', 'In progress'];
+    return ['Enquiry', 'Confirmed', 'Checked in', 'Checked out', 'Completed', 'Cancelled', 'Scheduled', 'In progressed', 'Order placed', 'Accepted', 'Preparing', 'Ready for pickup', 'Out for delivery', 'Delivered', 'Packing the cart', 'Arrived', 'Consultation active', 'treatment & documentation', 'Follow-up', ...LAUNDRY_STATUSES];
   };
 
   return (
@@ -344,7 +337,7 @@ const VendorServices = () => {
                     <SelectContent>
                       <SelectItem value="all">All Statuses</SelectItem>
                       {getAvailableStatuses().map(status => (
-                        <SelectItem key={status} value={status}>{status}</SelectItem>
+                        <SelectItem key={status} value={status} className="capitalize">{status}</SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
@@ -379,6 +372,7 @@ const VendorServices = () => {
                     <TableRow>
                       <TableHead className="w-[100px]">Booking ID</TableHead>
                       <TableHead>Status</TableHead>
+                      <TableHead>Update Status</TableHead>
                       <TableHead>Guest Name</TableHead>
                       <TableHead>Contact Number</TableHead>
                       <TableHead>Email ID</TableHead>
@@ -391,45 +385,74 @@ const VendorServices = () => {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {filteredBookings.map((booking) => (
-                      <TableRow 
-                        key={booking.id} 
-                        className="cursor-pointer hover:bg-muted/50 transition-colors"
-                        onClick={() => setSelectedBooking(booking)}
-                      >
-                        <TableCell className="font-mono text-xs font-bold text-primary">
-                          {booking.id}
-                        </TableCell>
-                        <TableCell>
-                          {getStatusBadge(booking.status)}
-                        </TableCell>
-                        <TableCell className="font-medium text-xs">{booking.guestName}</TableCell>
-                        <TableCell className="text-xs">{booking.guestPhone}</TableCell>
-                        <TableCell className="text-xs">{booking.guestEmail}</TableCell>
-                        <TableCell>
-                          <Badge variant="outline" className="capitalize text-[10px]">
-                            {categories.find(c => c.id === booking.serviceCategory)?.label || booking.serviceCategory}
-                          </Badge>
-                        </TableCell>
-                        <TableCell className="text-xs whitespace-nowrap">{booking.bookingDate}</TableCell>
-                        <TableCell className="text-xs whitespace-nowrap">{booking.startDate}</TableCell>
-                        <TableCell className="text-xs whitespace-nowrap">{booking.endDate}</TableCell>
-                        <TableCell className="text-right font-bold text-xs">AED {booking.amount.toFixed(2)}</TableCell>
-                        <TableCell className="text-center" onClick={(e) => e.stopPropagation()}>
-                          <Button 
-                            variant="ghost" 
-                            size="icon" 
-                            className="h-8 w-8 text-primary"
-                            onClick={() => setSelectedBooking(booking)}
-                          >
-                            <Eye className="w-4 h-4" />
-                          </Button>
-                        </TableCell>
-                      </TableRow>
-                    ))}
+                    {filteredBookings.map((booking) => {
+                      const allowedStatuses = booking.serviceCategory === 'laundry' ? LAUNDRY_STATUSES : 
+                        booking.serviceCategory === 'str' ? ['Enquiry', 'Confirmed', 'Checked in', 'Checked out', 'Cancelled'] :
+                        booking.serviceCategory === 'housekeeping' ? ['Enquiry', 'Confirmed', 'Scheduled', 'In progressed', 'Completed', 'Cancelled'] :
+                        booking.serviceCategory === 'food' ? ['Order placed', 'Accepted', 'Preparing', 'Ready for pickup', 'Out for delivery', 'Delivered', 'Cancelled'] :
+                        booking.serviceCategory === 'grocery' ? ['Order placed', 'Packing the cart', 'Out for delivery', 'Delivered', 'Cancelled'] :
+                        booking.serviceCategory === 'doctor' ? ['Enquiry', 'Arrived', 'Consultation active', 'treatment & documentation', 'Completed', 'Follow-up', 'Cancelled'] :
+                        booking.serviceCategory === 'chef' || booking.serviceCategory === 'catering' ? ['Enquiry', 'Confirmed', 'Menu finalized', 'Inprogress', 'Completed', 'Cancelled'] :
+                        booking.serviceCategory === 'car' || booking.serviceCategory === 'transport' ? ['Enquiry', 'Confirmed', 'In progress', 'Completed', 'Cancelled'] :
+                        ['Enquiry', 'Confirmed', 'Cancelled', 'Completed'];
+
+                      return (
+                        <TableRow 
+                          key={booking.id} 
+                          className="cursor-pointer hover:bg-muted/50 transition-colors"
+                          onClick={() => setSelectedBooking(booking)}
+                        >
+                          <TableCell className="font-mono text-xs font-bold text-primary">
+                            {booking.id}
+                          </TableCell>
+                          <TableCell>
+                            {getStatusBadge(booking.status)}
+                          </TableCell>
+                          <TableCell onClick={(e) => e.stopPropagation()}>
+                            <Select 
+                              value={booking.status} 
+                              onValueChange={(val) => handleUpdateStatus(booking.id, val)}
+                            >
+                              <SelectTrigger className="h-8 w-[160px] text-xs capitalize">
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {allowedStatuses.map(status => (
+                                  <SelectItem key={status} value={status} className="capitalize text-xs">
+                                    {status}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </TableCell>
+                          <TableCell className="font-medium text-xs">{booking.guestName}</TableCell>
+                          <TableCell className="text-xs">{booking.guestPhone}</TableCell>
+                          <TableCell className="text-xs">{booking.guestEmail}</TableCell>
+                          <TableCell>
+                            <Badge variant="outline" className="capitalize text-[10px]">
+                              {categories.find(c => c.id === booking.serviceCategory)?.label || booking.serviceCategory}
+                            </Badge>
+                          </TableCell>
+                          <TableCell className="text-xs whitespace-nowrap">{booking.bookingDate}</TableCell>
+                          <TableCell className="text-xs whitespace-nowrap">{booking.startDate}</TableCell>
+                          <TableCell className="text-xs whitespace-nowrap">{booking.endDate}</TableCell>
+                          <TableCell className="text-right font-bold text-xs">AED {booking.amount.toFixed(2)}</TableCell>
+                          <TableCell className="text-center" onClick={(e) => e.stopPropagation()}>
+                            <Button 
+                              variant="ghost" 
+                              size="icon" 
+                              className="h-8 w-8 text-primary"
+                              onClick={() => setSelectedBooking(booking)}
+                            >
+                              <Eye className="w-4 h-4" />
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })}
                     {filteredBookings.length === 0 && (
                       <TableRow>
-                        <TableCell colSpan={11} className="h-32 text-center text-muted-foreground">
+                        <TableCell colSpan={12} className="h-32 text-center text-muted-foreground">
                           No bookings found matching the search or filter criteria.
                         </TableCell>
                       </TableRow>
