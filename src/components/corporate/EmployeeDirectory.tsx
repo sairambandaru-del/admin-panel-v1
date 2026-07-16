@@ -22,9 +22,22 @@ import {
   Heart, 
   MapPin, 
   Calendar, 
-  DollarSign 
+  DollarSign,
+  Download,
+  FileText,
+  ChevronRight
 } from 'lucide-react';
 import { showSuccess, showError } from '@/utils/toast';
+import { cn } from "@/lib/utils";
+
+interface TripBooking {
+  id: string;
+  category: string;
+  item: string;
+  provider: string;
+  cost: number;
+  date: string;
+}
 
 interface Trip {
   id: string;
@@ -33,6 +46,7 @@ interface Trip {
   purpose: string;
   cost: number;
   status: 'Upcoming' | 'Active' | 'Completed';
+  bookings: TripBooking[];
 }
 
 interface ApprovalRequest {
@@ -90,8 +104,33 @@ const initialEmployees: Employee[] = [
       requiresApproval: false
     },
     trips: [
-      { id: 'TRP-101', destination: 'London, UK', dates: 'Jun 12 - Jun 18, 2024', purpose: 'Q2 Product Sync', cost: 1450, status: 'Upcoming' },
-      { id: 'TRP-102', destination: 'San Francisco, USA', dates: 'Mar 04 - Mar 10, 2024', purpose: 'Tech Summit', cost: 2100, status: 'Completed' }
+      { 
+        id: 'TRP-101', 
+        destination: 'London, UK', 
+        dates: 'Jun 12 - Jun 18, 2024', 
+        purpose: 'Q2 Product Sync', 
+        cost: 1450, 
+        status: 'Upcoming',
+        bookings: [
+          { id: 'BKG-101A', category: 'Short Term Rentals', item: 'Skyline London Apartment', provider: 'Cloudbeds', cost: 900, date: 'Jun 12, 2024' },
+          { id: 'BKG-101B', category: 'Transportation', item: 'Heathrow Express & Tube Pass', provider: 'Swift Car Rentals', cost: 150, date: 'Jun 12, 2024' },
+          { id: 'BKG-101C', category: 'In House Catering', item: 'Welcome Dinner Catering', provider: 'Gourmet Catering Co', cost: 400, date: 'Jun 13, 2024' }
+        ]
+      },
+      { 
+        id: 'TRP-102', 
+        destination: 'San Francisco, USA', 
+        dates: 'Mar 04 - Mar 10, 2024', 
+        purpose: 'Tech Summit', 
+        cost: 2100, 
+        status: 'Completed',
+        bookings: [
+          { id: 'BKG-102A', category: 'Short Term Rentals', item: 'SOMA Modern Loft', provider: 'Mews', cost: 1200, date: 'Mar 04, 2024' },
+          { id: 'BKG-102B', category: 'Car Rentals', item: 'Tesla Model 3 Rental', provider: 'Swift Car Rentals', cost: 500, date: 'Mar 04, 2024' },
+          { id: 'BKG-102C', category: 'Co-working Spaces', item: 'WeWork Day Pass', provider: 'WeWork', cost: 150, date: 'Mar 05, 2024' },
+          { id: 'BKG-102D', category: 'Dining', item: 'Client Dinner at Gary Danko', provider: 'Gary Danko', cost: 250, date: 'Mar 06, 2024' }
+        ]
+      }
     ],
     approvals: [
       { id: 'APR-201', destination: 'Tokyo, Japan', dates: 'Sep 15 - Sep 22, 2024', cost: 3200, reason: 'Partner Conference', status: 'Pending' }
@@ -118,7 +157,20 @@ const initialEmployees: Employee[] = [
       requiresApproval: true
     },
     trips: [
-      { id: 'TRP-103', destination: 'New York, USA', dates: 'May 25 - May 29, 2024', purpose: 'Enterprise Client Pitch', cost: 1850, status: 'Upcoming' }
+      { 
+        id: 'TRP-103', 
+        destination: 'New York, USA', 
+        dates: 'May 25 - May 29, 2024', 
+        purpose: 'Enterprise Client Pitch', 
+        cost: 1850, 
+        status: 'Upcoming',
+        bookings: [
+          { id: 'BKG-103A', category: 'Short Term Rentals', item: 'Manhattan Studio Loft', provider: 'Hostaway', cost: 1100, date: 'May 25, 2024' },
+          { id: 'BKG-103B', category: 'Transportation', item: 'JFK Airport Transfer', provider: 'Swift Car Rentals', cost: 150, date: 'May 25, 2024' },
+          { id: 'BKG-103C', category: 'Dining', item: 'Business Lunch Meeting', provider: 'Gourmet Catering Co', cost: 200, date: 'May 26, 2024' },
+          { id: 'BKG-103D', category: 'Wellness', item: 'Equinox Day Pass', provider: 'Equinox', cost: 400, date: 'May 27, 2024' }
+        ]
+      }
     ],
     approvals: []
   },
@@ -153,8 +205,20 @@ const EmployeeDirectory = () => {
   const [employees, setEmployees] = useState<Employee[]>(initialEmployees);
   const [selectedEmpId, setSelectedEmpId] = useState<string>(initialEmployees[0].id);
   const [searchQuery, setSearchQuery] = useState('');
+  const [selectedTripId, setSelectedTripId] = useState<string | null>(null);
 
   const selectedEmployee = employees.find(emp => emp.id === selectedEmpId) || employees[0];
+
+  // Automatically select the first trip when employee changes
+  React.useEffect(() => {
+    if (selectedEmployee.trips.length > 0) {
+      setSelectedTripId(selectedEmployee.trips[0].id);
+    } else {
+      setSelectedTripId(null);
+    }
+  }, [selectedEmpId, selectedEmployee]);
+
+  const activeTrip = selectedEmployee.trips.find(t => t.id === selectedTripId);
 
   const handleSavePreferences = (e: React.FormEvent) => {
     e.preventDefault();
@@ -184,6 +248,14 @@ const EmployeeDirectory = () => {
     } else {
       showError(`Travel request ${reqId} declined.`);
     }
+  };
+
+  const handleDownloadBookingInvoice = (booking: TripBooking) => {
+    showSuccess(`Downloading invoice for ${booking.category} (${booking.id})...`);
+  };
+
+  const handleDownloadTripInvoice = (trip: Trip) => {
+    showSuccess(`Downloading full trip invoice for ${trip.destination} (${trip.id})...`);
   };
 
   const filteredEmployees = employees.filter(emp => 
@@ -387,54 +459,139 @@ const EmployeeDirectory = () => {
             </TabsContent>
 
             {/* Active Trips Tab */}
-            <TabsContent value="trips" className="space-y-4">
-              <div className="rounded-md border">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Destination</TableHead>
-                      <TableHead>Dates</TableHead>
-                      <TableHead>Purpose</TableHead>
-                      <TableHead>Estimated Cost</TableHead>
-                      <TableHead>Status</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {selectedEmployee.trips.map((trip) => (
-                      <TableRow key={trip.id}>
-                        <TableCell className="font-semibold">
-                          <div className="flex items-center gap-2">
-                            <MapPin className="w-4 h-4 text-primary" />
-                            {trip.destination}
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <div className="flex items-center gap-1.5 text-xs">
-                            <Calendar className="w-3.5 h-3.5 text-muted-foreground" />
-                            {trip.dates}
-                          </div>
-                        </TableCell>
-                        <TableCell>{trip.purpose}</TableCell>
-                        <TableCell className="font-semibold">${trip.cost}</TableCell>
-                        <TableCell>
-                          <Badge variant={
-                            trip.status === 'Active' ? 'default' : 
-                            trip.status === 'Upcoming' ? 'secondary' : 'outline'
-                          }>
-                            {trip.status}
-                          </Badge>
-                        </TableCell>
-                      </TableRow>
-                    ))}
+            <TabsContent value="trips" className="space-y-6">
+              <div className="grid gap-6 lg:grid-cols-12">
+                {/* Left side: Trip List */}
+                <div className="lg:col-span-5 space-y-4">
+                  <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Trip History & Active Trips</h3>
+                  <div className="space-y-2">
+                    {selectedEmployee.trips.map((trip) => {
+                      const isSelected = selectedTripId === trip.id;
+                      return (
+                        <Card 
+                          key={trip.id} 
+                          className={cn(
+                            "cursor-pointer transition-all hover:border-primary/50",
+                            isSelected ? "border-primary bg-primary/5 ring-1 ring-primary" : ""
+                          )}
+                          onClick={() => setSelectedTripId(trip.id)}
+                        >
+                          <CardContent className="p-4 flex items-center justify-between">
+                            <div className="space-y-1 min-w-0">
+                              <div className="flex items-center gap-2">
+                                <MapPin className="w-4 h-4 text-primary shrink-0" />
+                                <p className="font-semibold text-sm truncate">{trip.destination}</p>
+                              </div>
+                              <p className="text-xs text-muted-foreground truncate">{trip.purpose}</p>
+                              <div className="flex items-center gap-2 text-[10px] text-muted-foreground">
+                                <Calendar className="w-3 h-3" />
+                                <span>{trip.dates}</span>
+                              </div>
+                            </div>
+                            <div className="text-right shrink-0 pl-2">
+                              <p className="font-bold text-sm text-primary">${trip.cost}</p>
+                              <Badge variant={trip.status === 'Active' ? 'default' : trip.status === 'Upcoming' ? 'secondary' : 'outline'} className="text-[9px] px-1.5 py-0 mt-1">
+                                {trip.status}
+                              </Badge>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      );
+                    })}
                     {selectedEmployee.trips.length === 0 && (
-                      <TableRow>
-                        <TableCell colSpan={5} className="h-24 text-center text-muted-foreground">
-                          No active or upcoming trips found for this employee.
-                        </TableCell>
-                      </TableRow>
+                      <div className="text-center py-8 text-sm text-muted-foreground border border-dashed rounded-lg">
+                        No trips found for this employee.
+                      </div>
                     )}
-                  </TableBody>
-                </Table>
+                  </div>
+                </div>
+
+                {/* Right side: Selected Trip Bookings & Invoice Breakdown */}
+                <div className="lg:col-span-7">
+                  {activeTrip ? (
+                    <Card className="border-primary/20 shadow-sm">
+                      <CardHeader className="border-b bg-muted/10 pb-4">
+                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                          <div>
+                            <CardTitle className="text-base flex items-center gap-2">
+                              <FileText className="w-4 h-4 text-primary" />
+                              Trip Invoice Breakdown
+                            </CardTitle>
+                            <CardDescription className="text-xs mt-1">
+                              {activeTrip.destination} • {activeTrip.dates}
+                            </CardDescription>
+                          </div>
+                          <Button 
+                            size="sm" 
+                            className="gap-2 shrink-0"
+                            onClick={() => handleDownloadTripInvoice(activeTrip)}
+                          >
+                            <Download className="w-4 h-4" />
+                            Download Full Invoice
+                          </Button>
+                        </div>
+                      </CardHeader>
+                      <CardContent className="pt-6 space-y-6">
+                        <div className="rounded-lg border overflow-hidden">
+                          <Table>
+                            <TableHeader className="bg-muted/30">
+                              <TableRow>
+                                <TableHead className="text-xs">Category</TableHead>
+                                <TableHead className="text-xs">Item / Provider</TableHead>
+                                <TableHead className="text-xs text-right">Cost</TableHead>
+                                <TableHead className="text-xs text-right">Invoice</TableHead>
+                              </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                              {activeTrip.bookings.map((booking) => (
+                                <TableRow key={booking.id} className="hover:bg-muted/10">
+                                  <TableCell className="py-3">
+                                    <Badge variant="outline" className="text-[10px] font-medium capitalize bg-primary/5 text-primary border-primary/20">
+                                      {booking.category}
+                                    </Badge>
+                                  </TableCell>
+                                  <TableCell className="py-3">
+                                    <div className="font-medium text-xs">{booking.item}</div>
+                                    <div className="text-[10px] text-muted-foreground">{booking.provider} • {booking.date}</div>
+                                  </TableCell>
+                                  <TableCell className="py-3 text-right font-semibold text-xs">
+                                    ${booking.cost.toFixed(2)}
+                                  </TableCell>
+                                  <TableCell className="py-3 text-right">
+                                    <Button 
+                                      variant="ghost" 
+                                      size="icon" 
+                                      className="h-8 w-8 text-muted-foreground hover:text-primary"
+                                      title="Download Booking Invoice"
+                                      onClick={() => handleDownloadBookingInvoice(booking)}
+                                    >
+                                      <Download className="w-3.5 h-3.5" />
+                                    </Button>
+                                  </TableCell>
+                                </TableRow>
+                              ))}
+                              <TableRow className="bg-primary/5 font-bold">
+                                <TableCell colSpan={2} className="py-3 text-xs">Total Trip Cost</TableCell>
+                                <TableCell className="py-3 text-right text-primary text-xs">
+                                  ${activeTrip.cost.toFixed(2)}
+                                </TableCell>
+                                <TableCell className="py-3" />
+                              </TableRow>
+                            </TableBody>
+                          </Table>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ) : (
+                    <div className="h-full flex flex-col items-center justify-center text-center p-8 border-2 border-dashed rounded-xl min-h-[300px]">
+                      <Plane className="w-10 h-10 text-muted-foreground/40 mb-3" />
+                      <h4 className="font-semibold text-sm">No Trip Selected</h4>
+                      <p className="text-xs text-muted-foreground max-w-xs mt-1">
+                        Select a trip from the list to view its detailed service category bookings and download invoices.
+                      </p>
+                    </div>
+                  )}
+                </div>
               </div>
             </TabsContent>
 
