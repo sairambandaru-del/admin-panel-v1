@@ -30,7 +30,6 @@ import {
   CheckCircle,
   LayoutGrid,
   List,
-  Shirt,
   ChevronRight
 } from 'lucide-react';
 import { showSuccess, showError } from '@/utils/toast';
@@ -372,20 +371,6 @@ const VendorServices = () => {
                   <CardDescription>View, search, and manage all guest bookings and download invoices.</CardDescription>
                 </div>
                 <div className="flex flex-wrap items-center gap-2">
-                  {/* Laundry Kanban Quick Switch Button */}
-                  <Button
-                    variant={category === 'laundry' && viewMode === 'kanban' ? 'default' : 'outline'}
-                    className="h-9 gap-2 border-primary/30 hover:border-primary text-xs"
-                    onClick={() => {
-                      setCategory('laundry');
-                      setViewMode('kanban');
-                      showSuccess("Switched to Laundry Kanban Board");
-                    }}
-                  >
-                    <Shirt className="w-4 h-4 text-primary" />
-                    Laundry Kanban
-                  </Button>
-
                   {/* View Mode Toggle */}
                   <div className="flex bg-muted p-1 rounded-lg border">
                     <Button 
