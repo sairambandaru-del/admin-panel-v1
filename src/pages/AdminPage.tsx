@@ -19,6 +19,7 @@ import UnitStatus from '@/components/inventory/UnitStatus';
 import PMSSync from '@/components/inventory/PMSSync';
 import BookingQuotation from '@/components/inventory/BookingQuotation';
 import VendorRegistry from '@/components/vendors/VendorRegistry';
+import VendorOnboarding from '@/components/vendors/VendorOnboarding';
 import VendorServices from '@/components/vendors/VendorServices';
 import VendorPerformance from '@/components/vendors/VendorPerformance';
 import VendorSOA from '@/components/vendors/VendorSOA';
@@ -57,6 +58,7 @@ const AdminPage = () => {
 
     // Vendors Section
     if (path === '/vendors/registry') return <VendorRegistry />;
+    if (path === '/vendors/onboarding') return <VendorOnboarding />;
     if (path === '/vendors/services') return <VendorServices />;
     if (path === '/vendors/performance') return <VendorPerformance />;
     if (path === '/vendors/accounts') return <VendorSOA />;

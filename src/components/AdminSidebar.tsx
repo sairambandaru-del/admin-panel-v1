@@ -25,6 +25,7 @@ import {
   RefreshCw,
   Quote,
   UserCheck,
+  UserPlus,
   Truck,
   Star,
   Receipt,
@@ -90,6 +91,7 @@ const navigation: NavItem[] = [
     icon: Users,
     items: [
       { title: "Registry & KYC", href: "/vendors/registry", icon: UserCheck },
+      { title: "Vendor Onboarding", href: "/vendors/onboarding", icon: UserPlus },
       { title: "Vendor Services", href: "/vendors/services", icon: Truck },
       { title: "Performance", href: "/vendors/performance", icon: Star },
       { title: "Statement of Accounts", href: "/vendors/accounts", icon: Receipt },
