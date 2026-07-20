@@ -42,123 +42,142 @@ export interface Booking {
 }
 
 const initialBookings: Booking[] = [
-  {
-    id: 'BK-5501',
-    status: 'Checked out',
-    startDate: '2024-05-02 14:00',
-    endDate: '2024-05-05 11:00',
-    bookingDate: '2024-04-15',
-    guestName: 'Robert Fox',
-    contactNumber: '+1 (555) 234-5678',
-    emailId: 'robert.fox@gmail.com',
-    serviceCategory: 'Short Term Rentals',
-    amount: 750.00,
-    unit: 'Skyline Suite 101'
-  },
-  {
-    id: 'BK-5502',
-    status: 'Confirmed',
-    startDate: '2024-05-05 15:00',
-    endDate: '2024-05-10 10:00',
-    bookingDate: '2024-04-20',
-    guestName: 'Jane Cooper',
-    contactNumber: '+1 (555) 876-5432',
-    emailId: 'jane.cooper@yahoo.com',
-    serviceCategory: 'Short Term Rentals',
-    amount: 1250.00,
-    unit: 'Ocean View 102'
-  },
-  {
-    id: 'BK-5520',
-    status: 'order accepted',
-    startDate: '2024-05-21 08:00',
-    endDate: '2024-05-23 17:00',
-    bookingDate: '2024-05-20',
-    guestName: 'Michael Jordan',
-    contactNumber: '+1 (555) 230-9944',
-    emailId: 'mj23@bulls.com',
-    serviceCategory: 'Laundry',
-    amount: 180.00,
-    unit: 'Premium Dry Cleaning'
-  },
-  {
-    id: 'BK-5521',
-    status: 'under processing',
-    startDate: '2024-05-20 09:00',
-    endDate: '2024-05-22 18:00',
-    bookingDate: '2024-05-19',
-    guestName: 'Serena Williams',
-    contactNumber: '+1 (555) 444-8811',
-    emailId: 'serena@tennis.com',
-    serviceCategory: 'Laundry',
-    amount: 240.00,
-    unit: 'Wash & Fold Bulk'
-  },
-  {
-    id: 'BK-5522',
-    status: 'exception raised',
-    startDate: '2024-05-19 10:00',
-    endDate: '2024-05-21 12:00',
-    bookingDate: '2024-05-18',
-    guestName: 'Tony Stark',
-    contactNumber: '+1 (555) 300-4000',
-    emailId: 'tony@starkindustries.com',
-    serviceCategory: 'Laundry',
-    amount: 350.00,
-    unit: 'Silk Suit Care'
-  },
-  {
-    id: 'BK-5510',
-    status: 'Enquiry',
-    startDate: '2024-05-22 09:00',
-    endDate: '2024-05-22 12:00',
-    bookingDate: '2024-05-18',
-    guestName: 'Alice Brown',
-    contactNumber: '+1 (555) 019-2834',
-    emailId: 'alice.b@gmail.com',
-    serviceCategory: 'House Keeping',
-    amount: 150.00,
-    unit: 'Deep Cleaning Service'
-  },
-  {
-    id: 'BK-5511',
-    status: 'Order placed',
-    startDate: '2024-05-20 19:00',
-    endDate: '2024-05-20 19:45',
-    bookingDate: '2024-05-20',
-    guestName: 'Mark Wilson',
-    contactNumber: '+1 (555) 024-9911',
-    emailId: 'mark.w@gmail.com',
-    serviceCategory: 'Food Delivery',
-    amount: 85.00,
-    unit: 'Gourmet Burger Combo'
-  },
-  {
-    id: 'BK-5512',
-    status: 'Packing the cart',
-    startDate: '2024-05-21 10:00',
-    endDate: '2024-05-21 11:30',
-    bookingDate: '2024-05-21',
-    guestName: 'Sarah Jenkins',
-    contactNumber: '+1 (555) 088-1234',
-    emailId: 'sarah.j@gmail.com',
-    serviceCategory: 'Grocery',
-    amount: 220.00,
-    unit: 'Weekly Essentials Cart'
-  },
-  {
-    id: 'BK-5513',
-    status: 'Consultation active',
-    startDate: '2024-05-21 14:00',
-    endDate: '2024-05-21 15:00',
-    bookingDate: '2024-05-21',
-    guestName: 'David Miller',
-    contactNumber: '+1 (555) 077-5678',
-    emailId: 'david.m@gmail.com',
-    serviceCategory: 'Doctor on Call',
-    amount: 450.00,
-    unit: 'General Practitioner Visit'
-  }
+  // Short Term Rentals (Skyline Apartments & Urban Oasis Stays)
+  // Statuses: Enquiry, Confirmed, Checked in, Checked out, Cancelled
+  { id: 'BK-5501', status: 'Checked out', startDate: '2024-05-02 14:00', endDate: '2024-05-05 11:00', bookingDate: '2024-04-15', guestName: 'Robert Fox', contactNumber: '+1 (555) 234-5678', emailId: 'robert.fox@gmail.com', serviceCategory: 'Short Term Rentals', amount: 750.00, unit: 'Skyline Suite 101' },
+  { id: 'BK-5502', status: 'Checked out', startDate: '2024-05-03 14:00', endDate: '2024-05-06 11:00', bookingDate: '2024-04-16', guestName: 'Jane Cooper', contactNumber: '+1 (555) 876-5432', emailId: 'jane.cooper@yahoo.com', serviceCategory: 'Short Term Rentals', amount: 850.00, unit: 'Urban Oasis Loft 3B' },
+  { id: 'BK-5503', status: 'Confirmed', startDate: '2024-05-25 15:00', endDate: '2024-05-30 10:00', bookingDate: '2024-05-10', guestName: 'Michael Jordan', contactNumber: '+1 (555) 230-9944', emailId: 'mj23@bulls.com', serviceCategory: 'Short Term Rentals', amount: 1250.00, unit: 'Skyline Suite 102' },
+  { id: 'BK-5504', status: 'Confirmed', startDate: '2024-05-26 15:00', endDate: '2024-05-29 10:00', bookingDate: '2024-05-11', guestName: 'Serena Williams', contactNumber: '+1 (555) 444-8811', emailId: 'serena@tennis.com', serviceCategory: 'Short Term Rentals', amount: 1100.00, unit: 'Urban Oasis Loft 4A' },
+  { id: 'BK-5505', status: 'Checked in', startDate: '2024-05-20 14:00', endDate: '2024-05-24 11:00', bookingDate: '2024-05-15', guestName: 'Tony Stark', contactNumber: '+1 (555) 300-4000', emailId: 'tony@starkindustries.com', serviceCategory: 'Short Term Rentals', amount: 2500.00, unit: 'Skyline Penthouse' },
+  { id: 'BK-5506', status: 'Checked in', startDate: '2024-05-21 14:00', endDate: '2024-05-25 11:00', bookingDate: '2024-05-16', guestName: 'Bruce Wayne', contactNumber: '+1 (555) 111-2222', emailId: 'bruce@waynecorp.com', serviceCategory: 'Short Term Rentals', amount: 2200.00, unit: 'Urban Oasis Villa' },
+  { id: 'BK-5507', status: 'Enquiry', startDate: '2024-06-01 14:00', endDate: '2024-06-05 11:00', bookingDate: '2024-05-18', guestName: 'Peter Parker', contactNumber: '+1 (555) 123-4567', emailId: 'peter.parker@dailybugle.com', serviceCategory: 'Short Term Rentals', amount: 600.00, unit: 'Skyline Suite 101' },
+  { id: 'BK-5508', status: 'Enquiry', startDate: '2024-06-02 14:00', endDate: '2024-06-06 11:00', bookingDate: '2024-05-19', guestName: 'Clark Kent', contactNumber: '+1 (555) 987-6543', emailId: 'clark.kent@dailyplanet.com', serviceCategory: 'Short Term Rentals', amount: 550.00, unit: 'Urban Oasis Loft 3B' },
+  { id: 'BK-5509', status: 'Cancelled', startDate: '2024-05-15 14:00', endDate: '2024-05-18 11:00', bookingDate: '2024-05-01', guestName: 'Diana Prince', contactNumber: '+1 (555) 555-1941', emailId: 'diana@themyscira.gov', serviceCategory: 'Short Term Rentals', amount: 900.00, unit: 'Skyline Suite 102' },
+  { id: 'BK-5510', status: 'Cancelled', startDate: '2024-05-16 14:00', endDate: '2024-05-19 11:00', bookingDate: '2024-05-02', guestName: 'Barry Allen', contactNumber: '+1 (555) 321-3211', emailId: 'barry@centralcitypd.gov', serviceCategory: 'Short Term Rentals', amount: 800.00, unit: 'Urban Oasis Loft 4A' },
+
+  // House Keeping (Elite Housekeeping & Sparkle Cleaners)
+  // Statuses: Enquiry, Confirmed, Scheduled, In progressed, Completed, Cancelled
+  { id: 'BK-5511', status: 'Completed', startDate: '2024-05-10 09:00', endDate: '2024-05-10 12:00', bookingDate: '2024-05-08', guestName: 'Alice Brown', contactNumber: '+1 (555) 019-2834', emailId: 'alice.b@gmail.com', serviceCategory: 'House Keeping', amount: 150.00, unit: 'Deep Cleaning Service' },
+  { id: 'BK-5512', status: 'Completed', startDate: '2024-05-11 09:00', endDate: '2024-05-11 12:00', bookingDate: '2024-05-09', guestName: 'Mark Wilson', contactNumber: '+1 (555) 024-9911', emailId: 'mark.w@gmail.com', serviceCategory: 'House Keeping', amount: 150.00, unit: 'Standard Turn-down Service' },
+  { id: 'BK-5513', status: 'Enquiry', startDate: '2024-05-22 09:00', endDate: '2024-05-22 12:00', bookingDate: '2024-05-18', guestName: 'Sarah Jenkins', contactNumber: '+1 (555) 088-1234', emailId: 'sarah.j@gmail.com', serviceCategory: 'House Keeping', amount: 150.00, unit: 'Deep Cleaning Service' },
+  { id: 'BK-5514', status: 'Enquiry', startDate: '2024-05-23 09:00', endDate: '2024-05-23 12:00', bookingDate: '2024-05-19', guestName: 'David Miller', contactNumber: '+1 (555) 077-5678', emailId: 'david.m@gmail.com', serviceCategory: 'House Keeping', amount: 120.00, unit: 'Standard Turn-down Service' },
+  { id: 'BK-5515', status: 'Confirmed', startDate: '2024-05-24 10:00', endDate: '2024-05-24 13:00', bookingDate: '2024-05-20', guestName: 'Emma Watson', contactNumber: '+1 (555) 044-8822', emailId: 'emma.w@example.com', serviceCategory: 'House Keeping', amount: 180.00, unit: 'Post-Party Deep Clean' },
+  { id: 'BK-5516', status: 'Confirmed', startDate: '2024-05-25 10:00', endDate: '2024-05-25 13:00', bookingDate: '2024-05-21', guestName: 'Amelie Poulain', contactNumber: '+1 (555) 333-4444', emailId: 'amelie@montmartre.fr', serviceCategory: 'House Keeping', amount: 180.00, unit: 'Weekly Express Clean' },
+  { id: 'BK-5517', status: 'Scheduled', startDate: '2024-05-26 09:00', endDate: '2024-05-26 12:00', bookingDate: '2024-05-22', guestName: 'Sherlock Holmes', contactNumber: '+1 (555) 221-221B', emailId: 'sherlock@bakerstreet.co.uk', serviceCategory: 'House Keeping', amount: 150.00, unit: 'Deep Cleaning Service' },
+  { id: 'BK-5518', status: 'Scheduled', startDate: '2024-05-27 09:00', endDate: '2024-05-27 12:00', bookingDate: '2024-05-23', guestName: 'John Watson', contactNumber: '+1 (555) 221-221C', emailId: 'watson@bakerstreet.co.uk', serviceCategory: 'House Keeping', amount: 120.00, unit: 'Standard Turn-down Service' },
+  { id: 'BK-5519', status: 'In progressed', startDate: '2024-05-21 08:00', endDate: '2024-05-21 11:00', bookingDate: '2024-05-20', guestName: 'Peter Parker', contactNumber: '+1 (555) 123-4567', emailId: 'peter.parker@dailybugle.com', serviceCategory: 'House Keeping', amount: 200.00, unit: 'Post-Party Deep Clean' },
+  { id: 'BK-5520', status: 'In progressed', startDate: '2024-05-21 09:00', endDate: '2024-05-21 12:00', bookingDate: '2024-05-20', guestName: 'Clark Kent', contactNumber: '+1 (555) 987-6543', emailId: 'clark.kent@dailyplanet.com', serviceCategory: 'House Keeping', amount: 180.00, unit: 'Weekly Express Clean' },
+  { id: 'BK-5521', status: 'Cancelled', startDate: '2024-05-18 09:00', endDate: '2024-05-18 12:00', bookingDate: '2024-05-15', guestName: 'Diana Prince', contactNumber: '+1 (555) 555-1941', emailId: 'diana@themyscira.gov', serviceCategory: 'House Keeping', amount: 150.00, unit: 'Deep Cleaning Service' },
+  { id: 'BK-5522', status: 'Cancelled', startDate: '2024-05-19 09:00', endDate: '2024-05-19 12:00', bookingDate: '2024-05-16', guestName: 'Barry Allen', contactNumber: '+1 (555) 321-3211', emailId: 'barry@centralcitypd.gov', serviceCategory: 'House Keeping', amount: 120.00, unit: 'Standard Turn-down Service' },
+
+  // Car Rentals (Swift Car Rentals & Apex Luxury Fleet)
+  // Statuses: Enquiry, Confirmed, In progress, Completed, Cancelled
+  { id: 'BK-5523', status: 'Completed', startDate: '2024-05-10 08:00', endDate: '2024-05-12 18:00', bookingDate: '2024-05-05', guestName: 'Robert Fox', contactNumber: '+1 (555) 234-5678', emailId: 'robert.fox@gmail.com', serviceCategory: 'Car Rentals', amount: 300.00, unit: 'Tesla Model 3' },
+  { id: 'BK-5524', status: 'Completed', startDate: '2024-05-11 08:00', endDate: '2024-05-13 18:00', bookingDate: '2024-05-06', guestName: 'Jane Cooper', contactNumber: '+1 (555) 876-5432', emailId: 'jane.cooper@yahoo.com', serviceCategory: 'Car Rentals', amount: 400.00, unit: 'Premium SUV' },
+  { id: 'BK-5525', status: 'Enquiry', startDate: '2024-05-25 08:00', endDate: '2024-05-28 18:00', bookingDate: '2024-05-20', guestName: 'Michael Jordan', contactNumber: '+1 (555) 230-9944', emailId: 'mj23@bulls.com', serviceCategory: 'Car Rentals', amount: 450.00, unit: 'Tesla Model 3' },
+  { id: 'BK-5526', status: 'Enquiry', startDate: '2024-05-26 08:00', endDate: '2024-05-29 18:00', bookingDate: '2024-05-21', guestName: 'Serena Williams', contactNumber: '+1 (555) 444-8811', emailId: 'serena@tennis.com', serviceCategory: 'Car Rentals', amount: 600.00, unit: 'Premium SUV' },
+  { id: 'BK-5527', status: 'Confirmed', startDate: '2024-05-22 08:00', endDate: '2024-05-24 18:00', bookingDate: '2024-05-18', guestName: 'Tony Stark', contactNumber: '+1 (555) 300-4000', emailId: 'tony@starkindustries.com', serviceCategory: 'Car Rentals', amount: 1500.00, unit: 'Aston Martin DB11' },
+  { id: 'BK-5528', status: 'Confirmed', startDate: '2024-05-23 08:00', endDate: '2024-05-25 18:00', bookingDate: '2024-05-19', guestName: 'Bruce Wayne', contactNumber: '+1 (555) 111-2222', emailId: 'bruce@waynecorp.com', serviceCategory: 'Car Rentals', amount: 1200.00, unit: 'Mercedes S-Class' },
+  { id: 'BK-5529', status: 'In progress', startDate: '2024-05-20 08:00', endDate: '2024-05-23 18:00', bookingDate: '2024-05-15', guestName: 'Peter Parker', contactNumber: '+1 (555) 123-4567', emailId: 'peter.parker@dailybugle.com', serviceCategory: 'Car Rentals', amount: 350.00, unit: 'Tesla Model 3' },
+  { id: 'BK-5530', status: 'In progress', startDate: '2024-05-21 08:00', endDate: '2024-05-24 18:00', bookingDate: '2024-05-16', guestName: 'Clark Kent', contactNumber: '+1 (555) 987-6543', emailId: 'clark.kent@dailyplanet.com', serviceCategory: 'Car Rentals', amount: 320.00, unit: 'Premium SUV' },
+  { id: 'BK-5531', status: 'Cancelled', startDate: '2024-05-15 08:00', endDate: '2024-05-17 18:00', bookingDate: '2024-05-10', guestName: 'Diana Prince', contactNumber: '+1 (555) 555-1941', emailId: 'diana@themyscira.gov', serviceCategory: 'Car Rentals', amount: 450.00, unit: 'Tesla Model 3' },
+  { id: 'BK-5532', status: 'Cancelled', startDate: '2024-05-16 08:00', endDate: '2024-05-18 18:00', bookingDate: '2024-05-11', guestName: 'Barry Allen', contactNumber: '+1 (555) 321-3211', emailId: 'barry@centralcitypd.gov', serviceCategory: 'Car Rentals', amount: 400.00, unit: 'Premium SUV' },
+
+  // Laundry (Laundry Pros & Spin Cycle Dry Cleaners)
+  // Statuses: order accepted, rider assigned, picked up, received at facility, under processing, quality check, out for delivery, delivered, exception raised, claim under review
+  { id: 'BK-5533', status: 'order accepted', startDate: '2024-05-21 08:00', endDate: '2024-05-23 17:00', bookingDate: '2024-05-20', guestName: 'Michael Jordan', contactNumber: '+1 (555) 230-9944', emailId: 'mj23@bulls.com', serviceCategory: 'Laundry', amount: 180.00, unit: 'Premium Dry Cleaning' },
+  { id: 'BK-5534', status: 'order accepted', startDate: '2024-05-22 08:00', endDate: '2024-05-24 17:00', bookingDate: '2024-05-21', guestName: 'Serena Williams', contactNumber: '+1 (555) 444-8811', emailId: 'serena@tennis.com', serviceCategory: 'Laundry', amount: 120.00, unit: 'Sports Gear Wash & Fold' },
+  { id: 'BK-5535', status: 'rider assigned', startDate: '2024-05-20 09:00', endDate: '2024-05-22 18:00', bookingDate: '2024-05-19', guestName: 'Tony Stark', contactNumber: '+1 (555) 300-4000', emailId: 'tony@starkindustries.com', serviceCategory: 'Laundry', amount: 240.00, unit: 'Wash & Fold Bulk' },
+  { id: 'BK-5536', status: 'rider assigned', startDate: '2024-05-21 09:00', endDate: '2024-05-23 18:00', bookingDate: '2024-05-20', guestName: 'Bruce Wayne', contactNumber: '+1 (555) 111-2222', emailId: 'bruce@waynecorp.com', serviceCategory: 'Laundry', amount: 220.00, unit: 'Tuxedo Special Care' },
+  { id: 'BK-5537', status: 'picked up', startDate: '2024-05-19 10:00', endDate: '2024-05-21 12:00', bookingDate: '2024-05-18', guestName: 'Peter Parker', contactNumber: '+1 (555) 123-4567', emailId: 'peter.parker@dailybugle.com', serviceCategory: 'Laundry', amount: 350.00, unit: 'Silk Suit Care' },
+  { id: 'BK-5538', status: 'picked up', startDate: '2024-05-20 10:00', endDate: '2024-05-22 12:00', bookingDate: '2024-05-19', guestName: 'Clark Kent', contactNumber: '+1 (555) 987-6543', emailId: 'clark.kent@dailyplanet.com', serviceCategory: 'Laundry', amount: 300.00, unit: 'Woolen Coat Dry Clean' },
+  { id: 'BK-5539', status: 'received at facility', startDate: '2024-05-18 11:00', endDate: '2024-05-20 15:00', bookingDate: '2024-05-17', guestName: 'Diana Prince', contactNumber: '+1 (555) 555-1941', emailId: 'diana@themyscira.gov', serviceCategory: 'Laundry', amount: 400.00, unit: 'Ancient Armor Polish & Clean' },
+  { id: 'BK-5540', status: 'received at facility', startDate: '2024-05-19 11:00', endDate: '2024-05-21 15:00', bookingDate: '2024-05-18', guestName: 'Barry Allen', contactNumber: '+1 (555) 321-3211', emailId: 'barry@centralcitypd.gov', serviceCategory: 'Laundry', amount: 380.00, unit: 'Friction-Resistant Suit Wash' },
+  { id: 'BK-5541', status: 'under processing', startDate: '2024-05-17 12:00', endDate: '2024-05-19 16:00', bookingDate: '2024-05-16', guestName: 'Arthur Curry', contactNumber: '+1 (555) 777-8888', emailId: 'aquaman@atlantis.gov', serviceCategory: 'Laundry', amount: 300.00, unit: 'Saltwater Stain Removal' },
+  { id: 'BK-5542', status: 'under processing', startDate: '2024-05-18 12:00', endDate: '2024-05-20 16:00', bookingDate: '2024-05-17', guestName: 'Victor Stone', contactNumber: '+1 (555) 888-9999', emailId: 'cyborg@star-labs.com', serviceCategory: 'Laundry', amount: 280.00, unit: 'Metallic Fiber Polish' },
+  { id: 'BK-5543', status: 'quality check', startDate: '2024-05-16 13:00', endDate: '2024-05-18 17:00', bookingDate: '2024-05-15', guestName: 'Hal Jordan', contactNumber: '+1 (555) 444-5555', emailId: 'greenlantern@oa.org', serviceCategory: 'Laundry', amount: 150.00, unit: 'Premium Dry Cleaning' },
+  { id: 'BK-5544', status: 'quality check', startDate: '2024-05-17 13:00', endDate: '2024-05-19 17:00', bookingDate: '2024-05-16', guestName: 'Oliver Queen', contactNumber: '+1 (555) 333-2222', emailId: 'arrow@starling.gov', serviceCategory: 'Laundry', amount: 140.00, unit: 'Sports Gear Wash & Fold' },
+  { id: 'BK-5545', status: 'out for delivery', startDate: '2024-05-15 14:00', endDate: '2024-05-17 18:00', bookingDate: '2024-05-14', guestName: 'John Doe', contactNumber: '+1 (555) 019-2834', emailId: 'john.doe@techcorp.com', serviceCategory: 'Laundry', amount: 200.00, unit: 'Wash & Fold Bulk' },
+  { id: 'BK-5546', status: 'out for delivery', startDate: '2024-05-16 14:00', endDate: '2024-05-18 18:00', bookingDate: '2024-05-15', guestName: 'Jane Smith', contactNumber: '+1 (555) 044-8822', emailId: 'jane.smith@globallogistics.com', serviceCategory: 'Laundry', amount: 180.00, unit: 'Tuxedo Special Care' },
+  { id: 'BK-5547', status: 'delivered', startDate: '2024-05-14 15:00', endDate: '2024-05-16 19:00', bookingDate: '2024-05-13', guestName: 'Mike Ross', contactNumber: '+1 (555) 077-5678', emailId: 'mike.ross@innovate.com', serviceCategory: 'Laundry', amount: 120.00, unit: 'Silk Suit Care' },
+  { id: 'BK-5548', status: 'delivered', startDate: '2024-05-15 15:00', endDate: '2024-05-17 19:00', bookingDate: '2024-05-14', guestName: 'Rachel Zane', contactNumber: '+1 (555) 088-1234', emailId: 'rachel@pearsonspecter.com', serviceCategory: 'Laundry', amount: 110.00, unit: 'Woolen Coat Dry Clean' },
+  { id: 'BK-5549', status: 'exception raised', startDate: '2024-05-13 16:00', endDate: '2024-05-15 20:00', bookingDate: '2024-05-12', guestName: 'Harvey Specter', contactNumber: '+1 (555) 999-0000', emailId: 'harvey@pearsonspecter.com', serviceCategory: 'Laundry', amount: 350.00, unit: 'Premium Dry Cleaning' },
+  { id: 'BK-5550', status: 'exception raised', startDate: '2024-05-14 16:00', endDate: '2024-05-16 20:00', bookingDate: '2024-05-13', guestName: 'Louis Litt', contactNumber: '+1 (555) 888-1111', emailId: 'louis@pearsonspecter.com', serviceCategory: 'Laundry', amount: 320.00, unit: 'Sports Gear Wash & Fold' },
+  { id: 'BK-5551', status: 'claim under review', startDate: '2024-05-12 17:00', endDate: '2024-05-14 21:00', bookingDate: '2024-05-11', guestName: 'Donna Paulsen', contactNumber: '+1 (555) 777-2222', emailId: 'donna@pearsonspecter.com', serviceCategory: 'Laundry', amount: 500.00, unit: 'Wash & Fold Bulk' },
+  { id: 'BK-5552', status: 'claim under review', startDate: '2024-05-13 17:00', endDate: '2024-05-15 21:00', bookingDate: '2024-05-12', guestName: 'Jessica Pearson', contactNumber: '+1 (555) 666-3333', emailId: 'jessica@pearsonspecter.com', serviceCategory: 'Laundry', amount: 480.00, unit: 'Tuxedo Special Care' },
+
+  // Food Delivery (Gourmet Catering Co & Feast & Fete Catering)
+  // Statuses: Order placed, Accepted, Preparing, Ready for pickup, Out for delivery, Delivered, Cancelled
+  { id: 'BK-5553', status: 'Order placed', startDate: '2024-05-20 19:00', endDate: '2024-05-20 19:45', bookingDate: '2024-05-20', guestName: 'Mark Wilson', contactNumber: '+1 (555) 024-9911', emailId: 'mark.w@gmail.com', serviceCategory: 'Food Delivery', amount: 85.00, unit: 'Gourmet Burger Combo' },
+  { id: 'BK-5554', status: 'Order placed', startDate: '2024-05-20 19:15', endDate: '2024-05-20 20:00', bookingDate: '2024-05-20', guestName: 'Sarah Jenkins', contactNumber: '+1 (555) 088-1234', emailId: 'sarah.j@gmail.com', serviceCategory: 'Food Delivery', amount: 95.00, unit: 'Premium Sushi Platter' },
+  { id: 'BK-5555', status: 'Accepted', startDate: '2024-05-20 18:00', endDate: '2024-05-20 18:45', bookingDate: '2024-05-20', guestName: 'David Miller', contactNumber: '+1 (555) 077-5678', emailId: 'david.m@gmail.com', serviceCategory: 'Food Delivery', amount: 120.00, unit: 'Gourmet Burger Combo' },
+  { id: 'BK-5556', status: 'Accepted', startDate: '2024-05-20 18:15', endDate: '2024-05-20 19:00', bookingDate: '2024-05-20', guestName: 'Emma Watson', contactNumber: '+1 (555) 044-8822', emailId: 'emma.w@example.com', serviceCategory: 'Food Delivery', amount: 110.00, unit: 'Premium Sushi Platter' },
+  { id: 'BK-5557', status: 'Preparing', startDate: '2024-05-20 17:00', endDate: '2024-05-20 17:45', bookingDate: '2024-05-20', guestName: 'Amelie Poulain', contactNumber: '+1 (555) 333-4444', emailId: 'amelie@montmartre.fr', serviceCategory: 'Food Delivery', amount: 150.00, unit: 'Gourmet Burger Combo' },
+  { id: 'BK-5558', status: 'Preparing', startDate: '2024-05-20 17:15', endDate: '2024-05-20 18:00', bookingDate: '2024-05-20', guestName: 'Sherlock Holmes', contactNumber: '+1 (555) 221-221B', emailId: 'sherlock@bakerstreet.co.uk', serviceCategory: 'Food Delivery', amount: 140.00, unit: 'Premium Sushi Platter' },
+  { id: 'BK-5559', status: 'Ready for pickup', startDate: '2024-05-20 16:00', endDate: '2024-05-20 16:45', bookingDate: '2024-05-20', guestName: 'John Watson', contactNumber: '+1 (555) 221-221C', emailId: 'watson@bakerstreet.co.uk', serviceCategory: 'Food Delivery', amount: 85.00, unit: 'Gourmet Burger Combo' },
+  { id: 'BK-5560', status: 'Ready for pickup', startDate: '2024-05-20 16:15', endDate: '2024-05-20 17:00', bookingDate: '2024-05-20', guestName: 'Peter Parker', contactNumber: '+1 (555) 123-4567', emailId: 'peter.parker@dailybugle.com', serviceCategory: 'Food Delivery', amount: 95.00, unit: 'Premium Sushi Platter' },
+  { id: 'BK-5561', status: 'Out for delivery', startDate: '2024-05-20 15:00', endDate: '2024-05-20 15:45', bookingDate: '2024-05-20', guestName: 'Clark Kent', contactNumber: '+1 (555) 987-6543', emailId: 'clark.kent@dailyplanet.com', serviceCategory: 'Food Delivery', amount: 120.00, unit: 'Gourmet Burger Combo' },
+  { id: 'BK-5562', status: 'Out for delivery', startDate: '2024-05-20 15:15', endDate: '2024-05-20 16:00', bookingDate: '2024-05-20', guestName: 'Diana Prince', contactNumber: '+1 (555) 555-1941', emailId: 'diana@themyscira.gov', serviceCategory: 'Food Delivery', amount: 110.00, unit: 'Premium Sushi Platter' },
+  { id: 'BK-5563', status: 'Delivered', startDate: '2024-05-20 14:00', endDate: '2024-05-20 14:45', bookingDate: '2024-05-20', guestName: 'Barry Allen', contactNumber: '+1 (555) 321-3211', emailId: 'barry@centralcitypd.gov', serviceCategory: 'Food Delivery', amount: 150.00, unit: 'Gourmet Burger Combo' },
+  { id: 'BK-5564', status: 'Delivered', startDate: '2024-05-20 14:15', endDate: '2024-05-20 15:00', bookingDate: '2024-05-20', guestName: 'Arthur Curry', contactNumber: '+1 (555) 777-8888', emailId: 'aquaman@atlantis.gov', serviceCategory: 'Food Delivery', amount: 140.00, unit: 'Premium Sushi Platter' },
+  { id: 'BK-5565', status: 'Cancelled', startDate: '2024-05-20 13:00', endDate: '2024-05-20 13:45', bookingDate: '2024-05-20', guestName: 'Victor Stone', contactNumber: '+1 (555) 888-9999', emailId: 'cyborg@star-labs.com', serviceCategory: 'Food Delivery', amount: 85.00, unit: 'Gourmet Burger Combo' },
+  { id: 'BK-5566', status: 'Cancelled', startDate: '2024-05-20 13:15', endDate: '2024-05-20 14:00', bookingDate: '2024-05-20', guestName: 'Hal Jordan', contactNumber: '+1 (555) 444-5555', emailId: 'greenlantern@oa.org', serviceCategory: 'Food Delivery', amount: 95.00, unit: 'Premium Sushi Platter' },
+
+  // Grocery (InstaCart Grocery & FreshMart Express)
+  // Statuses: Order placed, Packing the cart, Out for delivery, Delivered, Cancelled
+  { id: 'BK-5567', status: 'Order placed', startDate: '2024-05-21 10:00', endDate: '2024-05-21 11:30', bookingDate: '2024-05-21', guestName: 'Sarah Jenkins', contactNumber: '+1 (555) 088-1234', emailId: 'sarah.j@gmail.com', serviceCategory: 'Grocery', amount: 220.00, unit: 'Weekly Essentials Cart' },
+  { id: 'BK-5568', status: 'Order placed', startDate: '2024-05-21 10:15', endDate: '2024-05-21 11:45', bookingDate: '2024-05-21', guestName: 'David Miller', contactNumber: '+1 (555) 077-5678', emailId: 'david.m@gmail.com', serviceCategory: 'Grocery', amount: 180.00, unit: 'Fresh Produce Box' },
+  { id: 'BK-5569', status: 'Packing the cart', startDate: '2024-05-21 09:00', endDate: '2024-05-21 10:30', bookingDate: '2024-05-21', guestName: 'Emma Watson', contactNumber: '+1 (555) 044-8822', emailId: 'emma.w@example.com', serviceCategory: 'Grocery', amount: 250.00, unit: 'Weekly Essentials Cart' },
+  { id: 'BK-5570', status: 'Packing the cart', startDate: '2024-05-21 09:15', endDate: '2024-05-21 10:45', bookingDate: '2024-05-21', guestName: 'Amelie Poulain', contactNumber: '+1 (555) 333-4444', emailId: 'amelie@montmartre.fr', serviceCategory: 'Grocery', amount: 210.00, unit: 'Fresh Produce Box' },
+  { id: 'BK-5571', status: 'Out for delivery', startDate: '2024-05-21 08:00', endDate: '2024-05-21 09:30', bookingDate: '2024-05-21', guestName: 'Sherlock Holmes', contactNumber: '+1 (555) 221-221B', emailId: 'sherlock@bakerstreet.co.uk', serviceCategory: 'Grocery', amount: 220.00, unit: 'Weekly Essentials Cart' },
+  { id: 'BK-5572', status: 'Out for delivery', startDate: '2024-05-21 08:15', endDate: '2024-05-21 09:45', bookingDate: '2024-05-21', guestName: 'John Watson', contactNumber: '+1 (555) 221-221C', emailId: 'watson@bakerstreet.co.uk', serviceCategory: 'Grocery', amount: 180.00, unit: 'Fresh Produce Box' },
+  { id: 'BK-5573', status: 'Delivered', startDate: '2024-05-21 07:00', endDate: '2024-05-21 08:30', bookingDate: '2024-05-21', guestName: 'Peter Parker', contactNumber: '+1 (555) 123-4567', emailId: 'peter.parker@dailybugle.com', serviceCategory: 'Grocery', amount: 250.00, unit: 'Weekly Essentials Cart' },
+  { id: 'BK-5574', status: 'Delivered', startDate: '2024-05-21 07:15', endDate: '2024-05-21 08:45', bookingDate: '2024-05-21', guestName: 'Clark Kent', contactNumber: '+1 (555) 987-6543', emailId: 'clark.kent@dailyplanet.com', serviceCategory: 'Grocery', amount: 210.00, unit: 'Fresh Produce Box' },
+  { id: 'BK-5575', status: 'Cancelled', startDate: '2024-05-21 06:00', endDate: '2024-05-21 07:30', bookingDate: '2024-05-21', guestName: 'Diana Prince', contactNumber: '+1 (555) 555-1941', emailId: 'diana@themyscira.gov', serviceCategory: 'Grocery', amount: 220.00, unit: 'Weekly Essentials Cart' },
+  { id: 'BK-5576', status: 'Cancelled', startDate: '2024-05-21 06:15', endDate: '2024-05-21 07:45', bookingDate: '2024-05-21', guestName: 'Barry Allen', contactNumber: '+1 (555) 321-3211', emailId: 'barry@centralcitypd.gov', serviceCategory: 'Grocery', amount: 180.00, unit: 'Fresh Produce Box' },
+
+  // Doctor on Call (MedCall Pro & DoctorAtHome Services)
+  // Statuses: Enquiry, Arrived, Consultation active, treatment & documentation, Completed, Follow-up, Cancelled
+  { id: 'BK-5577', status: 'Enquiry', startDate: '2024-05-21 14:00', endDate: '2024-05-21 15:00', bookingDate: '2024-05-21', guestName: 'David Miller', contactNumber: '+1 (555) 077-5678', emailId: 'david.m@gmail.com', serviceCategory: 'Doctor on Call', amount: 450.00, unit: 'General Practitioner Visit' },
+  { id: 'BK-5578', status: 'Enquiry', startDate: '2024-05-21 14:15', endDate: '2024-05-21 15:15', bookingDate: '2024-05-21', guestName: 'Emma Watson', contactNumber: '+1 (555) 044-8822', emailId: 'emma.w@example.com', serviceCategory: 'Doctor on Call', amount: 400.00, unit: 'Specialist Consultation' },
+  { id: 'BK-5579', status: 'Arrived', startDate: '2024-05-21 13:00', endDate: '2024-05-21 14:00', bookingDate: '2024-05-21', guestName: 'Amelie Poulain', contactNumber: '+1 (555) 333-4444', emailId: 'amelie@montmartre.fr', serviceCategory: 'Doctor on Call', amount: 450.00, unit: 'General Practitioner Visit' },
+  { id: 'BK-5580', status: 'Arrived', startDate: '2024-05-21 13:15', endDate: '2024-05-21 14:15', bookingDate: '2024-05-21', guestName: 'Sherlock Holmes', contactNumber: '+1 (555) 221-221B', emailId: 'sherlock@bakerstreet.co.uk', serviceCategory: 'Doctor on Call', amount: 400.00, unit: 'Specialist Consultation' },
+  { id: 'BK-5581', status: 'Consultation active', startDate: '2024-05-21 12:00', endDate: '2024-05-21 13:00', bookingDate: '2024-05-21', guestName: 'John Watson', contactNumber: '+1 (555) 221-221C', emailId: 'watson@bakerstreet.co.uk', serviceCategory: 'Doctor on Call', amount: 450.00, unit: 'General Practitioner Visit' },
+  { id: 'BK-5582', status: 'Consultation active', startDate: '2024-05-21 12:15', endDate: '2024-05-21 13:15', bookingDate: '2024-05-21', guestName: 'Peter Parker', contactNumber: '+1 (555) 123-4567', emailId: 'peter.parker@dailybugle.com', serviceCategory: 'Doctor on Call', amount: 400.00, unit: 'Specialist Consultation' },
+  { id: 'BK-5583', status: 'treatment & documentation', startDate: '2024-05-21 11:00', endDate: '2024-05-21 12:00', bookingDate: '2024-05-21', guestName: 'Clark Kent', contactNumber: '+1 (555) 987-6543', emailId: 'clark.kent@dailyplanet.com', serviceCategory: 'Doctor on Call', amount: 450.00, unit: 'General Practitioner Visit' },
+  { id: 'BK-5584', status: 'treatment & documentation', startDate: '2024-05-21 11:15', endDate: '2024-05-21 12:15', bookingDate: '2024-05-21', guestName: 'Diana Prince', contactNumber: '+1 (555) 555-1941', emailId: 'diana@themyscira.gov', serviceCategory: 'Doctor on Call', amount: 400.00, unit: 'Specialist Consultation' },
+  { id: 'BK-5585', status: 'Completed', startDate: '2024-05-21 10:00', endDate: '2024-05-21 11:00', bookingDate: '2024-05-21', guestName: 'Barry Allen', contactNumber: '+1 (555) 321-3211', emailId: 'barry@centralcitypd.gov', serviceCategory: 'Doctor on Call', amount: 450.00, unit: 'General Practitioner Visit' },
+  { id: 'BK-5586', status: 'Completed', startDate: '2024-05-21 10:15', endDate: '2024-05-21 11:15', bookingDate: '2024-05-21', guestName: 'Arthur Curry', contactNumber: '+1 (555) 777-8888', emailId: 'aquaman@atlantis.gov', serviceCategory: 'Doctor on Call', amount: 400.00, unit: 'Specialist Consultation' },
+  { id: 'BK-5587', status: 'Follow-up', startDate: '2024-05-21 09:00', endDate: '2024-05-21 10:00', bookingDate: '2024-05-21', guestName: 'Victor Stone', contactNumber: '+1 (555) 888-9999', emailId: 'cyborg@star-labs.com', serviceCategory: 'Doctor on Call', amount: 450.00, unit: 'General Practitioner Visit' },
+  { id: 'BK-5588', status: 'Follow-up', startDate: '2024-05-21 09:15', endDate: '2024-05-21 10:15', bookingDate: '2024-05-21', guestName: 'Hal Jordan', contactNumber: '+1 (555) 444-5555', emailId: 'greenlantern@oa.org', serviceCategory: 'Doctor on Call', amount: 400.00, unit: 'Specialist Consultation' },
+  { id: 'BK-5589', status: 'Cancelled', startDate: '2024-05-21 08:00', endDate: '2024-05-21 09:00', bookingDate: '2024-05-21', guestName: 'Oliver Queen', contactNumber: '+1 (555) 333-2222', emailId: 'arrow@starling.gov', serviceCategory: 'Doctor on Call', amount: 450.00, unit: 'General Practitioner Visit' },
+  { id: 'BK-5590', status: 'Cancelled', startDate: '2024-05-21 08:15', endDate: '2024-05-21 09:15', bookingDate: '2024-05-21', guestName: 'Bruce Wayne', contactNumber: '+1 (555) 111-2222', emailId: 'bruce@waynecorp.com', serviceCategory: 'Doctor on Call', amount: 400.00, unit: 'Specialist Consultation' },
+
+  // In House Catering (Gourmet Catering Co & Feast & Fete Catering)
+  // Statuses: Enquiry, Confirmed, Menu finalized, Inprogress, Completed, Cancelled
+  { id: 'BK-5591', status: 'Enquiry', startDate: '2024-05-22 18:00', endDate: '2024-05-22 22:00', bookingDate: '2024-05-15', guestName: 'Sarah Jenkins', contactNumber: '+1 (555) 088-1234', emailId: 'sarah.j@gmail.com', serviceCategory: 'In House Catering', amount: 850.00, unit: 'In-House Buffet Dinner' },
+  { id: 'BK-5592', status: 'Enquiry', startDate: '2024-05-23 18:00', endDate: '2024-05-23 22:00', bookingDate: '2024-05-16', guestName: 'David Miller', contactNumber: '+1 (555) 077-5678', emailId: 'david.m@gmail.com', serviceCategory: 'In House Catering', amount: 900.00, unit: 'Private 5-Course French Dinner' },
+  { id: 'BK-5593', status: 'Confirmed', startDate: '2024-05-24 18:00', endDate: '2024-05-24 22:00', bookingDate: '2024-05-17', guestName: 'Emma Watson', contactNumber: '+1 (555) 044-8822', emailId: 'emma.w@example.com', serviceCategory: 'In House Catering', amount: 1200.00, unit: 'In-House Buffet Dinner' },
+  { id: 'BK-5594', status: 'Confirmed', startDate: '2024-05-25 18:00', endDate: '2024-05-25 22:00', bookingDate: '2024-05-18', guestName: 'Amelie Poulain', contactNumber: '+1 (555) 333-4444', emailId: 'amelie@montmartre.fr', serviceCategory: 'In House Catering', amount: 1500.00, unit: 'Private 5-Course French Dinner' },
+  { id: 'BK-5595', status: 'Menu finalized', startDate: '2024-05-26 18:00', endDate: '2024-05-26 22:00', bookingDate: '2024-05-19', guestName: 'Sherlock Holmes', contactNumber: '+1 (555) 221-221B', emailId: 'sherlock@bakerstreet.co.uk', serviceCategory: 'In House Catering', amount: 850.00, unit: 'In-House Buffet Dinner' },
+  { id: 'BK-5596', status: 'Menu finalized', startDate: '2024-05-27 18:00', endDate: '2024-05-27 22:00', bookingDate: '2024-05-20', guestName: 'John Watson', contactNumber: '+1 (555) 221-221C', emailId: 'watson@bakerstreet.co.uk', serviceCategory: 'In House Catering', amount: 900.00, unit: 'Private 5-Course French Dinner' },
+  { id: 'BK-5597', status: 'Inprogress', startDate: '2024-05-21 18:00', endDate: '2024-05-21 22:00', bookingDate: '2024-05-20', guestName: 'Peter Parker', contactNumber: '+1 (555) 123-4567', emailId: 'peter.parker@dailybugle.com', serviceCategory: 'In House Catering', amount: 1200.00, unit: 'In-House Buffet Dinner' },
+  { id: 'BK-5598', status: 'Inprogress', startDate: '2024-05-21 19:00', endDate: '2024-05-21 23:00', bookingDate: '2024-05-20', guestName: 'Clark Kent', contactNumber: '+1 (555) 987-6543', emailId: 'clark.kent@dailyplanet.com', serviceCategory: 'In House Catering', amount: 1500.00, unit: 'Private 5-Course French Dinner' },
+  { id: 'BK-5599', status: 'Completed', startDate: '2024-05-15 18:00', endDate: '2024-05-15 22:00', bookingDate: '2024-05-10', guestName: 'Diana Prince', contactNumber: '+1 (555) 555-1941', emailId: 'diana@themyscira.gov', serviceCategory: 'In House Catering', amount: 850.00, unit: 'In-House Buffet Dinner' },
+  { id: 'BK-5600', status: 'Completed', startDate: '2024-05-16 18:00', endDate: '2024-05-16 22:00', bookingDate: '2024-05-11', guestName: 'Barry Allen', contactNumber: '+1 (555) 321-3211', emailId: 'barry@centralcitypd.gov', serviceCategory: 'In House Catering', amount: 900.00, unit: 'Private 5-Course French Dinner' },
+  { id: 'BK-5601', status: 'Cancelled', startDate: '2024-05-18 18:00', endDate: '2024-05-18 22:00', bookingDate: '2024-05-12', guestName: 'Arthur Curry', contactNumber: '+1 (555) 777-8888', emailId: 'aquaman@atlantis.gov', serviceCategory: 'In House Catering', amount: 1200.00, unit: 'In-House Buffet Dinner' },
+  { id: 'BK-5602', status: 'Cancelled', startDate: '2024-05-19 18:00', endDate: '2024-05-19 22:00', bookingDate: '2024-05-13', guestName: 'Victor Stone', contactNumber: '+1 (555) 888-9999', emailId: 'cyborg@star-labs.com', serviceCategory: 'In House Catering', amount: 1500.00, unit: 'Private 5-Course French Dinner' },
+
+  // Wellness (Wellness Retreats & Zen Spa & Wellness)
+  // Statuses: Enquiry, Confirmed, Cancelled, Completed
+  { id: 'BK-5603', status: 'Enquiry', startDate: '2024-05-22 14:00', endDate: '2024-05-22 16:00', bookingDate: '2024-05-15', guestName: 'David Miller', contactNumber: '+1 (555) 077-5678', emailId: 'david.m@gmail.com', serviceCategory: 'Wellness', amount: 180.00, unit: 'Full Body Massage & Spa' },
+  { id: 'BK-5604', status: 'Enquiry', startDate: '2024-05-23 14:00', endDate: '2024-05-23 16:00', bookingDate: '2024-05-16', guestName: 'Emma Watson', contactNumber: '+1 (555) 044-8822', emailId: 'emma.w@example.com', serviceCategory: 'Wellness', amount: 300.00, unit: 'Force Meditation & Hot Stone' },
+  { id: 'BK-5605', status: 'Confirmed', startDate: '2024-05-24 14:00', endDate: '2024-05-24 16:00', bookingDate: '2024-05-17', guestName: 'Amelie Poulain', contactNumber: '+1 (555) 333-4444', emailId: 'amelie@montmartre.fr', serviceCategory: 'Wellness', amount: 180.00, unit: 'Full Body Massage & Spa' },
+  { id: 'BK-5606', status: 'Confirmed', startDate: '2024-05-25 14:00', endDate: '2024-05-25 16:00', bookingDate: '2024-05-18', guestName: 'Sherlock Holmes', contactNumber: '+1 (555) 221-221B', emailId: 'sherlock@bakerstreet.co.uk', serviceCategory: 'Wellness', amount: 300.00, unit: 'Force Meditation & Hot Stone' },
+  { id: 'BK-5607', status: 'Completed', startDate: '2024-05-15 14:00', endDate: '2024-05-15 16:00', bookingDate: '2024-05-10', guestName: 'John Watson', contactNumber: '+1 (555) 221-221C', emailId: 'watson@bakerstreet.co.uk', serviceCategory: 'Wellness', amount: 180.00, unit: 'Full Body Massage & Spa' },
+  { id: 'BK-5608', status: 'Completed', startDate: '2024-05-16 14:00', endDate: '2024-05-16 16:00', bookingDate: '2024-05-11', guestName: 'Peter Parker', contactNumber: '+1 (555) 123-4567', emailId: 'peter.parker@dailybugle.com', serviceCategory: 'Wellness', amount: 300.00, unit: 'Force Meditation & Hot Stone' },
+  { id: 'BK-5609', status: 'Cancelled', startDate: '2024-05-18 14:00', endDate: '2024-05-18 16:00', bookingDate: '2024-05-12', guestName: 'Clark Kent', contactNumber: '+1 (555) 987-6543', emailId: 'clark.kent@dailyplanet.com', serviceCategory: 'Wellness', amount: 180.00, unit: 'Full Body Massage & Spa' },
+  { id: 'BK-5610', status: 'Cancelled', startDate: '2024-05-19 14:00', endDate: '2024-05-19 16:00', bookingDate: '2024-05-13', guestName: 'Diana Prince', contactNumber: '+1 (555) 555-1941', emailId: 'diana@themyscira.gov', serviceCategory: 'Wellness', amount: 300.00, unit: 'Force Meditation & Hot Stone' }
 ];
 
 export const LAUNDRY_STATUSES = [
@@ -332,12 +351,14 @@ const BookingReport = () => {
       return ['Order placed', 'Packing the cart', 'Out for delivery', 'Delivered', 'Cancelled'];
     } else if (categoryFilter === 'Doctor on Call') {
       return ['Enquiry', 'Arrived', 'Consultation active', 'treatment & documentation', 'Completed', 'Follow-up', 'Cancelled'];
-    } else if (categoryFilter === 'Chef on Call' || categoryFilter === 'In House Catering') {
+    } else if (categoryFilter === 'In House Catering') {
       return ['Enquiry', 'Confirmed', 'Menu finalized', 'Inprogress', 'Completed', 'Cancelled'];
-    } else if (categoryFilter === 'Car Rentals' || categoryFilter === 'Transportation') {
+    } else if (categoryFilter === 'Car Rentals') {
       return ['Enquiry', 'Confirmed', 'In progress', 'Completed', 'Cancelled'];
     } else if (categoryFilter === 'Laundry') {
       return LAUNDRY_STATUSES;
+    } else if (categoryFilter === 'Wellness') {
+      return ['Enquiry', 'Confirmed', 'Cancelled', 'Completed'];
     } else if (categoryFilter !== 'all') {
       return ['Enquiry', 'Confirmed', 'Cancelled', 'Completed'];
     }
@@ -482,8 +503,9 @@ const BookingReport = () => {
                       booking.serviceCategory === 'Food Delivery' ? ['Order placed', 'Accepted', 'Preparing', 'Ready for pickup', 'Out for delivery', 'Delivered', 'Cancelled'] :
                       booking.serviceCategory === 'Grocery' ? ['Order placed', 'Packing the cart', 'Out for delivery', 'Delivered', 'Cancelled'] :
                       booking.serviceCategory === 'Doctor on Call' ? ['Enquiry', 'Arrived', 'Consultation active', 'treatment & documentation', 'Completed', 'Follow-up', 'Cancelled'] :
-                      booking.serviceCategory === 'Chef on Call' || booking.serviceCategory === 'In House Catering' ? ['Enquiry', 'Confirmed', 'Menu finalized', 'Inprogress', 'Completed', 'Cancelled'] :
-                      booking.serviceCategory === 'Car Rentals' || booking.serviceCategory === 'Transportation' ? ['Enquiry', 'Confirmed', 'In progress', 'Completed', 'Cancelled'] :
+                      booking.serviceCategory === 'In House Catering' ? ['Enquiry', 'Confirmed', 'Menu finalized', 'Inprogress', 'Completed', 'Cancelled'] :
+                      booking.serviceCategory === 'Car Rentals' ? ['Enquiry', 'Confirmed', 'In progress', 'Completed', 'Cancelled'] :
+                      booking.serviceCategory === 'Wellness' ? ['Enquiry', 'Confirmed', 'Cancelled', 'Completed'] :
                       ['Enquiry', 'Confirmed', 'Cancelled', 'Completed'];
 
                     return (
@@ -564,8 +586,9 @@ const BookingReport = () => {
                         booking.serviceCategory === 'Food Delivery' ? ['Order placed', 'Accepted', 'Preparing', 'Ready for pickup', 'Out for delivery', 'Delivered', 'Cancelled'] :
                         booking.serviceCategory === 'Grocery' ? ['Order placed', 'Packing the cart', 'Out for delivery', 'Delivered', 'Cancelled'] :
                         booking.serviceCategory === 'Doctor on Call' ? ['Enquiry', 'Arrived', 'Consultation active', 'treatment & documentation', 'Completed', 'Follow-up', 'Cancelled'] :
-                        booking.serviceCategory === 'Chef on Call' || booking.serviceCategory === 'In House Catering' ? ['Enquiry', 'Confirmed', 'Menu finalized', 'Inprogress', 'Completed', 'Cancelled'] :
-                        booking.serviceCategory === 'Car Rentals' || booking.serviceCategory === 'Transportation' ? ['Enquiry', 'Confirmed', 'In progress', 'Completed', 'Cancelled'] :
+                        booking.serviceCategory === 'In House Catering' ? ['Enquiry', 'Confirmed', 'Menu finalized', 'Inprogress', 'Completed', 'Cancelled'] :
+                        booking.serviceCategory === 'Car Rentals' ? ['Enquiry', 'Confirmed', 'In progress', 'Completed', 'Cancelled'] :
+                        booking.serviceCategory === 'Wellness' ? ['Enquiry', 'Confirmed', 'Cancelled', 'Completed'] :
                         ['Enquiry', 'Confirmed', 'Cancelled', 'Completed'];
 
                       const hasNextStatus = allowedStatuses.indexOf(booking.status) < allowedStatuses.length - 1;
