@@ -12,6 +12,9 @@ const accounts = [
   { id: 'CORP-001', name: 'TechCorp Solutions', manager: 'Sarah Jenkins', status: 'Active', type: 'Corporate' },
   { id: 'CORP-002', name: 'Global Logistics Inc', manager: 'Michael Chen', status: 'Active', type: 'Corporate' },
   { id: 'CORP-003', name: 'Innovate Media', manager: 'Emma Wilson', status: 'Pending', type: 'STR' },
+  { id: 'CORP-004', name: 'Stark Industries', manager: 'Pepper Potts', status: 'Active', type: 'Corporate' },
+  { id: 'CORP-005', name: 'Wayne Enterprises', manager: 'Lucius Fox', status: 'Active', type: 'Corporate' },
+  { id: 'CORP-006', name: 'Acme Corporation', manager: 'Wile E. Coyote', status: 'Pending', type: 'STR' },
 ];
 
 const CorporateDirectories = () => {
@@ -19,11 +22,11 @@ const CorporateDirectories = () => {
 
   return (
     <div className="grid gap-6 md:grid-cols-4">
-      <Card className="md:col-span-1">
-        <CardHeader>
+      <Card className="md:col-span-1 h-[calc(100vh-220px)] flex flex-col">
+        <CardHeader className="p-4 pb-2">
           <CardTitle className="text-lg">Accounts</CardTitle>
         </CardHeader>
-        <CardContent className="p-0">
+        <CardContent className="p-0 flex-1 overflow-y-auto">
           <div className="divide-y">
             {accounts.map((account) => (
               <button
@@ -46,7 +49,7 @@ const CorporateDirectories = () => {
         </CardContent>
       </Card>
 
-      <Card className="md:col-span-3">
+      <Card className="md:col-span-3 h-[calc(100vh-220px)] flex flex-col overflow-y-auto">
         <CardHeader className="border-b">
           <div className="flex justify-between items-center">
             <div>

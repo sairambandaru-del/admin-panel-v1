@@ -11,9 +11,30 @@ import { ShieldCheck, Receipt, User, Building2, Mail, Phone, Boxes, Search, Plus
 import { showSuccess } from '@/utils/toast';
 
 const vendors = [
-  { id: 'VND-001', name: 'Elite Housekeeping', manager: 'David Miller', status: 'Verified', type: 'Service Provider' },
-  { id: 'VND-002', name: 'Swift Car Rentals', manager: 'Elena Rodriguez', status: 'Verified', type: 'Logistics' },
-  { id: 'VND-003', name: 'Gourmet Catering Co', manager: 'Marcus Chen', status: 'Pending', type: 'Food & Beverage' },
+  // Housekeeping
+  { id: 'VND-001', name: 'Elite Housekeeping', manager: 'David Miller', status: 'Verified', type: 'House Keeping' },
+  { id: 'VND-002', name: 'Sparkle Cleaners', manager: 'Sarah Connor', status: 'Verified', type: 'House Keeping' },
+  // Car Rentals & Logistics
+  { id: 'VND-003', name: 'Swift Car Rentals', manager: 'Elena Rodriguez', status: 'Verified', type: 'Car Rentals' },
+  { id: 'VND-004', name: 'Apex Luxury Fleet', manager: 'James Bond', status: 'Verified', type: 'Car Rentals' },
+  // Food & Beverage / Catering
+  { id: 'VND-005', name: 'Gourmet Catering Co', manager: 'Marcus Chen', status: 'Pending', type: 'In House Catering' },
+  { id: 'VND-006', name: 'Feast & Fete Catering', manager: 'Amelie Poulain', status: 'Verified', type: 'In House Catering' },
+  // Laundry
+  { id: 'VND-007', name: 'Laundry Pros', manager: 'Michael Jordan', status: 'Verified', type: 'Laundry' },
+  { id: 'VND-008', name: 'Spin Cycle Dry Cleaners', manager: 'Danny DeVito', status: 'Verified', type: 'Laundry' },
+  // Wellness
+  { id: 'VND-009', name: 'Wellness Retreats', manager: 'David Miller', status: 'Verified', type: 'Wellness' },
+  { id: 'VND-010', name: 'Zen Spa & Wellness', manager: 'Yoda Grandmaster', status: 'Verified', type: 'Wellness' },
+  // Grocery
+  { id: 'VND-011', name: 'InstaCart Grocery', manager: 'John Doe', status: 'Verified', type: 'Grocery' },
+  { id: 'VND-012', name: 'FreshMart Express', manager: 'Bruce Wayne', status: 'Verified', type: 'Grocery' },
+  // Doctor on Call
+  { id: 'VND-013', name: 'MedCall Pro', manager: 'Clara Oswald', status: 'Verified', type: 'Doctor on Call' },
+  { id: 'VND-014', name: 'DoctorAtHome Services', manager: 'Gregory House', status: 'Verified', type: 'Doctor on Call' },
+  // Short Term Rentals
+  { id: 'VND-015', name: 'Skyline Apartments', manager: 'Emma Watson', status: 'Verified', type: 'Short Term Rentals' },
+  { id: 'VND-016', name: 'Urban Oasis Stays', manager: 'Tony Stark', status: 'Verified', type: 'Short Term Rentals' },
 ];
 
 // Mock inventory data mapped by Vendor ID
@@ -26,16 +47,76 @@ const vendorInventories: Record<string, Array<{ id: string; item: string; catego
     { id: 'INV-HK-05', item: 'Microfiber Cloth Packs', category: 'Supplies', quantity: 0, status: 'Out of Stock' },
   ],
   'VND-002': [
+    { id: 'INV-SC-01', item: 'All-Purpose Disinfectant', category: 'Supplies', quantity: 120, status: 'In Stock' },
+    { id: 'INV-SC-02', item: 'Steam Mops', category: 'Equipment', quantity: 8, status: 'Low Stock' },
+    { id: 'INV-SC-03', item: 'Biodegradable Trash Bags', category: 'Supplies', quantity: 300, status: 'In Stock' },
+  ],
+  'VND-003': [
     { id: 'INV-CR-01', item: 'Tesla Model 3', category: 'Electric Sedan', quantity: 8, status: 'Available' },
     { id: 'INV-CR-02', item: 'Premium SUV (GMC Yukon)', category: 'SUV', quantity: 5, status: 'Rented' },
     { id: 'INV-CR-03', item: 'Range Rover Sport', category: 'Luxury SUV', quantity: 3, status: 'Maintenance' },
     { id: 'INV-CR-04', item: 'Economy Sedan (Nissan Sunny)', category: 'Sedan', quantity: 12, status: 'Available' },
   ],
-  'VND-003': [
+  'VND-004': [
+    { id: 'INV-AL-01', item: 'Mercedes S-Class', category: 'Luxury Sedan', quantity: 4, status: 'Available' },
+    { id: 'INV-AL-02', item: 'Porsche Taycan', category: 'Electric Sports', quantity: 2, status: 'Rented' },
+    { id: 'INV-AL-03', item: 'Audi Q8', category: 'Luxury SUV', quantity: 5, status: 'Available' },
+  ],
+  'VND-005': [
     { id: 'INV-CAT-01', item: 'Buffet Setup Kits', category: 'Equipment', quantity: 10, status: 'In Stock' },
     { id: 'INV-CAT-02', item: 'Premium Dinnerware Sets (100pax)', category: 'Tableware', quantity: 150, status: 'In Stock' },
     { id: 'INV-CAT-03', item: 'Portable Gas Burners', category: 'Cooking', quantity: 5, status: 'Low Stock' },
     { id: 'INV-CAT-04', item: 'Commercial Chocolate Fountains', category: 'Specialty', quantity: 0, status: 'Out of Stock' },
+  ],
+  'VND-006': [
+    { id: 'INV-FF-01', item: 'Chafing Dishes', category: 'Equipment', quantity: 24, status: 'In Stock' },
+    { id: 'INV-FF-02', item: 'Crystal Wine Glasses', category: 'Tableware', quantity: 500, status: 'In Stock' },
+    { id: 'INV-FF-03', item: 'Mobile Bar Counters', category: 'Furniture', quantity: 3, status: 'Low Stock' },
+  ],
+  'VND-007': [
+    { id: 'INV-LP-01', item: 'Heavy Duty Laundry Bags', category: 'Supplies', quantity: 150, status: 'In Stock' },
+    { id: 'INV-LP-02', item: 'Hypoallergenic Detergent', category: 'Chemicals', quantity: 60, status: 'In Stock' },
+    { id: 'INV-LP-03', item: 'Fabric Softener (Lavender)', category: 'Chemicals', quantity: 40, status: 'In Stock' },
+  ],
+  'VND-008': [
+    { id: 'INV-SD-01', item: 'Dry Cleaning Solvent (Perch)', category: 'Chemicals', quantity: 15, status: 'Low Stock' },
+    { id: 'INV-SD-02', item: 'Garment Hangers (Wooden)', category: 'Supplies', quantity: 2000, status: 'In Stock' },
+    { id: 'INV-SD-03', item: 'Protective Plastic Garment Bags', category: 'Supplies', quantity: 1500, status: 'In Stock' },
+  ],
+  'VND-009': [
+    { id: 'INV-WR-01', item: 'Organic Massage Oils', category: 'Wellness', quantity: 35, status: 'In Stock' },
+    { id: 'INV-WR-02', item: 'Aromatherapy Diffusers', category: 'Equipment', quantity: 10, status: 'In Stock' },
+    { id: 'INV-WR-03', item: 'Heated Stone Therapy Kits', category: 'Equipment', quantity: 4, status: 'In Stock' },
+  ],
+  'VND-010': [
+    { id: 'INV-ZS-01', item: 'Herbal Tea Assortment', category: 'Beverages', quantity: 120, status: 'In Stock' },
+    { id: 'INV-ZS-02', item: 'Plush Spa Robes', category: 'Apparel', quantity: 50, status: 'In Stock' },
+    { id: 'INV-ZS-03', item: 'Disposable Slippers', category: 'Apparel', quantity: 500, status: 'In Stock' },
+  ],
+  'VND-011': [
+    { id: 'INV-IG-01', item: 'Insulated Delivery Bags', category: 'Logistics', quantity: 40, status: 'In Stock' },
+    { id: 'INV-IG-02', item: 'Fresh Produce Crates', category: 'Logistics', quantity: 100, status: 'In Stock' },
+  ],
+  'VND-012': [
+    { id: 'INV-FM-01', item: 'Eco-friendly Paper Bags', category: 'Supplies', quantity: 5000, status: 'In Stock' },
+    { id: 'INV-FM-02', item: 'Refrigerated Delivery Boxes', category: 'Logistics', quantity: 15, status: 'Low Stock' },
+  ],
+  'VND-013': [
+    { id: 'INV-MP-01', item: 'Portable ECG Monitors', category: 'Medical', quantity: 5, status: 'Available' },
+    { id: 'INV-MP-02', item: 'Emergency Medical Kits', category: 'Medical', quantity: 12, status: 'Available' },
+    { id: 'INV-MP-03', item: 'Rapid Antigen Test Kits', category: 'Medical', quantity: 450, status: 'In Stock' },
+  ],
+  'VND-014': [
+    { id: 'INV-DH-01', item: 'Digital Blood Pressure Monitors', category: 'Medical', quantity: 20, status: 'Available' },
+    { id: 'INV-DH-02', item: 'Mobile Ultrasound Scanners', category: 'Medical', quantity: 2, status: 'Available' },
+  ],
+  'VND-015': [
+    { id: 'INV-SA-01', item: 'Smart Lock Keycards', category: 'Security', quantity: 300, status: 'In Stock' },
+    { id: 'INV-SA-02', item: 'Welcome Amenity Baskets', category: 'Hospitality', quantity: 25, status: 'Low Stock' },
+  ],
+  'VND-016': [
+    { id: 'INV-UO-01', item: 'Premium Coffee Pods (Box of 100)', category: 'Hospitality', quantity: 40, status: 'In Stock' },
+    { id: 'INV-UO-02', item: 'Luxury Toiletries Sets', category: 'Hospitality', quantity: 150, status: 'In Stock' },
   ],
 };
 
@@ -73,11 +154,11 @@ const VendorRegistry = () => {
 
   return (
     <div className="grid gap-6 md:grid-cols-4">
-      <Card className="md:col-span-1">
-        <CardHeader>
+      <Card className="md:col-span-1 h-[calc(100vh-220px)] flex flex-col">
+        <CardHeader className="p-4 pb-2">
           <CardTitle className="text-lg">Vendor Accounts</CardTitle>
         </CardHeader>
-        <CardContent className="p-0">
+        <CardContent className="p-0 flex-1 overflow-y-auto">
           <div className="divide-y">
             {vendors.map((vendor) => (
               <button
@@ -103,7 +184,7 @@ const VendorRegistry = () => {
         </CardContent>
       </Card>
 
-      <Card className="md:col-span-3">
+      <Card className="md:col-span-3 h-[calc(100vh-220px)] flex flex-col overflow-y-auto">
         <CardHeader className="border-b">
           <div className="flex justify-between items-center">
             <div>

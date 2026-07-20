@@ -69,160 +69,55 @@ interface Booking {
 }
 
 const initialBookings: Booking[] = [
-  {
-    id: 'BK-9921',
-    vendor: 'Elite Housekeeping',
-    guestName: 'Alice Brown',
-    guestPhone: '+1 (555) 019-2834',
-    guestEmail: 'alice.brown@example.com',
-    serviceCategory: 'housekeeping',
-    serviceName: 'Deep Cleaning Service',
-    bookingDate: '2024-05-12 10:30 AM',
-    startDate: '2024-05-15 09:00 AM',
-    endDate: '2024-05-15 01:00 PM',
-    status: 'Completed',
-    amount: 120.00
-  },
-  {
-    id: 'BK-9922',
-    vendor: 'Elite Housekeeping',
-    guestName: 'Robert Fox',
-    guestPhone: '+1 (555) 234-5678',
-    guestEmail: 'robert.fox@gmail.com',
-    serviceCategory: 'housekeeping',
-    serviceName: 'Standard Turn-down Service',
-    bookingDate: '2024-05-18 09:00 AM',
-    startDate: '2024-05-22 10:00 AM',
-    endDate: '2024-05-22 12:00 PM',
-    status: 'Enquiry',
-    amount: 90.00
-  },
-  {
-    id: 'BK-9918',
-    vendor: 'Swift Car Rentals',
-    guestName: 'Mark Wilson',
-    guestPhone: '+1 (555) 024-9911',
-    guestEmail: 'mark.wilson@example.com',
-    serviceCategory: 'car',
-    serviceName: 'Premium SUV Rental',
-    bookingDate: '2024-05-11 02:15 PM',
-    startDate: '2024-05-14 08:00 AM',
-    endDate: '2024-05-17 06:00 PM',
-    status: 'Confirmed',
-    amount: 450.00
-  },
-  {
-    id: 'BK-9930',
-    vendor: 'Gourmet Catering Co',
-    guestName: 'Sarah Jenkins',
-    guestPhone: '+1 (555) 088-1234',
-    guestEmail: 'sarah.j@example.com',
-    serviceCategory: 'catering',
-    serviceName: 'In-House Buffet Dinner',
-    bookingDate: '2024-05-13 09:00 AM',
-    startDate: '2024-05-18 06:00 PM',
-    endDate: '2024-05-18 10:00 PM',
-    status: 'Enquiry',
-    amount: 850.00
-  },
-  {
-    id: 'BK-9931',
-    vendor: 'Gourmet Catering Co',
-    guestName: 'Emma Watson',
-    guestPhone: '+1 (555) 044-8822',
-    guestEmail: 'emma.w@example.com',
-    serviceCategory: 'catering',
-    serviceName: 'Private 5-Course French Dinner',
-    bookingDate: '2024-05-19 11:00 AM',
-    startDate: '2024-05-24 06:00 PM',
-    endDate: '2024-05-24 10:00 PM',
-    status: 'Menu finalized',
-    amount: 1200.00
-  },
-  {
-    id: 'BK-9945',
-    vendor: 'Wellness Retreats',
-    guestName: 'David Miller',
-    guestPhone: '+1 (555) 077-5678',
-    guestEmail: 'david.m@example.com',
-    serviceCategory: 'wellness',
-    serviceName: 'Full Body Massage & Spa',
-    bookingDate: '2024-05-14 11:00 AM',
-    startDate: '2024-05-16 02:00 PM',
-    endDate: '2024-05-16 04:00 PM',
-    status: 'Confirmed',
-    amount: 180.00
-  },
-  {
-    id: 'BK-9950',
-    vendor: 'Skyline Apartments',
-    guestName: 'Emma Watson',
-    guestPhone: '+1 (555) 044-8822',
-    guestEmail: 'emma.w@example.com',
-    serviceCategory: 'str',
-    serviceName: 'Luxury Penthouse Stay',
-    bookingDate: '2024-05-10 04:30 PM',
-    startDate: '2024-05-20 03:00 PM',
-    endDate: '2024-05-25 11:00 AM',
-    status: 'Checked in',
-    amount: 1250.00
-  },
-  {
-    id: 'BK-9970',
-    vendor: 'InstaCart Grocery',
-    guestName: 'John Doe',
-    guestPhone: '+1 (555) 099-1122',
-    guestEmail: 'john.doe@gmail.com',
-    serviceCategory: 'grocery',
-    serviceName: 'Fresh Produce & Dairy Delivery',
-    bookingDate: '2024-05-20 08:00 AM',
-    startDate: '2024-05-20 10:00 AM',
-    endDate: '2024-05-20 11:00 AM',
-    status: 'Packing the cart',
-    amount: 145.00
-  },
-  {
-    id: 'BK-9980',
-    vendor: 'MedCall Pro',
-    guestName: 'Clara Oswald',
-    guestPhone: '+1 (555) 044-1122',
-    guestEmail: 'clara@tardis.com',
-    serviceCategory: 'doctor',
-    serviceName: 'Emergency Doctor Consultation',
-    bookingDate: '2024-05-21 11:30 AM',
-    startDate: '2024-05-21 12:00 PM',
-    endDate: '2024-05-21 01:00 PM',
-    status: 'Consultation active',
-    amount: 350.00
-  },
-  {
-    id: 'BK-9985',
-    vendor: 'Swift Car Rentals',
-    guestName: 'Liam Neeson',
-    guestPhone: '+1 (555) 999-8888',
-    guestEmail: 'liam@taken.com',
-    serviceCategory: 'car',
-    serviceName: 'Range Rover Sport Rental',
-    bookingDate: '2024-05-15 09:00 AM',
-    startDate: '2024-05-20 08:00 AM',
-    endDate: '2024-05-23 06:00 PM',
-    status: 'In progress',
-    amount: 950.00
-  },
-  {
-    id: 'BK-9990',
-    vendor: 'Laundry Pros',
-    guestName: 'Michael Jordan',
-    guestPhone: '+1 (555) 230-9944',
-    guestEmail: 'mj23@bulls.com',
-    serviceCategory: 'laundry',
-    serviceName: 'Premium Dry Cleaning',
-    bookingDate: '2024-05-20 08:00 AM',
-    startDate: '2024-05-21 10:00 AM',
-    endDate: '2024-05-23 05:00 PM',
-    status: 'order accepted',
-    amount: 180.00
-  }
+  // Housekeeping (Elite Housekeeping & Sparkle Cleaners)
+  { id: 'BK-9921', vendor: 'Elite Housekeeping', guestName: 'Alice Brown', guestPhone: '+1 (555) 019-2834', guestEmail: 'alice.brown@example.com', serviceCategory: 'housekeeping', serviceName: 'Deep Cleaning Service', bookingDate: '2024-05-12 10:30 AM', startDate: '2024-05-15 09:00 AM', endDate: '2024-05-15 01:00 PM', status: 'Completed', amount: 120.00 },
+  { id: 'BK-9922', vendor: 'Elite Housekeeping', guestName: 'Robert Fox', guestPhone: '+1 (555) 234-5678', guestEmail: 'robert.fox@gmail.com', serviceCategory: 'housekeeping', serviceName: 'Standard Turn-down Service', bookingDate: '2024-05-18 09:00 AM', startDate: '2024-05-22 10:00 AM', endDate: '2024-05-22 12:00 PM', status: 'Enquiry', amount: 90.00 },
+  { id: 'BK-9923', vendor: 'Sparkle Cleaners', guestName: 'Michael Jordan', guestPhone: '+1 (555) 230-9944', guestEmail: 'mj23@bulls.com', serviceCategory: 'housekeeping', serviceName: 'Post-Party Deep Clean', bookingDate: '2024-05-19 08:00 AM', startDate: '2024-05-20 09:00 AM', endDate: '2024-05-20 03:00 PM', status: 'Confirmed', amount: 250.00 },
+  { id: 'BK-9924', vendor: 'Sparkle Cleaners', guestName: 'Serena Williams', guestPhone: '+1 (555) 444-8811', guestEmail: 'serena@tennis.com', serviceCategory: 'housekeeping', serviceName: 'Weekly Express Clean', bookingDate: '2024-05-20 09:00 AM', startDate: '2024-05-21 10:00 AM', endDate: '2024-05-21 12:00 PM', status: 'Scheduled', amount: 80.00 },
+  { id: 'BK-9925', vendor: 'Elite Housekeeping', guestName: 'Tony Stark', guestPhone: '+1 (555) 300-4000', guestEmail: 'tony@starkindustries.com', serviceCategory: 'housekeeping', serviceName: 'Penthouse Premium Clean', bookingDate: '2024-05-19 10:00 AM', startDate: '2024-05-20 11:00 AM', endDate: '2024-05-20 04:00 PM', status: 'In progressed', amount: 350.00 },
+  { id: 'BK-9926', vendor: 'Sparkle Cleaners', guestName: 'Bruce Wayne', guestPhone: '+1 (555) 111-2222', guestEmail: 'bruce@waynecorp.com', serviceCategory: 'housekeeping', serviceName: 'Manor Post-Event Clean', bookingDate: '2024-05-18 11:00 AM', startDate: '2024-05-19 08:00 AM', endDate: '2024-05-19 05:00 PM', status: 'Cancelled', amount: 500.00 },
+
+  // Car Rentals (Swift Car Rentals & Apex Luxury Fleet)
+  { id: 'BK-9918', vendor: 'Swift Car Rentals', guestName: 'Mark Wilson', guestPhone: '+1 (555) 024-9911', guestEmail: 'mark.wilson@example.com', serviceCategory: 'car', serviceName: 'Premium SUV Rental', bookingDate: '2024-05-11 02:15 PM', startDate: '2024-05-14 08:00 AM', endDate: '2024-05-17 06:00 PM', status: 'Confirmed', amount: 450.00 },
+  { id: 'BK-9919', vendor: 'Swift Car Rentals', guestName: 'Liam Neeson', guestPhone: '+1 (555) 999-8888', guestEmail: 'liam@taken.com', serviceCategory: 'car', serviceName: 'Range Rover Sport Rental', bookingDate: '2024-05-15 09:00 AM', startDate: '2024-05-20 08:00 AM', endDate: '2024-05-23 06:00 PM', status: 'In progress', amount: 950.00 },
+  { id: 'BK-9920', vendor: 'Apex Luxury Fleet', guestName: 'James Bond', guestPhone: '+1 (555) 007-0007', guestEmail: '007@mi6.gov.uk', serviceCategory: 'car', serviceName: 'Aston Martin DB11', bookingDate: '2024-05-18 04:00 PM', startDate: '2024-05-21 09:00 AM', endDate: '2024-05-24 06:00 PM', status: 'Completed', amount: 3000.00 },
+  { id: 'BK-9927', vendor: 'Apex Luxury Fleet', guestName: 'John Wick', guestPhone: '+1 (555) 911-9111', guestEmail: 'babayaga@continental.com', serviceCategory: 'car', serviceName: 'Ford Mustang Mach 1', bookingDate: '2024-05-19 02:00 PM', startDate: '2024-05-22 08:00 AM', endDate: '2024-05-25 08:00 AM', status: 'Enquiry', amount: 1200.00 },
+
+  // Catering (Gourmet Catering Co & Feast & Fete Catering)
+  { id: 'BK-9930', vendor: 'Gourmet Catering Co', guestName: 'Sarah Jenkins', guestPhone: '+1 (555) 088-1234', guestEmail: 'sarah.j@example.com', serviceCategory: 'catering', serviceName: 'In-House Buffet Dinner', bookingDate: '2024-05-13 09:00 AM', startDate: '2024-05-18 06:00 PM', endDate: '2024-05-18 10:00 PM', status: 'Enquiry', amount: 850.00 },
+  { id: 'BK-9931', vendor: 'Gourmet Catering Co', guestName: 'Emma Watson', guestPhone: '+1 (555) 044-8822', guestEmail: 'emma.w@example.com', serviceCategory: 'catering', serviceName: 'Private 5-Course French Dinner', bookingDate: '2024-05-19 11:00 AM', startDate: '2024-05-24 06:00 PM', endDate: '2024-05-24 10:00 PM', status: 'Menu finalized', amount: 1200.00 },
+  { id: 'BK-9932', vendor: 'Feast & Fete Catering', guestName: 'Amelie Poulain', guestPhone: '+1 (555) 333-4444', guestEmail: 'amelie@montmartre.fr', serviceCategory: 'catering', serviceName: 'Artisanal Canapes & Cocktails', bookingDate: '2024-05-15 10:00 AM', startDate: '2024-05-20 05:00 PM', endDate: '2024-05-20 09:00 PM', status: 'Confirmed', amount: 1500.00 },
+  { id: 'BK-9933', vendor: 'Feast & Fete Catering', guestName: 'Sherlock Holmes', guestPhone: '+1 (555) 221-221B', guestEmail: 'sherlock@bakerstreet.co.uk', serviceCategory: 'catering', serviceName: 'Traditional English High Tea', bookingDate: '2024-05-16 09:00 AM', startDate: '2024-05-21 02:00 PM', endDate: '2024-05-21 05:00 PM', status: 'Inprogress', amount: 600.00 },
+  { id: 'BK-9934', vendor: 'Gourmet Catering Co', guestName: 'Peter Parker', guestPhone: '+1 (555) 123-4567', guestEmail: 'peter.parker@dailybugle.com', serviceCategory: 'catering', serviceName: 'Rooftop Pizza & Sliders Party', bookingDate: '2024-05-17 11:00 AM', startDate: '2024-05-22 07:00 PM', endDate: '2024-05-22 10:00 PM', status: 'Completed', amount: 450.00 },
+  { id: 'BK-9935', vendor: 'Feast & Fete Catering', guestName: 'Clark Kent', guestPhone: '+1 (555) 987-6543', guestEmail: 'clark.kent@dailyplanet.com', serviceCategory: 'catering', serviceName: 'Organic Farm-to-Table Lunch', bookingDate: '2024-05-18 10:00 AM', startDate: '2024-05-23 12:00 PM', endDate: '2024-05-23 03:00 PM', status: 'Cancelled', amount: 750.00 },
+
+  // Laundry (Laundry Pros & Spin Cycle Dry Cleaners)
+  { id: 'BK-9990', vendor: 'Laundry Pros', guestName: 'Michael Jordan', guestPhone: '+1 (555) 230-9944', guestEmail: 'mj23@bulls.com', serviceCategory: 'laundry', serviceName: 'Premium Dry Cleaning', bookingDate: '2024-05-20 08:00 AM', startDate: '2024-05-21 10:00 AM', endDate: '2024-05-23 05:00 PM', status: 'order accepted', amount: 180.00 },
+  { id: 'BK-9991', vendor: 'Laundry Pros', guestName: 'Serena Williams', guestPhone: '+1 (555) 444-8811', guestEmail: 'serena@tennis.com', serviceCategory: 'laundry', serviceName: 'Sports Gear Wash & Fold', bookingDate: '2024-05-20 09:00 AM', startDate: '2024-05-21 11:00 AM', endDate: '2024-05-22 04:00 PM', status: 'rider assigned', amount: 120.00 },
+  { id: 'BK-9992', vendor: 'Spin Cycle Dry Cleaners', guestName: 'Tony Stark', guestPhone: '+1 (555) 300-4000', guestEmail: 'tony@starkindustries.com', serviceCategory: 'laundry', serviceName: 'Silk Suit Dry Cleaning', bookingDate: '2024-05-19 10:00 AM', startDate: '2024-05-20 09:00 AM', endDate: '2024-05-22 06:00 PM', status: 'picked up', amount: 350.00 },
+  { id: 'BK-9993', vendor: 'Spin Cycle Dry Cleaners', guestName: 'Bruce Wayne', guestPhone: '+1 (555) 111-2222', guestEmail: 'bruce@waynecorp.com', serviceCategory: 'laundry', serviceName: 'Tuxedo Special Care', bookingDate: '2024-05-18 11:00 AM', startDate: '2024-05-19 10:00 AM', endDate: '2024-05-21 05:00 PM', status: 'received at facility', amount: 400.00 },
+  { id: 'BK-9994', vendor: 'Laundry Pros', guestName: 'Peter Parker', guestPhone: '+1 (555) 123-4567', guestEmail: 'peter.parker@dailybugle.com', serviceCategory: 'laundry', serviceName: 'Spandex Suit Gentle Wash', bookingDate: '2024-05-17 11:00 AM', startDate: '2024-05-18 08:00 AM', endDate: '2024-05-19 04:00 PM', status: 'under processing', amount: 90.00 },
+  { id: 'BK-9995', vendor: 'Spin Cycle Dry Cleaners', guestName: 'Clark Kent', guestPhone: '+1 (555) 987-6543', guestEmail: 'clark.kent@dailyplanet.com', serviceCategory: 'laundry', serviceName: 'Woolen Coat Dry Clean', bookingDate: '2024-05-18 10:00 AM', startDate: '2024-05-19 09:00 AM', endDate: '2024-05-21 05:00 PM', status: 'quality check', amount: 150.00 },
+  { id: 'BK-9996', vendor: 'Laundry Pros', guestName: 'Diana Prince', guestPhone: '+1 (555) 555-1941', guestEmail: 'diana@themyscira.gov', serviceCategory: 'laundry', serviceName: 'Ancient Armor Polish & Clean', bookingDate: '2024-05-16 09:00 AM', startDate: '2024-05-17 10:00 AM', endDate: '2024-05-19 05:00 PM', status: 'out for delivery', amount: 600.00 },
+  { id: 'BK-9997', vendor: 'Spin Cycle Dry Cleaners', guestName: 'Barry Allen', guestPhone: '+1 (555) 321-3211', guestEmail: 'barry@centralcitypd.gov', serviceCategory: 'laundry', serviceName: 'Friction-Resistant Suit Wash', bookingDate: '2024-05-15 10:00 AM', startDate: '2024-05-16 08:00 AM', endDate: '2024-05-16 09:00 AM', status: 'delivered', amount: 200.00 },
+  { id: 'BK-9998', vendor: 'Laundry Pros', guestName: 'Arthur Curry', guestPhone: '+1 (555) 777-8888', guestEmail: 'aquaman@atlantis.gov', serviceCategory: 'laundry', serviceName: 'Saltwater Stain Removal', bookingDate: '2024-05-14 11:00 AM', startDate: '2024-05-15 09:00 AM', endDate: '2024-05-17 05:00 PM', status: 'exception raised', amount: 300.00 },
+  { id: 'BK-9999', vendor: 'Spin Cycle Dry Cleaners', guestName: 'Victor Stone', guestPhone: '+1 (555) 888-9999', guestEmail: 'cyborg@star-labs.com', serviceCategory: 'laundry', serviceName: 'Metallic Fiber Polish', bookingDate: '2024-05-13 09:00 AM', startDate: '2024-05-14 10:00 AM', endDate: '2024-05-16 05:00 PM', status: 'claim under review', amount: 500.00 },
+
+  // Wellness (Wellness Retreats & Zen Spa & Wellness)
+  { id: 'BK-9945', vendor: 'Wellness Retreats', guestName: 'David Miller', guestPhone: '+1 (555) 077-5678', guestEmail: 'david.m@example.com', serviceCategory: 'wellness', serviceName: 'Full Body Massage & Spa', bookingDate: '2024-05-14 11:00 AM', startDate: '2024-05-16 02:00 PM', endDate: '2024-05-16 04:00 PM', status: 'Confirmed', amount: 180.00 },
+  { id: 'BK-9946', vendor: 'Zen Spa & Wellness', guestName: 'Yoda Grandmaster', guestPhone: '+1 (555) 900-9000', guestEmail: 'yoda@jediorder.org', serviceCategory: 'wellness', serviceName: 'Force Meditation & Hot Stone', bookingDate: '2024-05-15 10:00 AM', startDate: '2024-05-18 09:00 AM', endDate: '2024-05-18 11:00 AM', status: 'Completed', amount: 300.00 },
+
+  // Grocery (InstaCart Grocery & FreshMart Express)
+  { id: 'BK-9970', vendor: 'InstaCart Grocery', guestName: 'John Doe', guestPhone: '+1 (555) 099-1122', guestEmail: 'john.doe@gmail.com', serviceCategory: 'grocery', serviceName: 'Fresh Produce & Dairy Delivery', bookingDate: '2024-05-20 08:00 AM', startDate: '2024-05-20 10:00 AM', endDate: '2024-05-20 11:00 AM', status: 'Packing the cart', amount: 145.00 },
+  { id: 'BK-9971', vendor: 'FreshMart Express', guestName: 'Bruce Wayne', guestPhone: '+1 (555) 111-2222', guestEmail: 'bruce@waynecorp.com', serviceCategory: 'grocery', serviceName: 'Organic Superfoods & Juices', bookingDate: '2024-05-21 09:00 AM', startDate: '2024-05-21 11:00 AM', endDate: '2024-05-21 12:00 PM', status: 'Order placed', amount: 350.00 },
+
+  // Doctor on Call (MedCall Pro & DoctorAtHome Services)
+  { id: 'BK-9980', vendor: 'MedCall Pro', guestName: 'Clara Oswald', guestPhone: '+1 (555) 044-1122', guestEmail: 'clara@tardis.com', serviceCategory: 'doctor', serviceName: 'Emergency Doctor Consultation', bookingDate: '2024-05-21 11:30 AM', startDate: '2024-05-21 12:00 PM', endDate: '2024-05-21 01:00 PM', status: 'Consultation active', amount: 350.00 },
+  { id: 'BK-9981', vendor: 'DoctorAtHome Services', guestName: 'Gregory House', guestPhone: '+1 (555) 911-0303', guestEmail: 'house@ppth.org', serviceCategory: 'doctor', serviceName: 'Diagnostic Home Visit', bookingDate: '2024-05-20 02:00 PM', startDate: '2024-05-22 10:00 AM', endDate: '2024-05-22 12:00 PM', status: 'Enquiry', amount: 500.00 },
+
+  // Short Term Rentals (Skyline Apartments & Urban Oasis Stays)
+  { id: 'BK-9950', vendor: 'Skyline Apartments', guestName: 'Emma Watson', guestPhone: '+1 (555) 044-8822', guestEmail: 'emma.w@example.com', serviceCategory: 'str', serviceName: 'Luxury Penthouse Stay', bookingDate: '2024-05-10 04:30 PM', startDate: '2024-05-20 03:00 PM', endDate: '2024-05-25 11:00 AM', status: 'Checked in', amount: 1250.00 },
+  { id: 'BK-9951', vendor: 'Urban Oasis Stays', guestName: 'Tony Stark', guestPhone: '+1 (555) 300-4000', guestEmail: 'tony@starkindustries.com', serviceCategory: 'str', serviceName: 'Modern Waterfront Loft', bookingDate: '2024-05-12 09:00 AM', startDate: '2024-05-22 03:00 PM', endDate: '2024-05-28 11:00 AM', status: 'Confirmed', amount: 1800.00 }
 ];
 
 const VendorServices = () => {

@@ -193,6 +193,78 @@ const initialEmployees: Employee[] = [
     approvals: [
       { id: 'APR-202', destination: 'Chicago, USA', dates: 'Jul 10 - Jul 14, 2024', cost: 850, reason: 'Marketing Workshop', status: 'Pending' }
     ]
+  },
+  {
+    id: 'EMP-004',
+    name: 'Tony Stark',
+    email: 'tony@starkindustries.com',
+    role: 'Chief Executive Officer',
+    department: 'Executive Office',
+    company: 'Stark Industries',
+    avatar: 'TS',
+    preferences: {
+      dietary: 'None',
+      seat: 'First Class Window',
+      roomType: 'Presidential Suite',
+      airline: 'Private Jet / Emirates'
+    },
+    policy: {
+      maxBudget: 2000,
+      cabinClass: 'First Class',
+      autoApprove: true,
+      requiresApproval: false
+    },
+    trips: [
+      {
+        id: 'TRP-104',
+        destination: 'Dubai, UAE',
+        dates: 'May 20 - May 25, 2024',
+        purpose: 'Clean Energy Summit',
+        cost: 8500,
+        status: 'Active',
+        bookings: [
+          { id: 'BKG-104A', category: 'Short Term Rentals', item: 'Burj Khalifa Luxury Suite', provider: 'Skyline Apartments', cost: 6000, date: 'May 20, 2024' },
+          { id: 'BKG-104B', category: 'Car Rentals', item: 'Lamborghini Aventador Rental', provider: 'Apex Luxury Fleet', cost: 2500, date: 'May 20, 2024' }
+        ]
+      }
+    ],
+    approvals: []
+  },
+  {
+    id: 'EMP-005',
+    name: 'Bruce Wayne',
+    email: 'bruce@waynecorp.com',
+    role: 'Chairman',
+    department: 'Board of Directors',
+    company: 'Wayne Enterprises',
+    avatar: 'BW',
+    preferences: {
+      dietary: 'None',
+      seat: 'First Class Aisle',
+      roomType: 'Penthouse Suite',
+      airline: 'British Airways'
+    },
+    policy: {
+      maxBudget: 1500,
+      cabinClass: 'First Class',
+      autoApprove: true,
+      requiresApproval: false
+    },
+    trips: [
+      {
+        id: 'TRP-105',
+        destination: 'Gotham City, USA',
+        dates: 'Jun 01 - Jun 05, 2024',
+        purpose: 'Charity Gala & Board Meeting',
+        cost: 4200,
+        status: 'Upcoming',
+        bookings: [
+          { id: 'BKG-105A', category: 'Short Term Rentals', item: 'Wayne Manor Guest Wing', provider: 'Urban Oasis Stays', cost: 3000, date: 'Jun 01, 2024' },
+          { id: 'BKG-105B', category: 'In House Catering', item: 'Gala Dinner Catering', provider: 'Feast & Fete Catering', cost: 1200, date: 'Jun 02, 2024' }
+        ]
+      }
+    ],
+    approvals: []
   }
 ];
 
