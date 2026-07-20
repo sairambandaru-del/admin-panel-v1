@@ -18,51 +18,6 @@ import {
   DialogTrigger 
 } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Building2, Plus, Edit2, Shield, Power } from 'lucide-react';
-import { showSuccess } from '@/utils/toast';
-
-export interface Account {
-  id: string;
-  name: string;
-  type: 'STR' | 'Corporate' | 'Vendor';
-  domain: string;
-  allowedModules: string[];
-  status: 'Active' | 'Inactive';
-}
-
-export const AVAILABLE_MODULES = [
-  { id: 'dashboard', label: 'Dashboard & KPIs' },
-  { id: 'corporate', label: 'Corporate Ecosystem' },
-  { id: 'inventory', label: 'Unit Inventory' },
-  { id: 'vendors', label: 'Vendors Registry' },
-  { id: 'finance', label: 'Financial Reporting' }
-];
-
-// Seed some initial accounts
-export const initialAccounts: Account[] = [
-  { id: 'ACC-01', name: 'TechCorp Solutions', type: 'Corporate', domain: 'techcorp.com', allowedModules: ['dashboard', 'corporate'], status: 'Active' },
-  { id: 'ACC-02', name: 'Elite Housekeeping', type: 'Vendor', domain: 'elitehouse.com', allowedModules: ['dashboard', 'vendors'], status: 'Active' },
-  { id: 'ACC-03', name: 'Skyline Holdings', type: 'STR', domain: 'sky<dyad-write path="src/components/settings/SettingsAccounts.tsx" description="Completing and expanding the SettingsAccounts component with the new corporate accounts.">
-"use client";
-
-import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Checkbox } from "@/components/ui/checkbox";
-import { 
-  Dialog, 
-  DialogContent, 
-  DialogDescription, 
-  DialogFooter, 
-  DialogHeader, 
-  DialogTitle, 
-  DialogTrigger 
-} from "@/components/ui/dialog";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Building2, Plus, Edit2, Power } from 'lucide-react';
 import { showSuccess } from '@/utils/toast';
 
