@@ -57,7 +57,10 @@ import {
   Radio,
   Sliders,
   ShieldCheck,
-  Briefcase
+  Briefcase,
+  Fuel,
+  Users,
+  Shield
 } from 'lucide-react';
 import { showSuccess, showError } from '@/utils/toast';
 import { ServiceCategory } from './VendorServices';
@@ -98,23 +101,43 @@ export interface TransportationServiceItem {
   vendorName: string;
   rideType: 'Airport Transfer' | 'Local Ride Hailing' | 'Premium Private Taxi' | 'Rent a Car';
   description: string;
-  vehicleModel: string; // e.g. "Range Rover Sport · Silver · C 21987"
+  vehicleModel: string;
   rideModeProfile: 'Business' | 'Relaxed' | 'VIP' | 'Green' | 'Focus';
   zenPoolEligible: boolean;
   aquaAccessEligible: boolean;
-  onboardExtras: string[]; // e.g. ['WiFi Hotspot', 'Phone Charger', 'Bottled Water']
+  onboardExtras: string[];
   priceAED: number;
   pricingUnit: 'Per Trip' | 'Per Hour' | 'Per Day' | '3-Day Package';
   dailyCapacity: number;
   isActive: boolean;
 }
 
+export interface CarRentalItem {
+  id: string;
+  sku: string;
+  vehicleName: string; // e.g. "Range Rover Sport HSE 2024"
+  vendorName: string;
+  categoryClass: 'Luxury SUV' | 'Electric & Hybrid' | 'Executive Sedan' | 'Sports Car' | 'Compact Economy';
+  transmission: 'Automatic' | 'Manual';
+  fuelType: 'Petrol' | 'Electric' | 'Hybrid';
+  seats: number;
+  dailyRateAED: number;
+  weeklyRateAED: number;
+  depositAED: number;
+  insuranceIncluded: boolean;
+  deliveryToUnit: boolean;
+  zenPoolEligible: boolean;
+  aquaAccessEligible: boolean;
+  availableVehiclesCount: number;
+  isActive: boolean;
+}
+
 export const EXACT_14_CATEGORIES: Array<{ id: ServiceCategory; label: string; icon: React.ElementType }> = [
+  { id: 'Car rental', label: 'Car Rental', icon: Car },
   { id: 'Transportation', label: 'Transportation Hub', icon: CarTaxiFront },
   { id: 'House keeping', label: 'House Keeping', icon: Home },
   { id: 'Laundry', label: 'Laundry', icon: Shirt },
   { id: 'Short term rental', label: 'Short Term Rental', icon: Building },
-  { id: 'Car rental', label: 'Car Rental', icon: Car },
   { id: 'Doctor on call', label: 'Doctor on Call', icon: Stethoscope },
   { id: 'Leisure activities', label: 'Leisure Activities', icon: Compass },
   { id: 'Dining', label: 'Dining', icon: UtensilsCrossed },
@@ -126,26 +149,87 @@ export const EXACT_14_CATEGORIES: Array<{ id: ServiceCategory; label: string; ic
   { id: 'Food delivery', label: 'Food Delivery', icon: ShoppingBag }
 ];
 
-const VENDORS_LIST = [
-  'Swift Airport Transfers',
-  'Apex Luxury Fleet',
-  'Sparkle Cleaners',
-  'Elite Housekeeping Co',
-  'QuickWash Laundry',
-  'Spin Cycle Dry Cleaners',
-  'Skyline Property Mgmt',
-  'MedCall Pro Services',
-  'Desert Safari Adventures',
-  'Zuma Fine Dining',
-  'WeWork Global Pass',
-  'Zen Spa & Wellness',
-  'Gourmet Chef Collective',
-  'Feast & Fete Catering',
-  'FreshMart Express',
-  'Bistro Express'
+// Car Rental Catalog
+const initialCarRentalCatalog: CarRentalItem[] = [
+  {
+    id: 'CAR-001',
+    sku: 'SKU-CAR-RR-SPORT',
+    vehicleName: 'Range Rover Sport HSE 2024 (Silver)',
+    vendorName: 'Apex Luxury Fleet',
+    categoryClass: 'Luxury SUV',
+    transmission: 'Automatic',
+    fuelType: 'Petrol',
+    seats: 5,
+    dailyRateAED: 850.00,
+    weeklyRateAED: 5200.00,
+    depositAED: 2000.00,
+    insuranceIncluded: true,
+    deliveryToUnit: true,
+    zenPoolEligible: true,
+    aquaAccessEligible: true,
+    availableVehiclesCount: 6,
+    isActive: true
+  },
+  {
+    id: 'CAR-002',
+    sku: 'SKU-CAR-TESLA-M3',
+    vehicleName: 'Tesla Model 3 Performance (White)',
+    vendorName: 'Apex Luxury Fleet',
+    categoryClass: 'Electric & Hybrid',
+    transmission: 'Automatic',
+    fuelType: 'Electric',
+    seats: 5,
+    dailyRateAED: 450.00,
+    weeklyRateAED: 2800.00,
+    depositAED: 1500.00,
+    insuranceIncluded: true,
+    deliveryToUnit: true,
+    zenPoolEligible: true,
+    aquaAccessEligible: true,
+    availableVehiclesCount: 12,
+    isActive: true
+  },
+  {
+    id: 'CAR-003',
+    sku: 'SKU-CAR-MERC-S500',
+    vehicleName: 'Mercedes-Benz S500 AMG Line (Black)',
+    vendorName: 'Swift Airport Transfers',
+    categoryClass: 'Executive Sedan',
+    transmission: 'Automatic',
+    fuelType: 'Petrol',
+    seats: 5,
+    dailyRateAED: 950.00,
+    weeklyRateAED: 6000.00,
+    depositAED: 2500.00,
+    insuranceIncluded: true,
+    deliveryToUnit: true,
+    zenPoolEligible: true,
+    aquaAccessEligible: true,
+    availableVehiclesCount: 4,
+    isActive: true
+  },
+  {
+    id: 'CAR-004',
+    sku: 'SKU-CAR-PORSCHE-MACAN',
+    vehicleName: 'Porsche Macan GTS (Carmine Red)',
+    vendorName: 'Apex Luxury Fleet',
+    categoryClass: 'Sports Car',
+    transmission: 'Automatic',
+    fuelType: 'Petrol',
+    seats: 5,
+    dailyRateAED: 1100.00,
+    weeklyRateAED: 7000.00,
+    depositAED: 3000.00,
+    insuranceIncluded: true,
+    deliveryToUnit: true,
+    zenPoolEligible: true,
+    aquaAccessEligible: true,
+    availableVehiclesCount: 3,
+    isActive: true
+  }
 ];
 
-// Structured Transportation Catalog matching Transportation Hub Frontend
+// Transportation Catalog
 const initialTransportationCatalog: TransportationServiceItem[] = [
   {
     id: 'TRN-001',
@@ -163,61 +247,10 @@ const initialTransportationCatalog: TransportationServiceItem[] = [
     pricingUnit: 'Per Trip',
     dailyCapacity: 40,
     isActive: true
-  },
-  {
-    id: 'TRN-002',
-    sku: 'SKU-TRN-CHAUFFEUR-HALF',
-    serviceTitle: 'Half-day Chauffeur — Client Visits',
-    vendorName: 'Apex Luxury Fleet',
-    rideType: 'Premium Private Taxi',
-    description: 'Chauffeur-driven luxury vehicles, booked hourly or full day',
-    vehicleModel: 'Range Rover Sport · Silver · C 21987',
-    rideModeProfile: 'VIP',
-    zenPoolEligible: true,
-    aquaAccessEligible: true,
-    onboardExtras: ['WiFi Hotspot', 'Phone Charger', 'Bottled Water', 'Quiet Cabin Mode'],
-    priceAED: 550.00,
-    pricingUnit: 'Per Hour',
-    dailyCapacity: 15,
-    isActive: true
-  },
-  {
-    id: 'TRN-003',
-    sku: 'SKU-TRN-LOCAL-HAIL',
-    serviceTitle: 'Local Ride Hailing (DIFC & City Trips)',
-    vendorName: 'Swift Airport Transfers',
-    rideType: 'Local Ride Hailing',
-    description: 'Point-to-point, hourly, multi-stop city rides across Dubai',
-    vehicleModel: 'Tesla Model S Plaid (White · Electric)',
-    rideModeProfile: 'Green',
-    zenPoolEligible: true,
-    aquaAccessEligible: true,
-    onboardExtras: ['WiFi Hotspot', 'Phone Charger', 'Bottled Water'],
-    priceAED: 60.00,
-    pricingUnit: 'Per Trip',
-    dailyCapacity: 100,
-    isActive: true
-  },
-  {
-    id: 'TRN-004',
-    sku: 'SKU-TRN-WEEKEND-SUV',
-    serviceTitle: 'Weekend SUV — Jebel Jais Drive',
-    vendorName: 'Apex Luxury Fleet',
-    rideType: 'Rent a Car',
-    description: 'Self-drive, daily & weekly luxury SUV rental packages',
-    vehicleModel: 'Range Rover Sport HSE 2024 (Silver)',
-    rideModeProfile: 'Relaxed',
-    zenPoolEligible: true,
-    aquaAccessEligible: true,
-    onboardExtras: ['Child Safety Seat', 'All-Wheel Drive Package', 'GPS Navigation'],
-    priceAED: 1050.00,
-    pricingUnit: '3-Day Package',
-    dailyCapacity: 10,
-    isActive: true
   }
 ];
 
-// Structured Housekeeping Catalog
+// Housekeeping Catalog
 const initialHousekeepingCatalog: HousekeepingServiceItem[] = [
   {
     id: 'HKP-001',
@@ -231,20 +264,6 @@ const initialHousekeepingCatalog: HousekeepingServiceItem[] = [
     priceAED: 0,
     isIncludedInStay: true,
     dailyCapacity: 45,
-    isActive: true
-  },
-  {
-    id: 'HKP-002',
-    sku: 'SKU-HKP-DEEP',
-    serviceTitle: 'Deep Cleaning',
-    vendorName: 'Sparkle Cleaners',
-    serviceType: 'Deep Cleaning',
-    description: 'Thorough cleaning including upholstery, curtains, and hard-to-reach areas',
-    durationFormatted: '3 hours',
-    durationMinutes: 180,
-    priceAED: 120.00,
-    isIncludedInStay: false,
-    dailyCapacity: 15,
     isActive: true
   }
 ];
@@ -267,92 +286,93 @@ const initialLaundryCatalog: LaundryServiceItem[] = [
 ];
 
 const VendorInventory = () => {
+  const [carRentalCatalog, setCarRentalCatalog] = useState<CarRentalItem[]>(initialCarRentalCatalog);
   const [transportationCatalog, setTransportationCatalog] = useState<TransportationServiceItem[]>(initialTransportationCatalog);
   const [housekeepingCatalog, setHousekeepingCatalog] = useState<HousekeepingServiceItem[]>(initialHousekeepingCatalog);
   const [laundryCatalog, setLaundryCatalog] = useState<LaundryServiceItem[]>(initialLaundryCatalog);
   
-  const [selectedCategory, setSelectedCategory] = useState<ServiceCategory>('Transportation');
+  const [selectedCategory, setSelectedCategory] = useState<ServiceCategory>('Car rental');
   const [searchTerm, setSearchTerm] = useState('');
-  const [transportRideTypeFilter, setTransportRideTypeFilter] = useState('all');
+  const [carClassFilter, setCarClassFilter] = useState('all');
 
-  // Modals state for Transportation
-  const [isAddTrnOpen, setIsAddTrnOpen] = useState(false);
-  const [isEditTrnOpen, setIsEditTrnOpen] = useState(false);
-  const [editingTrnItem, setEditingTrnItem] = useState<TransportationServiceItem | null>(null);
+  // Modals state for Car Rental
+  const [isAddCarOpen, setIsAddCarOpen] = useState(false);
+  const [isEditCarOpen, setIsEditCarOpen] = useState(false);
+  const [editingCarItem, setEditingCarItem] = useState<CarRentalItem | null>(null);
 
-  const [trnFormData, setTrnFormData] = useState<TransportationServiceItem>({
+  const [carFormData, setCarFormData] = useState<CarRentalItem>({
     id: '',
     sku: '',
-    serviceTitle: '',
-    vendorName: 'Swift Airport Transfers',
-    rideType: 'Airport Transfer',
-    description: '',
-    vehicleModel: 'Mercedes S-Class Maybach',
-    rideModeProfile: 'Business',
+    vehicleName: '',
+    vendorName: 'Apex Luxury Fleet',
+    categoryClass: 'Luxury SUV',
+    transmission: 'Automatic',
+    fuelType: 'Petrol',
+    seats: 5,
+    dailyRateAED: 750,
+    weeklyRateAED: 4500,
+    depositAED: 2000,
+    insuranceIncluded: true,
+    deliveryToUnit: true,
     zenPoolEligible: true,
     aquaAccessEligible: true,
-    onboardExtras: ['WiFi Hotspot', 'Phone Charger', 'Bottled Water'],
-    priceAED: 180,
-    pricingUnit: 'Per Trip',
-    dailyCapacity: 30,
+    availableVehiclesCount: 5,
     isActive: true
   });
 
-  const filteredTransportationItems = transportationCatalog.filter(item => {
+  const filteredCarItems = carRentalCatalog.filter(item => {
     const matchesSearch = 
-      item.serviceTitle.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      item.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      item.vehicleModel.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      item.vehicleName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       item.sku.toLowerCase().includes(searchTerm.toLowerCase()) ||
       item.vendorName.toLowerCase().includes(searchTerm.toLowerCase());
 
-    const matchesRideType = transportRideTypeFilter === 'all' || item.rideType === transportRideTypeFilter;
+    const matchesClass = carClassFilter === 'all' || item.categoryClass === carClassFilter;
 
-    return matchesSearch && matchesRideType;
+    return matchesSearch && matchesClass;
   });
 
-  const handleAddTransportationItem = (e: React.FormEvent) => {
+  const handleAddCarItem = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!trnFormData.serviceTitle || !trnFormData.sku) {
-      showError("Please enter Service Title and SKU.");
+    if (!carFormData.vehicleName || !carFormData.sku) {
+      showError("Please enter Vehicle Name and SKU.");
       return;
     }
 
-    const newItem: TransportationServiceItem = {
-      ...trnFormData,
-      id: `TRN-00${transportationCatalog.length + 1}`
+    const newItem: CarRentalItem = {
+      ...carFormData,
+      id: `CAR-00${carRentalCatalog.length + 1}`
     };
 
-    setTransportationCatalog([...transportationCatalog, newItem]);
-    setIsAddTrnOpen(false);
-    showSuccess(`Added "${newItem.serviceTitle}" to Transportation Hub Catalog.`);
+    setCarRentalCatalog([...carRentalCatalog, newItem]);
+    setIsAddCarOpen(false);
+    showSuccess(`Added "${newItem.vehicleName}" to Car Rental Fleet Catalog.`);
   };
 
-  const handleOpenEditTrn = (item: TransportationServiceItem) => {
-    setEditingTrnItem(item);
-    setTrnFormData(item);
-    setIsEditTrnOpen(true);
+  const handleOpenEditCar = (item: CarRentalItem) => {
+    setEditingCarItem(item);
+    setCarFormData(item);
+    setIsEditCarOpen(true);
   };
 
-  const handleUpdateTrnItem = (e: React.FormEvent) => {
+  const handleUpdateCarItem = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!editingTrnItem) return;
+    if (!editingCarItem) return;
 
-    setTransportationCatalog(prev => prev.map(item => {
-      if (item.id === editingTrnItem.id) {
-        return trnFormData;
+    setCarRentalCatalog(prev => prev.map(item => {
+      if (item.id === editingCarItem.id) {
+        return carFormData;
       }
       return item;
     }));
 
-    setIsEditTrnOpen(false);
-    setEditingTrnItem(null);
-    showSuccess(`Updated Transportation offering "${trnFormData.serviceTitle}".`);
+    setIsEditCarOpen(false);
+    setEditingCarItem(null);
+    showSuccess(`Updated Car Rental offering "${carFormData.vehicleName}".`);
   };
 
-  const handleDeleteTrnItem = (id: string, name: string) => {
-    setTransportationCatalog(prev => prev.filter(i => i.id !== id));
-    showSuccess(`Removed "${name}" from Transportation Catalog.`);
+  const handleDeleteCarItem = (id: string, name: string) => {
+    setCarRentalCatalog(prev => prev.filter(i => i.id !== id));
+    showSuccess(`Removed "${name}" from Car Rental Catalog.`);
   };
 
   return (
@@ -361,47 +381,47 @@ const VendorInventory = () => {
       <div className="grid gap-4 md:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-xs font-medium">Transportation Offerings</CardTitle>
-            <CarTaxiFront className="h-4 w-4 text-primary" />
+            <CardTitle className="text-xs font-medium">Rental Fleet Vehicles</CardTitle>
+            <Car className="h-4 w-4 text-primary" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{transportationCatalog.length}</div>
-            <p className="text-xs text-muted-foreground mt-1">Configured Ride Services</p>
+            <div className="text-2xl font-bold">{carRentalCatalog.length} Models</div>
+            <p className="text-xs text-muted-foreground mt-1">Configured Rental Models</p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-xs font-medium">Zen Pool & Aqua Access</CardTitle>
-            <Sparkles className="h-4 w-4 text-emerald-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-emerald-600">100% Eligible</div>
-            <p className="text-xs text-muted-foreground mt-1">All rides meet tier criteria</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-xs font-medium">Core Service Modes</CardTitle>
-            <Navigation className="h-4 w-4 text-primary" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">4 Ride Types</div>
-            <p className="text-xs text-muted-foreground mt-1">Airport, Local, Taxi, Rental</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-xs font-medium">Fleet Daily Trips</CardTitle>
+            <CardTitle className="text-xs font-medium">Delivery to Suite / Unit</CardTitle>
             <CheckCircle2 className="h-4 w-4 text-emerald-500" />
           </CardHeader>
           <CardContent>
+            <div className="text-2xl font-bold text-emerald-600">100% Free Delivery</div>
+            <p className="text-xs text-muted-foreground mt-1">Direct dropoff at property</p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-xs font-medium">Avg. Daily Rate</CardTitle>
+            <Tag className="h-4 w-4 text-primary" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">AED 837.50</div>
+            <p className="text-xs text-muted-foreground mt-1">Self-drive rentals</p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-xs font-medium">Total Fleet Available</CardTitle>
+            <Boxes className="h-4 w-4 text-emerald-500" />
+          </CardHeader>
+          <CardContent>
             <div className="text-2xl font-bold text-emerald-600">
-              {transportationCatalog.reduce((sum, item) => sum + item.dailyCapacity, 0)} Trips/Day
+              {carRentalCatalog.reduce((sum, item) => sum + item.availableVehiclesCount, 0)} Cars
             </div>
-            <p className="text-xs text-muted-foreground mt-1">Active fleet capacity</p>
+            <p className="text-xs text-muted-foreground mt-1">Active vendor stock</p>
           </CardContent>
         </Card>
       </div>
@@ -417,173 +437,170 @@ const VendorInventory = () => {
               </CardDescription>
             </div>
 
-            {selectedCategory === 'Transportation' && (
-              <Dialog open={isAddTrnOpen} onOpenChange={setIsAddTrnOpen}>
+            {selectedCategory === 'Car rental' && (
+              <Dialog open={isAddCarOpen} onOpenChange={setIsAddCarOpen}>
                 <DialogTrigger asChild>
                   <Button className="gap-2 shrink-0">
-                    <Plus className="w-4 h-4" /> Add Transportation Ride Service
+                    <Plus className="w-4 h-4" /> Add Car Rental Fleet Model
                   </Button>
                 </DialogTrigger>
                 <DialogContent className="sm:max-w-[550px]">
-                  <form onSubmit={handleAddTransportationItem}>
+                  <form onSubmit={handleAddCarItem}>
                     <DialogHeader>
-                      <DialogTitle>Add Transportation Offering (Ride Service)</DialogTitle>
+                      <DialogTitle>Add Car Rental Vehicle Offering</DialogTitle>
                       <DialogDescription>
-                        Configure ride type, ride settings profile, Zen Pool/Aqua eligibility, and vehicle details.
+                        Configure vehicle specs, daily/weekly rates, security deposit, and suite delivery options.
                       </DialogDescription>
                     </DialogHeader>
 
                     <div className="grid gap-4 py-4 text-xs">
                       <div className="grid grid-cols-2 gap-3">
                         <div className="space-y-1.5">
-                          <Label htmlFor="trn-sku">SKU Code</Label>
+                          <Label htmlFor="car-sku">SKU Code</Label>
                           <Input 
-                            id="trn-sku" 
-                            placeholder="e.g. SKU-TRN-AIRPORT" 
-                            value={trnFormData.sku}
-                            onChange={e => setTrnFormData({...trnFormData, sku: e.target.value})}
+                            id="car-sku" 
+                            placeholder="e.g. SKU-CAR-ROVER" 
+                            value={carFormData.sku}
+                            onChange={e => setCarFormData({...carFormData, sku: e.target.value})}
                             required
                           />
                         </div>
                         <div className="space-y-1.5">
-                          <Label htmlFor="trn-vendor">Assigned Chauffeur / Fleet Vendor</Label>
+                          <Label htmlFor="car-vendor">Rental Vendor</Label>
                           <Select 
-                            value={trnFormData.vendorName}
-                            onValueChange={v => setTrnFormData({...trnFormData, vendorName: v})}
+                            value={carFormData.vendorName}
+                            onValueChange={v => setCarFormData({...carFormData, vendorName: v})}
                           >
-                            <SelectTrigger id="trn-vendor"><SelectValue /></SelectTrigger>
+                            <SelectTrigger id="car-vendor"><SelectValue /></SelectTrigger>
                             <SelectContent>
-                              <SelectItem value="Swift Airport Transfers">Swift Airport Transfers</SelectItem>
                               <SelectItem value="Apex Luxury Fleet">Apex Luxury Fleet</SelectItem>
+                              <SelectItem value="Swift Airport Transfers">Swift Airport Transfers</SelectItem>
                             </SelectContent>
                           </Select>
                         </div>
                       </div>
 
                       <div className="space-y-1.5">
-                        <Label htmlFor="trn-title">Service Title</Label>
+                        <Label htmlFor="car-name">Vehicle Name & Model Year</Label>
                         <Input 
-                          id="trn-title" 
-                          placeholder="e.g. Airport Transfer (DXB & AUH)" 
-                          value={trnFormData.serviceTitle}
-                          onChange={e => setTrnFormData({...trnFormData, serviceTitle: e.target.value})}
+                          id="car-name" 
+                          placeholder="e.g. Range Rover Sport HSE 2024 (Silver)" 
+                          value={carFormData.vehicleName}
+                          onChange={e => setCarFormData({...carFormData, vehicleName: e.target.value})}
                           required
                         />
                       </div>
 
-                      <div className="grid grid-cols-2 gap-3">
+                      <div className="grid grid-cols-3 gap-3">
                         <div className="space-y-1.5">
-                          <Label htmlFor="trn-type">Ride Type (Transportation Category)</Label>
+                          <Label htmlFor="car-class">Category Class</Label>
                           <Select 
-                            value={trnFormData.rideType}
-                            onValueChange={(v: any) => setTrnFormData({...trnFormData, rideType: v})}
+                            value={carFormData.categoryClass}
+                            onValueChange={(v: any) => setCarFormData({...carFormData, categoryClass: v})}
                           >
-                            <SelectTrigger id="trn-type"><SelectValue /></SelectTrigger>
+                            <SelectTrigger id="car-class"><SelectValue /></SelectTrigger>
                             <SelectContent>
-                              <SelectItem value="Airport Transfer">Airport Transfer</SelectItem>
-                              <SelectItem value="Local Ride Hailing">Local Ride Hailing</SelectItem>
-                              <SelectItem value="Premium Private Taxi">Premium Private Taxi</SelectItem>
-                              <SelectItem value="Rent a Car">Rent a Car</SelectItem>
+                              <SelectItem value="Luxury SUV">Luxury SUV</SelectItem>
+                              <SelectItem value="Electric & Hybrid">Electric & Hybrid</SelectItem>
+                              <SelectItem value="Executive Sedan">Executive Sedan</SelectItem>
+                              <SelectItem value="Sports Car">Sports Car</SelectItem>
+                              <SelectItem value="Compact Economy">Compact Economy</SelectItem>
                             </SelectContent>
                           </Select>
                         </div>
 
                         <div className="space-y-1.5">
-                          <Label htmlFor="trn-profile">Ride Setting Profile Preset</Label>
+                          <Label htmlFor="car-trans">Transmission</Label>
                           <Select 
-                            value={trnFormData.rideModeProfile}
-                            onValueChange={(v: any) => setTrnFormData({...trnFormData, rideModeProfile: v})}
+                            value={carFormData.transmission}
+                            onValueChange={(v: any) => setCarFormData({...carFormData, transmission: v})}
                           >
-                            <SelectTrigger id="trn-profile"><SelectValue /></SelectTrigger>
+                            <SelectTrigger id="car-trans"><SelectValue /></SelectTrigger>
                             <SelectContent>
-                              <SelectItem value="Business">Business</SelectItem>
-                              <SelectItem value="Relaxed">Relaxed</SelectItem>
-                              <SelectItem value="VIP">VIP</SelectItem>
-                              <SelectItem value="Green">Green</SelectItem>
-                              <SelectItem value="Focus">Focus</SelectItem>
+                              <SelectItem value="Automatic">Automatic</SelectItem>
+                              <SelectItem value="Manual">Manual</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+
+                        <div className="space-y-1.5">
+                          <Label htmlFor="car-fuel">Fuel Type</Label>
+                          <Select 
+                            value={carFormData.fuelType}
+                            onValueChange={(v: any) => setCarFormData({...carFormData, fuelType: v})}
+                          >
+                            <SelectTrigger id="car-fuel"><SelectValue /></SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="Petrol">Petrol</SelectItem>
+                              <SelectItem value="Electric">Electric</SelectItem>
+                              <SelectItem value="Hybrid">Hybrid</SelectItem>
                             </SelectContent>
                           </Select>
                         </div>
                       </div>
 
-                      <div className="space-y-1.5">
-                        <Label htmlFor="trn-vehicle">Assigned Vehicle Model & License Tag</Label>
-                        <Input 
-                          id="trn-vehicle" 
-                          placeholder="e.g. Range Rover Sport · Silver · C 21987" 
-                          value={trnFormData.vehicleModel}
-                          onChange={e => setTrnFormData({...trnFormData, vehicleModel: e.target.value})}
-                          required
-                        />
-                      </div>
-
-                      <div className="space-y-1.5">
-                        <Label htmlFor="trn-desc">Description for Guest Mobile App</Label>
-                        <Textarea 
-                          id="trn-desc" 
-                          placeholder="Describe ride scope (e.g. Meet & greet, one-way/round-trip DXB & AUH)..." 
-                          value={trnFormData.description}
-                          onChange={e => setTrnFormData({...trnFormData, description: e.target.value})}
-                          required
-                        />
-                      </div>
-
-                      <div className="grid grid-cols-2 gap-3">
+                      <div className="grid grid-cols-3 gap-3">
                         <div className="space-y-1.5">
-                          <Label htmlFor="trn-price">Base Price (AED)</Label>
+                          <Label htmlFor="car-daily">Daily Rate (AED)</Label>
                           <Input 
-                            id="trn-price" 
+                            id="car-daily" 
                             type="number"
-                            step="1.00"
-                            value={trnFormData.priceAED}
-                            onChange={e => setTrnFormData({...trnFormData, priceAED: Number(e.target.value)})}
+                            step="10.00"
+                            value={carFormData.dailyRateAED}
+                            onChange={e => setCarFormData({...carFormData, dailyRateAED: Number(e.target.value)})}
                           />
                         </div>
 
                         <div className="space-y-1.5">
-                          <Label htmlFor="trn-unit">Pricing Unit</Label>
-                          <Select 
-                            value={trnFormData.pricingUnit}
-                            onValueChange={(v: any) => setTrnFormData({...trnFormData, pricingUnit: v})}
-                          >
-                            <SelectTrigger id="trn-unit"><SelectValue /></SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="Per Trip">Per Trip</SelectItem>
-                              <SelectItem value="Per Hour">Per Hour</SelectItem>
-                              <SelectItem value="Per Day">Per Day</SelectItem>
-                              <SelectItem value="3-Day Package">3-Day Package</SelectItem>
-                            </SelectContent>
-                          </Select>
+                          <Label htmlFor="car-weekly">Weekly Rate (AED)</Label>
+                          <Input 
+                            id="car-weekly" 
+                            type="number"
+                            step="50.00"
+                            value={carFormData.weeklyRateAED}
+                            onChange={e => setCarFormData({...carFormData, weeklyRateAED: Number(e.target.value)})}
+                          />
+                        </div>
+
+                        <div className="space-y-1.5">
+                          <Label htmlFor="car-dep">Refundable Deposit (AED)</Label>
+                          <Input 
+                            id="car-dep" 
+                            type="number"
+                            step="100.00"
+                            value={carFormData.depositAED}
+                            onChange={e => setCarFormData({...carFormData, depositAED: Number(e.target.value)})}
+                          />
                         </div>
                       </div>
 
-                      <div className="flex items-center justify-between pt-2 border-t text-xs">
+                      <div className="grid grid-cols-2 gap-3 pt-2 border-t text-xs">
                         <div className="flex items-center space-x-2">
                           <Switch 
-                            id="trn-zen"
-                            checked={trnFormData.zenPoolEligible}
-                            onCheckedChange={v => setTrnFormData({...trnFormData, zenPoolEligible: v})}
+                            id="car-ins"
+                            checked={carFormData.insuranceIncluded}
+                            onCheckedChange={v => setCarFormData({...carFormData, insuranceIncluded: v})}
                           />
-                          <Label htmlFor="trn-zen" className="cursor-pointer font-semibold text-amber-900">
-                            Zen Pool Eligible
+                          <Label htmlFor="car-ins" className="cursor-pointer font-semibold">
+                            Full Insurance Included
                           </Label>
                         </div>
 
                         <div className="flex items-center space-x-2">
                           <Switch 
-                            id="trn-aqua"
-                            checked={trnFormData.aquaAccessEligible}
-                            onCheckedChange={v => setTrnFormData({...trnFormData, aquaAccessEligible: v})}
+                            id="car-del"
+                            checked={carFormData.deliveryToUnit}
+                            onCheckedChange={v => setCarFormData({...carFormData, deliveryToUnit: v})}
                           />
-                          <Label htmlFor="trn-aqua" className="cursor-pointer font-semibold text-cyan-900">
-                            Aqua Access
+                          <Label htmlFor="car-del" className="cursor-pointer font-semibold">
+                            Direct Delivery to Unit
                           </Label>
                         </div>
                       </div>
                     </div>
 
                     <DialogFooter>
-                      <Button type="submit" className="w-full">Save Ride Offering</Button>
+                      <Button type="submit" className="w-full">Save Car Model</Button>
                     </DialogFooter>
                   </form>
                 </DialogContent>
@@ -619,17 +636,18 @@ const VendorInventory = () => {
 
             {/* Filter Controls */}
             <div className="flex items-center gap-2 w-full xl:w-auto">
-              {selectedCategory === 'Transportation' && (
-                <Select value={transportRideTypeFilter} onValueChange={setTransportRideTypeFilter}>
+              {selectedCategory === 'Car rental' && (
+                <Select value={carClassFilter} onValueChange={setCarClassFilter}>
                   <SelectTrigger className="w-[180px] h-9 text-xs">
-                    <SelectValue placeholder="All Ride Types" />
+                    <SelectValue placeholder="All Classes" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">All Ride Types</SelectItem>
-                    <SelectItem value="Airport Transfer">Airport Transfer</SelectItem>
-                    <SelectItem value="Local Ride Hailing">Local Ride Hailing</SelectItem>
-                    <SelectItem value="Premium Private Taxi">Premium Private Taxi</SelectItem>
-                    <SelectItem value="Rent a Car">Rent a Car</SelectItem>
+                    <SelectItem value="all">All Vehicle Classes</SelectItem>
+                    <SelectItem value="Luxury SUV">Luxury SUV</SelectItem>
+                    <SelectItem value="Electric & Hybrid">Electric & Hybrid</SelectItem>
+                    <SelectItem value="Executive Sedan">Executive Sedan</SelectItem>
+                    <SelectItem value="Sports Car">Sports Car</SelectItem>
+                    <SelectItem value="Compact Economy">Compact Economy</SelectItem>
                   </SelectContent>
                 </Select>
               )}
@@ -637,7 +655,7 @@ const VendorInventory = () => {
               <div className="relative w-full xl:w-60 shrink-0">
                 <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                 <Input
-                  placeholder="Search ride service or vehicle..."
+                  placeholder="Search car model or SKU..."
                   value={searchTerm}
                   onChange={e => setSearchTerm(e.target.value)}
                   className="pl-8 h-9 text-xs"
@@ -648,79 +666,72 @@ const VendorInventory = () => {
         </CardHeader>
 
         <CardContent className="pt-2">
-          {selectedCategory === 'Transportation' ? (
-            /* TAILORED TRANSPORTATION HUB CATALOG TABLE (MATCHES FRONTEND APP) */
+          {selectedCategory === 'Car rental' ? (
+            /* TAILORED CAR RENTAL FLEET CATALOG TABLE */
             <div className="rounded-md border overflow-x-auto">
               <Table>
                 <TableHeader>
                   <TableRow className="bg-muted/30">
                     <TableHead>SKU</TableHead>
-                    <TableHead>Ride Service Title</TableHead>
-                    <TableHead>Ride Type</TableHead>
-                    <TableHead>Assigned Vehicle / Fleet ID</TableHead>
-                    <TableHead>Eligibility Badges</TableHead>
-                    <TableHead>Ride Profile Preset</TableHead>
-                    <TableHead>Onboard Extras</TableHead>
-                    <TableHead>Rate (AED)</TableHead>
-                    <TableHead className="text-center">Daily Capacity</TableHead>
+                    <TableHead>Vehicle Model Name</TableHead>
+                    <TableHead>Category Class</TableHead>
+                    <TableHead>Specs (Transmission / Fuel)</TableHead>
+                    <TableHead>Daily Rate (AED)</TableHead>
+                    <TableHead>Weekly Rate (AED)</TableHead>
+                    <TableHead>Security Deposit</TableHead>
+                    <TableHead>Service Perks</TableHead>
+                    <TableHead className="text-center">Fleet Available</TableHead>
                     <TableHead className="text-right">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {filteredTransportationItems.map(item => (
+                  {filteredCarItems.map(item => (
                     <TableRow key={item.id} className="hover:bg-muted/50 transition-colors">
                       <TableCell className="font-mono text-xs font-bold">{item.sku}</TableCell>
                       <TableCell>
                         <div>
-                          <p className="font-bold text-xs text-foreground">{item.serviceTitle}</p>
-                          <p className="text-[10px] text-muted-foreground truncate max-w-[220px]">{item.description}</p>
+                          <p className="font-bold text-xs text-foreground">{item.vehicleName}</p>
+                          <p className="text-[10px] text-muted-foreground">{item.vendorName}</p>
                         </div>
                       </TableCell>
                       <TableCell>
                         <Badge variant="outline" className="text-[10px] bg-primary/5 text-primary border-primary/20">
-                          {item.rideType}
-                        </Badge>
-                      </TableCell>
-                      <TableCell className="text-xs font-semibold text-foreground">
-                        {item.vehicleModel}
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex flex-col gap-1">
-                          {item.zenPoolEligible && (
-                            <Badge variant="outline" className="text-[9px] bg-amber-50 text-amber-900 border-amber-300 w-fit py-0">
-                              <Crown className="w-2.5 h-2.5 mr-1 text-amber-600" /> Zen Pool eligible
-                            </Badge>
-                          )}
-                          {item.aquaAccessEligible && (
-                            <Badge variant="outline" className="text-[9px] bg-cyan-50 text-cyan-900 border-cyan-300 w-fit py-0">
-                              <Sparkles className="w-2.5 h-2.5 mr-1 text-cyan-600" /> Aqua access
-                            </Badge>
-                          )}
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <Badge className={`text-[10px] font-bold ${
-                          item.rideModeProfile === 'Business' ? 'bg-slate-900 text-white' :
-                          item.rideModeProfile === 'VIP' ? 'bg-amber-600 text-white' :
-                          item.rideModeProfile === 'Green' ? 'bg-emerald-600 text-white' : 'bg-blue-600 text-white'
-                        }`}>
-                          {item.rideModeProfile}
+                          {item.categoryClass}
                         </Badge>
                       </TableCell>
                       <TableCell>
-                        <div className="flex flex-wrap gap-1 max-w-[200px]">
-                          {item.onboardExtras.map((ex, idx) => (
-                            <Badge key={idx} variant="secondary" className="text-[9px] px-1 py-0 font-normal">
-                              {ex}
-                            </Badge>
-                          ))}
+                        <div className="space-y-0.5 text-[11px]">
+                          <p className="font-medium text-foreground">{item.transmission} • {item.seats} Seats</p>
+                          <p className="text-muted-foreground flex items-center gap-1">
+                            <Fuel className="w-3 h-3 text-primary" /> {item.fuelType}
+                          </p>
                         </div>
                       </TableCell>
                       <TableCell className="text-xs font-bold text-foreground">
-                        AED {item.priceAED.toFixed(2)} <span className="text-[10px] font-normal text-muted-foreground">/ {item.pricingUnit}</span>
+                        AED {item.dailyRateAED.toFixed(2)}
+                      </TableCell>
+                      <TableCell className="text-xs font-bold text-emerald-600">
+                        AED {item.weeklyRateAED.toFixed(2)}
+                      </TableCell>
+                      <TableCell className="text-xs font-mono text-muted-foreground">
+                        AED {item.depositAED.toFixed(2)}
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex flex-col gap-1">
+                          {item.insuranceIncluded && (
+                            <Badge variant="outline" className="text-[9px] bg-emerald-50 text-emerald-800 border-emerald-300 w-fit py-0">
+                              <Shield className="w-2.5 h-2.5 mr-1 text-emerald-600" /> Full Insurance
+                            </Badge>
+                          )}
+                          {item.deliveryToUnit && (
+                            <Badge variant="outline" className="text-[9px] bg-blue-50 text-blue-800 border-blue-300 w-fit py-0">
+                              <CheckCircle2 className="w-2.5 h-2.5 mr-1 text-blue-600" /> Suite Delivery
+                            </Badge>
+                          )}
+                        </div>
                       </TableCell>
                       <TableCell className="text-center font-mono text-xs font-bold">
-                        {item.dailyCapacity} Trips/Day
+                        {item.availableVehiclesCount} Cars
                       </TableCell>
                       <TableCell className="text-right">
                         <div className="flex justify-end items-center gap-1">
@@ -728,8 +739,8 @@ const VendorInventory = () => {
                             variant="ghost" 
                             size="icon" 
                             className="h-7 w-7 text-muted-foreground hover:text-foreground"
-                            onClick={() => handleOpenEditTrn(item)}
-                            title="Edit Service Offering"
+                            onClick={() => handleOpenEditCar(item)}
+                            title="Edit Vehicle Specs"
                           >
                             <Edit2 className="w-3.5 h-3.5" />
                           </Button>
@@ -737,8 +748,8 @@ const VendorInventory = () => {
                             variant="ghost" 
                             size="icon" 
                             className="h-7 w-7 text-destructive hover:text-destructive"
-                            onClick={() => handleDeleteTrnItem(item.id, item.serviceTitle)}
-                            title="Delete Offering"
+                            onClick={() => handleDeleteCarItem(item.id, item.vehicleName)}
+                            title="Delete Car Model"
                           >
                             <Trash2 className="w-3.5 h-3.5" />
                           </Button>
@@ -749,65 +760,31 @@ const VendorInventory = () => {
                 </TableBody>
               </Table>
             </div>
-          ) : selectedCategory === 'House keeping' ? (
-            /* TAILORED HOUSEKEEPING SERVICE CATALOG TABLE */
+          ) : selectedCategory === 'Transportation' ? (
+            /* TAILORED TRANSPORTATION HUB CATALOG TABLE */
             <div className="rounded-md border overflow-x-auto">
               <Table>
                 <TableHeader>
                   <TableRow className="bg-muted/30">
                     <TableHead>SKU</TableHead>
-                    <TableHead>Service Title</TableHead>
-                    <TableHead>Classification</TableHead>
-                    <TableHead>Frontend App Description</TableHead>
-                    <TableHead>Estimated Duration</TableHead>
-                    <TableHead>Vendor Provider</TableHead>
-                    <TableHead>Price (AED)</TableHead>
+                    <TableHead>Ride Service Title</TableHead>
+                    <TableHead>Ride Type</TableHead>
+                    <TableHead>Assigned Vehicle / Fleet ID</TableHead>
+                    <TableHead>Eligibility Badges</TableHead>
+                    <TableHead>Rate (AED)</TableHead>
                     <TableHead className="text-center">Daily Capacity</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {housekeepingCatalog.map(item => (
+                  {transportationCatalog.map(item => (
                     <TableRow key={item.id}>
                       <TableCell className="font-mono text-xs font-bold">{item.sku}</TableCell>
                       <TableCell className="font-bold text-xs">{item.serviceTitle}</TableCell>
-                      <TableCell><Badge variant="outline" className="text-[10px]">{item.serviceType}</Badge></TableCell>
-                      <TableCell className="text-xs text-muted-foreground">{item.description}</TableCell>
-                      <TableCell className="text-xs font-mono">{item.durationFormatted}</TableCell>
-                      <TableCell className="text-xs">{item.vendorName}</TableCell>
+                      <TableCell><Badge variant="outline" className="text-[10px]">{item.rideType}</Badge></TableCell>
+                      <TableCell className="text-xs">{item.vehicleModel}</TableCell>
+                      <TableCell><Badge className="bg-amber-100 text-amber-900 border-amber-300 text-[9px]">Zen Pool Eligible</Badge></TableCell>
                       <TableCell className="text-xs font-bold">AED {item.priceAED.toFixed(2)}</TableCell>
-                      <TableCell className="text-center font-mono text-xs">{item.dailyCapacity} Requests/Day</TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
-          ) : selectedCategory === 'Laundry' ? (
-            /* TAILORED LAUNDRY PRICE CATALOG TABLE */
-            <div className="rounded-md border overflow-x-auto">
-              <Table>
-                <TableHeader>
-                  <TableRow className="bg-muted/30">
-                    <TableHead>SKU</TableHead>
-                    <TableHead>Garment / Service Item</TableHead>
-                    <TableHead>Sub-Category</TableHead>
-                    <TableHead>Service Method</TableHead>
-                    <TableHead>Vendor Provider</TableHead>
-                    <TableHead>Standard Rate (AED)</TableHead>
-                    <TableHead>Express Rate (AED)</TableHead>
-                    <TableHead className="text-center">Capacity</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {laundryCatalog.map(item => (
-                    <TableRow key={item.id}>
-                      <TableCell className="font-mono text-xs font-bold">{item.sku}</TableCell>
-                      <TableCell className="font-semibold text-xs">{item.itemName}</TableCell>
-                      <TableCell><Badge variant="outline" className="text-[10px]">{item.subCategory}</Badge></TableCell>
-                      <TableCell><Badge variant="secondary" className="text-[10px]">{item.serviceMethod}</Badge></TableCell>
-                      <TableCell className="text-xs text-muted-foreground">{item.vendorName}</TableCell>
-                      <TableCell className="text-xs font-bold">AED {item.unitPriceAED.toFixed(2)}</TableCell>
-                      <TableCell className="text-xs font-bold text-amber-600">AED {item.expressPriceAED.toFixed(2)}</TableCell>
-                      <TableCell className="text-center font-mono text-xs">{item.dailyCapacity} Pcs/Day</TableCell>
+                      <TableCell className="text-center font-mono text-xs">{item.dailyCapacity} Trips/Day</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
@@ -818,93 +795,92 @@ const VendorInventory = () => {
               <Boxes className="w-10 h-10 text-muted-foreground mx-auto mb-2 opacity-50" />
               <h4 className="font-bold text-sm">Custom Inventory for {selectedCategory}</h4>
               <p className="text-xs text-muted-foreground max-w-sm mx-auto mt-1">
-                Select the Transportation Hub, Housekeeping, or Laundry tabs above to view synchronized service offerings and pricing catalogs.
+                Select the Car Rental or Transportation Hub tabs above to inspect synchronized fleet offerings and pricing catalogs.
               </p>
             </div>
           )}
         </CardContent>
       </Card>
 
-      {/* Edit Transportation Dialog */}
-      <Dialog open={isEditTrnOpen} onOpenChange={setIsEditTrnOpen}>
+      {/* Edit Car Rental Dialog */}
+      <Dialog open={isEditCarOpen} onOpenChange={setIsEditCarOpen}>
         <DialogContent className="sm:max-w-[550px]">
-          {editingTrnItem && (
-            <form onSubmit={handleUpdateTrnItem}>
+          {editingCarItem && (
+            <form onSubmit={handleUpdateCarItem}>
               <DialogHeader>
-                <DialogTitle>Edit Transportation Offering: {editingTrnItem.serviceTitle}</DialogTitle>
-                <DialogDescription>Modify ride details, rates, and vehicle specifications.</DialogDescription>
+                <DialogTitle>Edit Car Rental Model: {editingCarItem.vehicleName}</DialogTitle>
+                <DialogDescription>Modify rates, security deposit, and fleet availability.</DialogDescription>
               </DialogHeader>
 
               <div className="grid gap-4 py-4 text-xs">
                 <div className="grid grid-cols-2 gap-3">
                   <div className="space-y-1.5">
-                    <Label htmlFor="edit-trn-sku">SKU Code</Label>
+                    <Label htmlFor="edit-car-sku">SKU Code</Label>
                     <Input 
-                      id="edit-trn-sku" 
-                      value={trnFormData.sku}
-                      onChange={e => setTrnFormData({...trnFormData, sku: e.target.value})}
+                      id="edit-car-sku" 
+                      value={carFormData.sku}
+                      onChange={e => setCarFormData({...carFormData, sku: e.target.value})}
                       required
                     />
                   </div>
                   <div className="space-y-1.5">
-                    <Label htmlFor="edit-trn-vendor">Vendor</Label>
+                    <Label htmlFor="edit-car-vendor">Vendor</Label>
                     <Select 
-                      value={trnFormData.vendorName}
-                      onValueChange={v => setTrnFormData({...trnFormData, vendorName: v})}
+                      value={carFormData.vendorName}
+                      onValueChange={v => setCarFormData({...carFormData, vendorName: v})}
                     >
-                      <SelectTrigger id="edit-trn-vendor"><SelectValue /></SelectTrigger>
+                      <SelectTrigger id="edit-car-vendor"><SelectValue /></SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="Swift Airport Transfers">Swift Airport Transfers</SelectItem>
                         <SelectItem value="Apex Luxury Fleet">Apex Luxury Fleet</SelectItem>
+                        <SelectItem value="Swift Airport Transfers">Swift Airport Transfers</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
                 </div>
 
                 <div className="space-y-1.5">
-                  <Label htmlFor="edit-trn-title">Service Title</Label>
+                  <Label htmlFor="edit-car-name">Vehicle Name</Label>
                   <Input 
-                    id="edit-trn-title" 
-                    value={trnFormData.serviceTitle}
-                    onChange={e => setTrnFormData({...trnFormData, serviceTitle: e.target.value})}
+                    id="edit-car-name" 
+                    value={carFormData.vehicleName}
+                    onChange={e => setCarFormData({...carFormData, vehicleName: e.target.value})}
                     required
                   />
                 </div>
 
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-3 gap-3">
                   <div className="space-y-1.5">
-                    <Label htmlFor="edit-trn-price">Base Price (AED)</Label>
+                    <Label htmlFor="edit-car-daily">Daily Rate (AED)</Label>
                     <Input 
-                      id="edit-trn-price" 
+                      id="edit-car-daily" 
                       type="number"
-                      step="1.00"
-                      value={trnFormData.priceAED}
-                      onChange={e => setTrnFormData({...trnFormData, priceAED: Number(e.target.value)})}
+                      value={carFormData.dailyRateAED}
+                      onChange={e => setCarFormData({...carFormData, dailyRateAED: Number(e.target.value)})}
                     />
                   </div>
                   <div className="space-y-1.5">
-                    <Label htmlFor="edit-trn-cap">Daily Trip Capacity</Label>
+                    <Label htmlFor="edit-car-weekly">Weekly Rate (AED)</Label>
                     <Input 
-                      id="edit-trn-cap" 
+                      id="edit-car-weekly" 
                       type="number"
-                      value={trnFormData.dailyCapacity}
-                      onChange={e => setTrnFormData({...trnFormData, dailyCapacity: Number(e.target.value)})}
+                      value={carFormData.weeklyRateAED}
+                      onChange={e => setCarFormData({...carFormData, weeklyRateAED: Number(e.target.value)})}
                     />
                   </div>
-                </div>
-
-                <div className="space-y-1.5">
-                  <Label htmlFor="edit-trn-desc">Description</Label>
-                  <Textarea 
-                    id="edit-trn-desc" 
-                    value={trnFormData.description}
-                    onChange={e => setTrnFormData({...trnFormData, description: e.target.value})}
-                  />
+                  <div className="space-y-1.5">
+                    <Label htmlFor="edit-car-dep">Deposit (AED)</Label>
+                    <Input 
+                      id="edit-car-dep" 
+                      type="number"
+                      value={carFormData.depositAED}
+                      onChange={e => setCarFormData({...carFormData, depositAED: Number(e.target.value)})}
+                    />
+                  </div>
                 </div>
               </div>
 
               <DialogFooter>
-                <Button type="submit" className="w-full">Update Transportation Offering</Button>
+                <Button type="submit" className="w-full">Update Vehicle Model</Button>
               </DialogFooter>
             </form>
           )}
