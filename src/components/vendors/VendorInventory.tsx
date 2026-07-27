@@ -28,9 +28,7 @@ import {
   Trash2, 
   RefreshCw, 
   Building2, 
-  DollarSign,
-  TrendingDown,
-  Layers
+  DollarSign
 } from 'lucide-react';
 import { showSuccess, showError } from '@/utils/toast';
 
@@ -46,15 +44,21 @@ export interface InventoryItem {
   lastRestocked: string;
 }
 
-const initialInventory: InventoryItem[] = [
-  { id: 'INV-101', sku: 'SKU-HK-001', itemName: 'Premium Bed Linens (King)', vendorName: 'Elite Housekeeping', category: 'House keeping', quantity: 12, minThreshold: 20, unitCost: 150, lastRestocked: '2024-05-10' },
-  { id: 'INV-102', sku: 'SKU-HK-002', itemName: 'Standard Cleaning Supplies Kit', vendorName: 'Sparkle Cleaners', category: 'House keeping', quantity: 85, minThreshold: 30, unitCost: 45, lastRestocked: '2024-05-18' },
-  { id: 'INV-103', sku: 'SKU-CR-001', itemName: 'Tesla Model 3 Key Cards & Charging Adapters', vendorName: 'Swift Car Rentals', category: 'Car rental', quantity: 8, minThreshold: 10, unitCost: 250, lastRestocked: '2024-05-01' },
-  { id: 'INV-104', sku: 'SKU-LP-001', itemName: 'Heavy Duty Eco Laundry Detergent (20L)', vendorName: 'Laundry Pros', category: 'Laundry', quantity: 0, minThreshold: 5, unitCost: 180, lastRestocked: '2024-04-20' },
-  { id: 'INV-105', sku: 'SKU-LP-002', itemName: 'Hypoallergenic Fabric Softener (15L)', vendorName: 'Spin Cycle Dry Cleaners', category: 'Laundry', quantity: 18, minThreshold: 10, unitCost: 120, lastRestocked: '2024-05-15' },
-  { id: 'INV-106', sku: 'SKU-FNB-001', itemName: 'Artisanal Coffee Beans (5kg Bags)', vendorName: 'Gourmet Catering Co', category: 'In-house catering', quantity: 34, minThreshold: 15, unitCost: 85, lastRestocked: '2024-05-19' },
-  { id: 'INV-107', sku: 'SKU-WL-001', itemName: 'Organic Massage Oils & Aromatherapy Set', vendorName: 'Zen Spa & Wellness', category: 'Wellness', quantity: 4, minThreshold: 12, unitCost: 95, lastRestocked: '2024-05-02' },
-  { id: 'INV-108', sku: 'SKU-TR-001', itemName: 'Executive Sedan Child Safety Seats', vendorName: 'Apex Luxury Fleet', category: 'Transportation', quantity: 15, minThreshold: 8, unitCost: 310, lastRestocked: '2024-05-12' },
+const CATEGORIES_LIST = [
+  'Laundry',
+  'House keeping',
+  'Car rental',
+  'In-house catering',
+  'Wellness',
+  'Transportation',
+  'Grocery',
+  'Chef on call',
+  'Maintenance',
+  'Florist & Decor',
+  'Security & Chauffeur',
+  'Luggage & Storage',
+  'Childcare & Nanny',
+  'Pet Care'
 ];
 
 const VENDORS_LIST = [
@@ -65,18 +69,32 @@ const VENDORS_LIST = [
   'Laundry Pros',
   'Spin Cycle Dry Cleaners',
   'Gourmet Catering Co',
-  'Zen Spa & Wellness'
+  'Zen Spa & Wellness',
+  'FixIt Pro Maintenance',
+  'Blooms & Petals',
+  'Guardian VIP Security',
+  'SafeKeep Luggage',
+  'Nanny Care Express',
+  'Paws & Whiskers'
 ];
 
-const CATEGORIES_LIST = [
-  'House keeping',
-  'Car rental',
-  'Transportation',
-  'Laundry',
-  'In-house catering',
-  'Wellness',
-  'Grocery',
-  'Chef on call'
+const initialInventory: InventoryItem[] = [
+  { id: 'INV-101', sku: 'SKU-HK-001', itemName: 'Premium Bed Linens (King)', vendorName: 'Elite Housekeeping', category: 'House keeping', quantity: 12, minThreshold: 20, unitCost: 150, lastRestocked: '2024-05-10' },
+  { id: 'INV-102', sku: 'SKU-HK-002', itemName: 'Standard Cleaning Supplies Kit', vendorName: 'Sparkle Cleaners', category: 'House keeping', quantity: 85, minThreshold: 30, unitCost: 45, lastRestocked: '2024-05-18' },
+  { id: 'INV-103', sku: 'SKU-CR-001', itemName: 'Tesla Model 3 Key Cards & Charging Adapters', vendorName: 'Swift Car Rentals', category: 'Car rental', quantity: 8, minThreshold: 10, unitCost: 250, lastRestocked: '2024-05-01' },
+  { id: 'INV-104', sku: 'SKU-LP-001', itemName: 'Heavy Duty Eco Laundry Detergent (20L)', vendorName: 'Laundry Pros', category: 'Laundry', quantity: 0, minThreshold: 5, unitCost: 180, lastRestocked: '2024-04-20' },
+  { id: 'INV-105', sku: 'SKU-LP-002', itemName: 'Hypoallergenic Fabric Softener (15L)', vendorName: 'Spin Cycle Dry Cleaners', category: 'Laundry', quantity: 18, minThreshold: 10, unitCost: 120, lastRestocked: '2024-05-15' },
+  { id: 'INV-106', sku: 'SKU-FNB-001', itemName: 'Artisanal Coffee Beans (5kg Bags)', vendorName: 'Gourmet Catering Co', category: 'In-house catering', quantity: 34, minThreshold: 15, unitCost: 85, lastRestocked: '2024-05-19' },
+  { id: 'INV-107', sku: 'SKU-WL-001', itemName: 'Organic Massage Oils & Aromatherapy Set', vendorName: 'Zen Spa & Wellness', category: 'Wellness', quantity: 4, minThreshold: 12, unitCost: 95, lastRestocked: '2024-05-02' },
+  { id: 'INV-108', sku: 'SKU-TR-001', itemName: 'Executive Sedan Child Safety Seats', vendorName: 'Apex Luxury Fleet', category: 'Transportation', quantity: 15, minThreshold: 8, unitCost: 310, lastRestocked: '2024-05-12' },
+  { id: 'INV-109', sku: 'SKU-GR-001', itemName: 'Organic Fresh Produce Welcome Basket', vendorName: 'Gourmet Catering Co', category: 'Grocery', quantity: 22, minThreshold: 10, unitCost: 120, lastRestocked: '2024-05-20' },
+  { id: 'INV-110', sku: 'SKU-COC-001', itemName: 'Gourmet Chef Knife & Utensil Kit', vendorName: 'Gourmet Catering Co', category: 'Chef on call', quantity: 6, minThreshold: 5, unitCost: 450, lastRestocked: '2024-05-05' },
+  { id: 'INV-111', sku: 'SKU-MNT-001', itemName: 'HVAC Filter Replacement Packs', vendorName: 'FixIt Pro Maintenance', category: 'Maintenance', quantity: 40, minThreshold: 15, unitCost: 65, lastRestocked: '2024-05-14' },
+  { id: 'INV-112', sku: 'SKU-FLD-001', itemName: 'Luxury Orchid Floral Arrangements', vendorName: 'Blooms & Petals', category: 'Florist & Decor', quantity: 10, minThreshold: 8, unitCost: 210, lastRestocked: '2024-05-21' },
+  { id: 'INV-113', sku: 'SKU-SEC-001', itemName: 'Secure Vehicle GPS Tracker Units', vendorName: 'Guardian VIP Security', category: 'Security & Chauffeur', quantity: 14, minThreshold: 5, unitCost: 380, lastRestocked: '2024-05-11' },
+  { id: 'INV-114', sku: 'SKU-LUG-001', itemName: 'Heavy-Duty Luggage Tags & Lock Seals', vendorName: 'SafeKeep Luggage', category: 'Luggage & Storage', quantity: 120, minThreshold: 50, unitCost: 15, lastRestocked: '2024-05-17' },
+  { id: 'INV-115', sku: 'SKU-NAN-001', itemName: 'Child Care Safety & First Aid Kits', vendorName: 'Nanny Care Express', category: 'Childcare & Nanny', quantity: 16, minThreshold: 10, unitCost: 85, lastRestocked: '2024-05-09' },
+  { id: 'INV-116', sku: 'SKU-PET-001', itemName: 'Hypoallergenic Pet Grooming Kits', vendorName: 'Paws & Whiskers', category: 'Pet Care', quantity: 25, minThreshold: 10, unitCost: 75, lastRestocked: '2024-05-16' },
 ];
 
 const VendorInventory = () => {
@@ -431,11 +449,11 @@ const VendorInventory = () => {
             </Select>
 
             <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-              <SelectTrigger className="w-[160px] h-9 text-xs">
+              <SelectTrigger className="w-[180px] h-9 text-xs">
                 <SelectValue placeholder="All Categories" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Categories</SelectItem>
+                <SelectItem value="all">All Categories ({CATEGORIES_LIST.length})</SelectItem>
                 {CATEGORIES_LIST.map(c => (
                   <SelectItem key={c} value={c}>{c}</SelectItem>
                 ))}
