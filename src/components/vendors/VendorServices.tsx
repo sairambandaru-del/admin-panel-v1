@@ -27,8 +27,12 @@ import {
   AlertTriangle,
   ArrowRight,
   ShieldAlert,
-  Plus,
-  Tag
+  Kanban,
+  List,
+  Receipt,
+  User,
+  MapPin,
+  Calendar
 } from 'lucide-react';
 import { showSuccess, showError } from '@/utils/toast';
 import GuestCommunicationModal, { BookingCommsData, ServiceException } from '@/components/common/GuestCommunicationModal';
@@ -110,13 +114,22 @@ const initialVendorBookings: VendorServiceBooking[] = [
   }
 ];
 
+const KANBAN_STATUSES: Array<{ id: VendorServiceBooking['status']; title: string; color: string }> = [
+  { id: 'Scheduled', title: 'Scheduled', color: 'border-blue-400 bg-blue-50/50' },
+  { id: 'In Progress', title: 'In Progress', color: 'border-amber-400 bg-amber-50/50' },
+  { id: 'Exception Raised', title: 'Exception Raised', color: 'border-rose-400 bg-rose-50/50' },
+  { id: 'Price Updated', title: 'Price Updated', color: 'border-emerald-400 bg-emerald-50/50' },
+  { id: 'Completed', title: 'Completed', color: 'border-slate-300 bg-slate-50/50' },
+];
+
 const VendorServices = () => {
   const [bookings, setBookings] = useState<VendorServiceBooking[]>(initialVendorBookings);
+  const [viewMode, setViewMode] = useState<'table' | 'kanban'>('kanban');
   const [searchTerm, setSearchTerm] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [statusFilter, setStatusFilter] = useState('all');
 
-  // Guest Chat Modal State
+  // Guest Chat & Invoice Modal State
   const [selectedBookingForComms, setSelectedBookingForComms] = useState<BookingCommsData | null>(null);
   const [isCommsOpen, setIsCommsOpen] = useState(false);
 
@@ -148,9 +161,9 @@ const VendorServices = () => {
       serviceCategory: booking.category,
       dates: booking.dateScheduled,
       status: booking.status,
+      totalAmount: booking.costDisplay,
       pendingException: booking.pendingException || null,
       onApproveException: (bId, newCost) => {
-        // Callback when guest approves in the mobile frontend chat
         setBookings(prev => prev.map(b => {
           if (b.id === bId) {
             return {
@@ -185,10 +198,10 @@ const VendorServices = () => {
     setIsCommsOpen(true);
   };
 
-  const handleOpenRaiseException = (booking: VendorServiceBooking, e: React.MouseEvent) => {
-    e.stopPropagation();
+  const handleOpenRaiseException = (booking: VendorServiceBooking, e?: React.MouseEvent) => {
+    if (e) e.stopPropagation();
     setExceptionBooking(booking);
-    setProposedPrice((booking.costNumeric + 90).toString()); // Default suggested adjustment
+    setProposedPrice((booking.costNumeric + 90).toString());
     setExceptionDetails(
       booking.category === 'Laundry' 
         ? "Bag contained 3 additional delicate silk items requiring specialized dry cleaning."
@@ -231,12 +244,18 @@ const VendorServices = () => {
     setIsExceptionDialogOpen(false);
     showSuccess(`Exception raised for ${exceptionBooking.id}. Notification sent to guest in mobile app!`);
 
-    // Automatically open communication modal to demonstrate guest approval flow
     handleOpenComms({
       ...exceptionBooking,
       status: 'Exception Raised',
       pendingException: newException
     });
+  };
+
+  const handleUpdateStatus = (bookingId: string, newStatus: VendorServiceBooking['status']) => {
+    setBookings(prev => prev.map(b => 
+      b.id === bookingId ? { ...b, status: newStatus } : b
+    ));
+    showSuccess(`Order ${bookingId} status updated to ${newStatus}.`);
   };
 
   return (
@@ -294,15 +313,37 @@ const VendorServices = () => {
         </Card>
       </div>
 
-      {/* Main Vendor Bookings List */}
+      {/* Main Vendor Bookings Header & Switcher */}
       <Card>
         <CardHeader className="pb-3">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div>
-              <CardTitle className="text-lg">Vendor Service Bookings & Exceptions</CardTitle>
+              <CardTitle className="text-lg">Vendor Service Dispatch & Kanban</CardTitle>
               <CardDescription>
-                Track dispatch, raise price exceptions (e.g. extra laundry items/treatments), and sync with guest approval on mobile.
+                Manage service execution in Table or Kanban view. Raise exceptions with price revisions and inspect guest invoices.
               </CardDescription>
+            </div>
+
+            {/* View Mode Switcher */}
+            <div className="flex items-center gap-1 bg-muted p-1 rounded-lg border w-fit">
+              <Button
+                variant={viewMode === 'kanban' ? 'secondary' : 'ghost'}
+                size="sm"
+                className="h-8 gap-1.5 text-xs font-medium"
+                onClick={() => setViewMode('kanban')}
+              >
+                <Kanban className="w-3.5 h-3.5" />
+                Kanban View
+              </Button>
+              <Button
+                variant={viewMode === 'table' ? 'secondary' : 'ghost'}
+                size="sm"
+                className="h-8 gap-1.5 text-xs font-medium"
+                onClick={() => setViewMode('table')}
+              >
+                <List className="w-3.5 h-3.5" />
+                Table View
+              </Button>
             </div>
           </div>
 
@@ -348,111 +389,233 @@ const VendorServices = () => {
           </div>
         </CardHeader>
 
-        <CardContent className="p-0">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Booking ID</TableHead>
-                <TableHead>Vendor</TableHead>
-                <TableHead>Service Title</TableHead>
-                <TableHead>Guest & Unit</TableHead>
-                <TableHead>Scheduled Date</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Price</TableHead>
-                <TableHead className="text-right">Actions & Guest Sync</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredBookings.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={8} className="text-center py-8 text-muted-foreground text-xs">
-                    No vendor service bookings match your filters.
-                  </TableCell>
-                </TableRow>
-              ) : (
-                filteredBookings.map((booking) => {
-                  const hasPendingException = booking.pendingException?.status === 'Pending Guest Approval';
-                  const isLaundry = booking.category === 'Laundry';
+        <CardContent className="pt-2">
+          {viewMode === 'kanban' ? (
+            /* KANBAN BOARD VIEW */
+            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4 overflow-x-auto pb-4">
+              {KANBAN_STATUSES.map(col => {
+                const columnBookings = filteredBookings.filter(b => b.status === col.id);
 
-                  return (
-                    <TableRow 
-                      key={booking.id} 
-                      className={`cursor-pointer hover:bg-muted/50 transition-colors ${hasPendingException ? 'bg-amber-50/40' : ''}`}
-                      onClick={() => handleOpenComms(booking)}
-                    >
-                      <TableCell className="font-bold text-xs font-mono">{booking.id}</TableCell>
-                      <TableCell>
-                        <div>
-                          <p className="font-semibold text-xs">{booking.vendorName}</p>
-                          <Badge variant="outline" className={`text-[9px] ${isLaundry ? 'bg-indigo-50 text-indigo-700 border-indigo-200' : 'bg-primary/5 text-primary border-primary/20'}`}>
-                            {booking.category}
-                          </Badge>
-                        </div>
-                      </TableCell>
-                      <TableCell className="text-xs font-medium max-w-[180px] truncate">
-                        {booking.serviceTitle}
-                      </TableCell>
-                      <TableCell>
-                        <div>
-                          <p className="font-semibold text-xs">{booking.guestName}</p>
-                          <p className="text-[10px] text-muted-foreground truncate max-w-[160px]">{booking.unitAddress}</p>
-                        </div>
-                      </TableCell>
-                      <TableCell className="text-xs font-mono">{booking.dateScheduled}</TableCell>
-                      <TableCell>
-                        <Badge variant={
-                          booking.status === 'Completed' ? 'default' :
-                          booking.status === 'Scheduled' ? 'secondary' :
-                          booking.status === 'Exception Raised' ? 'destructive' :
-                          booking.status === 'Price Updated' ? 'default' : 'outline'
-                        } className={
-                          booking.status === 'In Progress' ? 'bg-amber-100 text-amber-800 border-amber-300' : 
-                          booking.status === 'Price Updated' ? 'bg-emerald-100 text-emerald-800 border-emerald-300' : ''
-                        }>
-                          {booking.status}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>
-                        <div className="font-bold text-xs">
-                          {booking.costDisplay}
-                          {booking.pendingException?.status === 'Approved' && (
-                            <span className="block text-[9px] text-emerald-600 font-semibold">Approved by Guest</span>
-                          )}
-                        </div>
-                      </TableCell>
-                      <TableCell className="text-right" onClick={(e) => e.stopPropagation()}>
-                        <div className="flex justify-end gap-1.5">
-                          {/* Raise Exception Button */}
-                          <Button 
-                            variant="outline" 
-                            size="sm" 
-                            className={`h-8 gap-1 text-xs ${isLaundry ? 'border-amber-300 bg-amber-50 text-amber-900 hover:bg-amber-100' : 'text-amber-800 hover:bg-amber-50'}`}
-                            onClick={(e) => handleOpenRaiseException(booking, e)}
-                            title="Raise Exception & Revised Price"
-                          >
-                            <AlertTriangle className="w-3.5 h-3.5 text-amber-600" />
-                            <span>Raise Exception</span>
-                          </Button>
+                return (
+                  <div key={col.id} className="flex flex-col rounded-xl border bg-muted/20 min-w-[240px]">
+                    <div className={`p-3 border-b rounded-t-xl flex justify-between items-center ${col.color}`}>
+                      <h4 className="font-bold text-xs tracking-tight">{col.title}</h4>
+                      <Badge variant="outline" className="text-[10px] bg-background font-mono">
+                        {columnBookings.length}
+                      </Badge>
+                    </div>
 
-                          {/* Chat Button */}
-                          <Button 
-                            variant="ghost" 
-                            size="sm" 
-                            className="h-8 gap-1.5 text-xs text-primary hover:text-primary hover:bg-primary/10"
-                            onClick={() => handleOpenComms(booking)}
-                            title="Open Chat & Mobile Guest View"
-                          >
-                            <MessageSquare className="w-3.5 h-3.5" />
-                            <span>Chat</span>
-                          </Button>
+                    <div className="p-2 space-y-3 flex-1 overflow-y-auto max-h-[620px]">
+                      {columnBookings.length === 0 ? (
+                        <div className="h-24 flex items-center justify-center text-[11px] text-muted-foreground border border-dashed rounded-lg">
+                          No orders
                         </div>
+                      ) : (
+                        columnBookings.map(b => (
+                          <Card 
+                            key={b.id} 
+                            className="p-3 space-y-2 cursor-pointer hover:border-primary/60 transition-all shadow-2xs group bg-card"
+                            onClick={() => handleOpenComms(b)}
+                          >
+                            <div className="flex justify-between items-start">
+                              <span className="font-mono font-bold text-[11px]">{b.id}</span>
+                              <Badge variant="outline" className="text-[9px] px-1 py-0 bg-primary/5 text-primary border-primary/20">
+                                {b.category}
+                              </Badge>
+                            </div>
+
+                            <div>
+                              <p className="font-bold text-xs text-foreground group-hover:text-primary transition-colors leading-tight">
+                                {b.serviceTitle}
+                              </p>
+                              <p className="text-[10px] text-muted-foreground mt-0.5">{b.vendorName}</p>
+                            </div>
+
+                            <div className="space-y-1 text-[11px] border-t border-b py-2 text-muted-foreground">
+                              <div className="flex items-center gap-1 text-foreground font-medium">
+                                <User className="w-3 h-3 text-primary shrink-0" />
+                                <span className="truncate">{b.guestName}</span>
+                              </div>
+                              <div className="flex items-center gap-1 truncate">
+                                <MapPin className="w-3 h-3 text-muted-foreground shrink-0" />
+                                <span className="truncate">{b.unitAddress}</span>
+                              </div>
+                              <div className="flex items-center gap-1 font-mono text-[10px]">
+                                <Calendar className="w-3 h-3 text-muted-foreground shrink-0" />
+                                <span>{b.dateScheduled}</span>
+                              </div>
+                            </div>
+
+                            <div className="flex justify-between items-center pt-1">
+                              <span className="font-bold text-xs text-primary">{b.costDisplay}</span>
+                              
+                              <div className="flex items-center gap-1" onClick={e => e.stopPropagation()}>
+                                <Button 
+                                  variant="ghost" 
+                                  size="icon" 
+                                  className="h-7 w-7 text-amber-700 hover:bg-amber-50"
+                                  title="Raise Exception & Price Revision"
+                                  onClick={(e) => handleOpenRaiseException(b, e)}
+                                >
+                                  <AlertTriangle className="w-3.5 h-3.5" />
+                                </Button>
+                                <Button 
+                                  variant="ghost" 
+                                  size="icon" 
+                                  className="h-7 w-7 text-primary hover:bg-primary/10"
+                                  title="View Guest Chat & Invoice"
+                                  onClick={() => handleOpenComms(b)}
+                                >
+                                  <MessageSquare className="w-3.5 h-3.5" />
+                                </Button>
+                              </div>
+                            </div>
+
+                            {/* Status advance button */}
+                            {b.status === 'Scheduled' && (
+                              <Button 
+                                size="sm" 
+                                variant="outline" 
+                                className="w-full text-[10px] h-7 mt-1 border-amber-300 text-amber-900 bg-amber-50 hover:bg-amber-100"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleUpdateStatus(b.id, 'In Progress');
+                                }}
+                              >
+                                Start Order
+                              </Button>
+                            )}
+
+                            {b.status === 'In Progress' && (
+                              <Button 
+                                size="sm" 
+                                variant="outline" 
+                                className="w-full text-[10px] h-7 mt-1 border-emerald-300 text-emerald-900 bg-emerald-50 hover:bg-emerald-100"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleUpdateStatus(b.id, 'Completed');
+                                }}
+                              >
+                                Mark Completed
+                              </Button>
+                            )}
+                          </Card>
+                        ))
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          ) : (
+            /* TABLE VIEW */
+            <div className="rounded-md border">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Booking ID</TableHead>
+                    <TableHead>Vendor</TableHead>
+                    <TableHead>Service Title</TableHead>
+                    <TableHead>Guest & Unit</TableHead>
+                    <TableHead>Scheduled Date</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead>Price</TableHead>
+                    <TableHead className="text-right">Actions & Guest Sync</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {filteredBookings.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={8} className="text-center py-8 text-muted-foreground text-xs">
+                        No vendor service bookings match your filters.
                       </TableCell>
                     </TableRow>
-                  );
-                })
-              )}
-            </TableBody>
-          </Table>
+                  ) : (
+                    filteredBookings.map((booking) => {
+                      const hasPendingException = booking.pendingException?.status === 'Pending Guest Approval';
+                      const isLaundry = booking.category === 'Laundry';
+
+                      return (
+                        <TableRow 
+                          key={booking.id} 
+                          className={`cursor-pointer hover:bg-muted/50 transition-colors ${hasPendingException ? 'bg-amber-50/40' : ''}`}
+                          onClick={() => handleOpenComms(booking)}
+                        >
+                          <TableCell className="font-bold text-xs font-mono">{booking.id}</TableCell>
+                          <TableCell>
+                            <div>
+                              <p className="font-semibold text-xs">{booking.vendorName}</p>
+                              <Badge variant="outline" className={`text-[9px] ${isLaundry ? 'bg-indigo-50 text-indigo-700 border-indigo-200' : 'bg-primary/5 text-primary border-primary/20'}`}>
+                                {booking.category}
+                              </Badge>
+                            </div>
+                          </TableCell>
+                          <TableCell className="text-xs font-medium max-w-[180px] truncate">
+                            {booking.serviceTitle}
+                          </TableCell>
+                          <TableCell>
+                            <div>
+                              <p className="font-semibold text-xs">{booking.guestName}</p>
+                              <p className="text-[10px] text-muted-foreground truncate max-w-[160px]">{booking.unitAddress}</p>
+                            </div>
+                          </TableCell>
+                          <TableCell className="text-xs font-mono">{booking.dateScheduled}</TableCell>
+                          <TableCell>
+                            <Badge variant={
+                              booking.status === 'Completed' ? 'default' :
+                              booking.status === 'Scheduled' ? 'secondary' :
+                              booking.status === 'Exception Raised' ? 'destructive' :
+                              booking.status === 'Price Updated' ? 'default' : 'outline'
+                            } className={
+                              booking.status === 'In Progress' ? 'bg-amber-100 text-amber-800 border-amber-300' : 
+                              booking.status === 'Price Updated' ? 'bg-emerald-100 text-emerald-800 border-emerald-300' : ''
+                            }>
+                              {booking.status}
+                            </Badge>
+                          </TableCell>
+                          <TableCell>
+                            <div className="font-bold text-xs">
+                              {booking.costDisplay}
+                              {booking.pendingException?.status === 'Approved' && (
+                                <span className="block text-[9px] text-emerald-600 font-semibold">Approved by Guest</span>
+                              )}
+                            </div>
+                          </TableCell>
+                          <TableCell className="text-right" onClick={(e) => e.stopPropagation()}>
+                            <div className="flex justify-end gap-1.5">
+                              {/* Raise Exception Button */}
+                              <Button 
+                                variant="outline" 
+                                size="sm" 
+                                className={`h-8 gap-1 text-xs ${isLaundry ? 'border-amber-300 bg-amber-50 text-amber-900 hover:bg-amber-100' : 'text-amber-800 hover:bg-amber-50'}`}
+                                onClick={(e) => handleOpenRaiseException(booking, e)}
+                                title="Raise Exception & Revised Price"
+                              >
+                                <AlertTriangle className="w-3.5 h-3.5 text-amber-600" />
+                                <span>Raise Exception</span>
+                              </Button>
+
+                              {/* Chat & Invoice Button */}
+                              <Button 
+                                variant="ghost" 
+                                size="sm" 
+                                className="h-8 gap-1.5 text-xs text-primary hover:text-primary hover:bg-primary/10"
+                                onClick={() => handleOpenComms(booking)}
+                                title="Open Chat & View Invoice"
+                              >
+                                <MessageSquare className="w-3.5 h-3.5" />
+                                <span>Chat / Invoice</span>
+                              </Button>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })
+                  )}
+                </TableBody>
+              </Table>
+            </div>
+          )}
         </CardContent>
       </Card>
 
