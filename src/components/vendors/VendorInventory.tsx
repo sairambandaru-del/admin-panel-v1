@@ -31,77 +31,78 @@ import {
   DollarSign
 } from 'lucide-react';
 import { showSuccess, showError } from '@/utils/toast';
+import { ServiceCategory } from './VendorServices';
 
 export interface InventoryItem {
   id: string;
   sku: string;
   itemName: string;
   vendorName: string;
-  category: string;
+  category: ServiceCategory;
   quantity: number;
   minThreshold: number;
   unitCost: number;
   lastRestocked: string;
 }
 
-const CATEGORIES_LIST = [
-  'Laundry',
-  'House keeping',
-  'Car rental',
-  'In-house catering',
+export const EXACT_14_CATEGORIES: ServiceCategory[] = [
+  'Short term rental',
+  'Leisure activities',
+  'Dining',
+  'Co-working',
   'Wellness',
+  'Laundry',
+  'Car rental',
   'Transportation',
-  'Grocery',
   'Chef on call',
-  'Maintenance',
-  'Florist & Decor',
-  'Security & Chauffeur',
-  'Luggage & Storage',
-  'Childcare & Nanny',
-  'Pet Care'
+  'In-house catering',
+  'Doctor on call',
+  'Grocery',
+  'Food delivery',
+  'House keeping'
 ];
 
 const VENDORS_LIST = [
-  'Elite Housekeeping',
-  'Sparkle Cleaners',
-  'Swift Car Rentals',
-  'Apex Luxury Fleet',
-  'Laundry Pros',
-  'Spin Cycle Dry Cleaners',
-  'Gourmet Catering Co',
+  'Skyline Property Mgmt',
+  'Desert Safari Adventures',
+  'Zuma Fine Dining',
+  'WeWork Global Pass',
   'Zen Spa & Wellness',
-  'FixIt Pro Maintenance',
-  'Blooms & Petals',
-  'Guardian VIP Security',
-  'SafeKeep Luggage',
-  'Nanny Care Express',
-  'Paws & Whiskers'
+  'QuickWash Laundry',
+  'Apex Luxury Fleet',
+  'Swift Airport Transfers',
+  'Gourmet Chef Collective',
+  'Feast & Fete Catering',
+  'MedCall Pro Services',
+  'FreshMart Express',
+  'Bistro Express',
+  'Sparkle Cleaners'
 ];
 
 const initialInventory: InventoryItem[] = [
-  { id: 'INV-101', sku: 'SKU-HK-001', itemName: 'Premium Bed Linens (King)', vendorName: 'Elite Housekeeping', category: 'House keeping', quantity: 12, minThreshold: 20, unitCost: 150, lastRestocked: '2024-05-10' },
-  { id: 'INV-102', sku: 'SKU-HK-002', itemName: 'Standard Cleaning Supplies Kit', vendorName: 'Sparkle Cleaners', category: 'House keeping', quantity: 85, minThreshold: 30, unitCost: 45, lastRestocked: '2024-05-18' },
-  { id: 'INV-103', sku: 'SKU-CR-001', itemName: 'Tesla Model 3 Key Cards & Charging Adapters', vendorName: 'Swift Car Rentals', category: 'Car rental', quantity: 8, minThreshold: 10, unitCost: 250, lastRestocked: '2024-05-01' },
-  { id: 'INV-104', sku: 'SKU-LP-001', itemName: 'Heavy Duty Eco Laundry Detergent (20L)', vendorName: 'Laundry Pros', category: 'Laundry', quantity: 0, minThreshold: 5, unitCost: 180, lastRestocked: '2024-04-20' },
-  { id: 'INV-105', sku: 'SKU-LP-002', itemName: 'Hypoallergenic Fabric Softener (15L)', vendorName: 'Spin Cycle Dry Cleaners', category: 'Laundry', quantity: 18, minThreshold: 10, unitCost: 120, lastRestocked: '2024-05-15' },
-  { id: 'INV-106', sku: 'SKU-FNB-001', itemName: 'Artisanal Coffee Beans (5kg Bags)', vendorName: 'Gourmet Catering Co', category: 'In-house catering', quantity: 34, minThreshold: 15, unitCost: 85, lastRestocked: '2024-05-19' },
-  { id: 'INV-107', sku: 'SKU-WL-001', itemName: 'Organic Massage Oils & Aromatherapy Set', vendorName: 'Zen Spa & Wellness', category: 'Wellness', quantity: 4, minThreshold: 12, unitCost: 95, lastRestocked: '2024-05-02' },
-  { id: 'INV-108', sku: 'SKU-TR-001', itemName: 'Executive Sedan Child Safety Seats', vendorName: 'Apex Luxury Fleet', category: 'Transportation', quantity: 15, minThreshold: 8, unitCost: 310, lastRestocked: '2024-05-12' },
-  { id: 'INV-109', sku: 'SKU-GR-001', itemName: 'Organic Fresh Produce Welcome Basket', vendorName: 'Gourmet Catering Co', category: 'Grocery', quantity: 22, minThreshold: 10, unitCost: 120, lastRestocked: '2024-05-20' },
-  { id: 'INV-110', sku: 'SKU-COC-001', itemName: 'Gourmet Chef Knife & Utensil Kit', vendorName: 'Gourmet Catering Co', category: 'Chef on call', quantity: 6, minThreshold: 5, unitCost: 450, lastRestocked: '2024-05-05' },
-  { id: 'INV-111', sku: 'SKU-MNT-001', itemName: 'HVAC Filter Replacement Packs', vendorName: 'FixIt Pro Maintenance', category: 'Maintenance', quantity: 40, minThreshold: 15, unitCost: 65, lastRestocked: '2024-05-14' },
-  { id: 'INV-112', sku: 'SKU-FLD-001', itemName: 'Luxury Orchid Floral Arrangements', vendorName: 'Blooms & Petals', category: 'Florist & Decor', quantity: 10, minThreshold: 8, unitCost: 210, lastRestocked: '2024-05-21' },
-  { id: 'INV-113', sku: 'SKU-SEC-001', itemName: 'Secure Vehicle GPS Tracker Units', vendorName: 'Guardian VIP Security', category: 'Security & Chauffeur', quantity: 14, minThreshold: 5, unitCost: 380, lastRestocked: '2024-05-11' },
-  { id: 'INV-114', sku: 'SKU-LUG-001', itemName: 'Heavy-Duty Luggage Tags & Lock Seals', vendorName: 'SafeKeep Luggage', category: 'Luggage & Storage', quantity: 120, minThreshold: 50, unitCost: 15, lastRestocked: '2024-05-17' },
-  { id: 'INV-115', sku: 'SKU-NAN-001', itemName: 'Child Care Safety & First Aid Kits', vendorName: 'Nanny Care Express', category: 'Childcare & Nanny', quantity: 16, minThreshold: 10, unitCost: 85, lastRestocked: '2024-05-09' },
-  { id: 'INV-116', sku: 'SKU-PET-001', itemName: 'Hypoallergenic Pet Grooming Kits', vendorName: 'Paws & Whiskers', category: 'Pet Care', quantity: 25, minThreshold: 10, unitCost: 75, lastRestocked: '2024-05-16' },
+  { id: 'INV-101', sku: 'SKU-STR-001', itemName: 'Luxury Suite Amenity Kit & Welcome Pack', vendorName: 'Skyline Property Mgmt', category: 'Short term rental', quantity: 24, minThreshold: 10, unitCost: 120, lastRestocked: '2024-05-18' },
+  { id: 'INV-102', sku: 'SKU-LEI-001', itemName: 'Desert Safari VIP Experience Pass', vendorName: 'Desert Safari Adventures', category: 'Leisure activities', quantity: 15, minThreshold: 5, unitCost: 450, lastRestocked: '2024-05-15' },
+  { id: 'INV-103', sku: 'SKU-DIN-001', itemName: 'Zuma Chef Tasting Menu Voucher Pack', vendorName: 'Zuma Fine Dining', category: 'Dining', quantity: 30, minThreshold: 8, unitCost: 350, lastRestocked: '2024-05-20' },
+  { id: 'INV-104', sku: 'SKU-CWK-001', itemName: 'WeWork Executive Day Keycards', vendorName: 'WeWork Global Pass', category: 'Co-working', quantity: 50, minThreshold: 15, unitCost: 85, lastRestocked: '2024-05-12' },
+  { id: 'INV-105', sku: 'SKU-WLN-001', itemName: 'Organic Massage Oils & Aromatherapy Set', vendorName: 'Zen Spa & Wellness', category: 'Wellness', quantity: 4, minThreshold: 12, unitCost: 95, lastRestocked: '2024-05-02' },
+  { id: 'INV-106', sku: 'SKU-LND-001', itemName: 'Heavy Duty Eco Laundry Detergent (20L)', vendorName: 'QuickWash Laundry', category: 'Laundry', quantity: 0, minThreshold: 5, unitCost: 180, lastRestocked: '2024-04-20' },
+  { id: 'INV-107', sku: 'SKU-LND-002', itemName: 'Hypoallergenic Fabric Softener (15L)', vendorName: 'QuickWash Laundry', category: 'Laundry', quantity: 18, minThreshold: 10, unitCost: 120, lastRestocked: '2024-05-15' },
+  { id: 'INV-108', sku: 'SKU-CAR-001', itemName: 'Tesla Model 3 Key Cards & Charging Adapters', vendorName: 'Apex Luxury Fleet', category: 'Car rental', quantity: 8, minThreshold: 10, unitCost: 250, lastRestocked: '2024-05-01' },
+  { id: 'INV-109', sku: 'SKU-TRN-001', itemName: 'Executive Sedan Child Safety Seats', vendorName: 'Swift Airport Transfers', category: 'Transportation', quantity: 15, minThreshold: 8, unitCost: 310, lastRestocked: '2024-05-12' },
+  { id: 'INV-110', sku: 'SKU-CHF-001', itemName: '3-Course Gourmet Chef Pre-measured Ingredient Kit', vendorName: 'Gourmet Chef Collective', category: 'Chef on call', quantity: 6, minThreshold: 5, unitCost: 450, lastRestocked: '2024-05-05' },
+  { id: 'INV-111', sku: 'SKU-CAT-001', itemName: 'Executive Banquet Chafing Dish Set & Fuel', vendorName: 'Feast & Fete Catering', category: 'In-house catering', quantity: 12, minThreshold: 4, unitCost: 550, lastRestocked: '2024-05-14' },
+  { id: 'INV-112', sku: 'SKU-DOC-001', itemName: 'Emergency Diagnostic & Medical Kit', vendorName: 'MedCall Pro Services', category: 'Doctor on call', quantity: 10, minThreshold: 6, unitCost: 380, lastRestocked: '2024-05-11' },
+  { id: 'INV-113', sku: 'SKU-GRC-001', itemName: 'Organic Produce & Grocery Basket', vendorName: 'FreshMart Express', category: 'Grocery', quantity: 22, minThreshold: 10, unitCost: 120, lastRestocked: '2024-05-20' },
+  { id: 'INV-114', sku: 'SKU-FDL-001', itemName: 'Thermal Meal Insulated Delivery Bags', vendorName: 'Bistro Express', category: 'Food delivery', quantity: 35, minThreshold: 15, unitCost: 65, lastRestocked: '2024-05-17' },
+  { id: 'INV-115', sku: 'SKU-HKP-001', itemName: 'Premium Linen Turnover Sets (King)', vendorName: 'Sparkle Cleaners', category: 'House keeping', quantity: 12, minThreshold: 20, unitCost: 150, lastRestocked: '2024-05-10' },
+  { id: 'INV-116', sku: 'SKU-HKP-002', itemName: 'Standard Turnover Cleaning Kit', vendorName: 'Sparkle Cleaners', category: 'House keeping', quantity: 85, minThreshold: 30, unitCost: 45, lastRestocked: '2024-05-18' }
 ];
 
 const VendorInventory = () => {
   const [inventory, setInventory] = useState<InventoryItem[]>(initialInventory);
   const [searchTerm, setSearchTerm] = useState('');
   const [vendorFilter, setVendorFilter] = useState('all');
-  const [categoryFilter, setCategoryFilter] = useState('all');
+  const [categoryFilter, setCategoryFilter] = useState<string>('all');
   const [statusFilter, setStatusFilter] = useState('all');
 
   // Modals state
@@ -114,7 +115,7 @@ const VendorInventory = () => {
     sku: '',
     itemName: '',
     vendorName: VENDORS_LIST[0],
-    category: CATEGORIES_LIST[0],
+    category: EXACT_14_CATEGORIES[0],
     quantity: 10,
     minThreshold: 10,
     unitCost: 50
@@ -159,7 +160,7 @@ const VendorInventory = () => {
       sku: formData.sku,
       itemName: formData.itemName,
       vendorName: formData.vendorName,
-      category: formData.category,
+      category: formData.category as ServiceCategory,
       quantity: Number(formData.quantity),
       minThreshold: Number(formData.minThreshold),
       unitCost: Number(formData.unitCost),
@@ -172,7 +173,7 @@ const VendorInventory = () => {
       sku: '',
       itemName: '',
       vendorName: VENDORS_LIST[0],
-      category: CATEGORIES_LIST[0],
+      category: EXACT_14_CATEGORIES[0],
       quantity: 10,
       minThreshold: 10,
       unitCost: 50
@@ -205,7 +206,7 @@ const VendorInventory = () => {
           sku: formData.sku,
           itemName: formData.itemName,
           vendorName: formData.vendorName,
-          category: formData.category,
+          category: formData.category as ServiceCategory,
           quantity: Number(formData.quantity),
           minThreshold: Number(formData.minThreshold),
           unitCost: Number(formData.unitCost)
@@ -261,7 +262,7 @@ const VendorInventory = () => {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{totalItemsCount}</div>
-            <p className="text-xs text-muted-foreground mt-1">Across all vendor partners</p>
+            <p className="text-xs text-muted-foreground mt-1">Across 14 synchronized categories</p>
           </CardContent>
         </Card>
 
@@ -306,7 +307,7 @@ const VendorInventory = () => {
             <div>
               <CardTitle className="text-lg">Vendor Inventory Directory</CardTitle>
               <CardDescription>
-                Monitor stock levels, set minimum thresholds, and adjust inventory for service providers.
+                Synchronized with Vendor Services across all 14 service categories.
               </CardDescription>
             </div>
 
@@ -321,7 +322,7 @@ const VendorInventory = () => {
                   <DialogHeader>
                     <DialogTitle>Add New Inventory Item</DialogTitle>
                     <DialogDescription>
-                      Assign an item to a vendor and configure minimum reorder thresholds.
+                      Assign an item to a vendor and select from the 14 service categories.
                     </DialogDescription>
                   </DialogHeader>
                   <div className="grid gap-4 py-4 text-xs">
@@ -337,16 +338,16 @@ const VendorInventory = () => {
                         />
                       </div>
                       <div className="space-y-1.5">
-                        <Label htmlFor="category">Category</Label>
+                        <Label htmlFor="category">Service Category</Label>
                         <Select 
                           value={formData.category} 
-                          onValueChange={val => setFormData({...formData, category: val})}
+                          onValueChange={val => setFormData({...formData, category: val as ServiceCategory})}
                         >
                           <SelectTrigger id="category">
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
-                            {CATEGORIES_LIST.map(cat => (
+                            {EXACT_14_CATEGORIES.map(cat => (
                               <SelectItem key={cat} value={cat}>{cat}</SelectItem>
                             ))}
                           </SelectContent>
@@ -449,12 +450,12 @@ const VendorInventory = () => {
             </Select>
 
             <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-              <SelectTrigger className="w-[180px] h-9 text-xs">
+              <SelectTrigger className="w-[190px] h-9 text-xs">
                 <SelectValue placeholder="All Categories" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Categories ({CATEGORIES_LIST.length})</SelectItem>
-                {CATEGORIES_LIST.map(c => (
+                <SelectItem value="all">All 14 Categories</SelectItem>
+                {EXACT_14_CATEGORIES.map(c => (
                   <SelectItem key={c} value={c}>{c}</SelectItem>
                 ))}
               </SelectContent>
@@ -517,7 +518,7 @@ const VendorInventory = () => {
                         </div>
                       </TableCell>
                       <TableCell>
-                        <Badge variant="outline" className="text-[10px] bg-primary/5 text-primary border-primary/20">
+                        <Badge variant="outline" className="text-[10px] bg-primary/5 text-primary border-primary/20 capitalize">
                           {item.category}
                         </Badge>
                       </TableCell>
@@ -627,16 +628,16 @@ const VendorInventory = () => {
                     />
                   </div>
                   <div className="space-y-1.5">
-                    <Label htmlFor="edit-category">Category</Label>
+                    <Label htmlFor="edit-category">Service Category</Label>
                     <Select 
                       value={formData.category} 
-                      onValueChange={val => setFormData({...formData, category: val})}
+                      onValueChange={val => setFormData({...formData, category: val as ServiceCategory})}
                     >
                       <SelectTrigger id="edit-category">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        {CATEGORIES_LIST.map(cat => (
+                        {EXACT_14_CATEGORIES.map(cat => (
                           <SelectItem key={cat} value={cat}>{cat}</SelectItem>
                         ))}
                       </SelectContent>
