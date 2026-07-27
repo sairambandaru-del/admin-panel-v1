@@ -49,10 +49,15 @@ import {
   Zap,
   Tag,
   Clock,
-  Bed,
-  Moon,
-  Droplets,
-  Sparkle
+  Plane,
+  Navigation,
+  Crown,
+  Leaf,
+  Wifi,
+  Radio,
+  Sliders,
+  ShieldCheck,
+  Briefcase
 } from 'lucide-react';
 import { showSuccess, showError } from '@/utils/toast';
 import { ServiceCategory } from './VendorServices';
@@ -78,7 +83,7 @@ export interface HousekeepingServiceItem {
   vendorName: string;
   serviceType: 'Daily Service' | 'Deep Cleaning' | 'Targeted Service' | 'Amenity Refill' | 'Evening Service';
   description: string;
-  durationFormatted: string; // e.g. "90 min", "3 hours", "1 hour", "30 min"
+  durationFormatted: string;
   durationMinutes: number;
   priceAED: number;
   isIncludedInStay: boolean;
@@ -86,24 +91,26 @@ export interface HousekeepingServiceItem {
   isActive: boolean;
 }
 
-export interface CategoryInventoryItem {
+export interface TransportationServiceItem {
   id: string;
   sku: string;
-  itemName: string;
+  serviceTitle: string;
   vendorName: string;
-  category: ServiceCategory;
-  lastRestocked: string;
-  unitCost: number;
-
-  // Custom Category Attributes
-  unitAddress?: string;
-  roomType?: string;
-  vehicleModel?: string;
-  plateNumber?: string;
-  medicalKitType?: string;
+  rideType: 'Airport Transfer' | 'Local Ride Hailing' | 'Premium Private Taxi' | 'Rent a Car';
+  description: string;
+  vehicleModel: string; // e.g. "Range Rover Sport · Silver · C 21987"
+  rideModeProfile: 'Business' | 'Relaxed' | 'VIP' | 'Green' | 'Focus';
+  zenPoolEligible: boolean;
+  aquaAccessEligible: boolean;
+  onboardExtras: string[]; // e.g. ['WiFi Hotspot', 'Phone Charger', 'Bottled Water']
+  priceAED: number;
+  pricingUnit: 'Per Trip' | 'Per Hour' | 'Per Day' | '3-Day Package';
+  dailyCapacity: number;
+  isActive: boolean;
 }
 
 export const EXACT_14_CATEGORIES: Array<{ id: ServiceCategory; label: string; icon: React.ElementType }> = [
+  { id: 'Transportation', label: 'Transportation Hub', icon: CarTaxiFront },
   { id: 'House keeping', label: 'House Keeping', icon: Home },
   { id: 'Laundry', label: 'Laundry', icon: Shirt },
   { id: 'Short term rental', label: 'Short Term Rental', icon: Building },
@@ -113,7 +120,6 @@ export const EXACT_14_CATEGORIES: Array<{ id: ServiceCategory; label: string; ic
   { id: 'Dining', label: 'Dining', icon: UtensilsCrossed },
   { id: 'Co-working', label: 'Co-working', icon: Laptop },
   { id: 'Wellness', label: 'Wellness', icon: HeartPulse },
-  { id: 'Transportation', label: 'Transportation', icon: CarTaxiFront },
   { id: 'Chef on call', label: 'Chef on Call', icon: ChefHat },
   { id: 'In-house catering', label: 'Catering', icon: Utensils },
   { id: 'Grocery', label: 'Grocery', icon: ShoppingBasket },
@@ -121,25 +127,97 @@ export const EXACT_14_CATEGORIES: Array<{ id: ServiceCategory; label: string; ic
 ];
 
 const VENDORS_LIST = [
+  'Swift Airport Transfers',
+  'Apex Luxury Fleet',
   'Sparkle Cleaners',
   'Elite Housekeeping Co',
   'QuickWash Laundry',
   'Spin Cycle Dry Cleaners',
   'Skyline Property Mgmt',
-  'Apex Luxury Fleet',
   'MedCall Pro Services',
   'Desert Safari Adventures',
   'Zuma Fine Dining',
   'WeWork Global Pass',
   'Zen Spa & Wellness',
-  'Swift Airport Transfers',
   'Gourmet Chef Collective',
   'Feast & Fete Catering',
   'FreshMart Express',
   'Bistro Express'
 ];
 
-// Structured Housekeeping Catalog matching exact frontend structure
+// Structured Transportation Catalog matching Transportation Hub Frontend
+const initialTransportationCatalog: TransportationServiceItem[] = [
+  {
+    id: 'TRN-001',
+    sku: 'SKU-TRN-AIRPORT-DXB',
+    serviceTitle: 'Airport Transfer (DXB & AUH)',
+    vendorName: 'Swift Airport Transfers',
+    rideType: 'Airport Transfer',
+    description: 'Meet & greet, one-way or round-trip transfers for DXB & AUH airports',
+    vehicleModel: 'Mercedes S-Class Maybach (Black · DXB 9021)',
+    rideModeProfile: 'Business',
+    zenPoolEligible: true,
+    aquaAccessEligible: true,
+    onboardExtras: ['WiFi Hotspot', 'Phone Charger', 'Bottled Water', 'Bloomberg News Briefing'],
+    priceAED: 180.00,
+    pricingUnit: 'Per Trip',
+    dailyCapacity: 40,
+    isActive: true
+  },
+  {
+    id: 'TRN-002',
+    sku: 'SKU-TRN-CHAUFFEUR-HALF',
+    serviceTitle: 'Half-day Chauffeur — Client Visits',
+    vendorName: 'Apex Luxury Fleet',
+    rideType: 'Premium Private Taxi',
+    description: 'Chauffeur-driven luxury vehicles, booked hourly or full day',
+    vehicleModel: 'Range Rover Sport · Silver · C 21987',
+    rideModeProfile: 'VIP',
+    zenPoolEligible: true,
+    aquaAccessEligible: true,
+    onboardExtras: ['WiFi Hotspot', 'Phone Charger', 'Bottled Water', 'Quiet Cabin Mode'],
+    priceAED: 550.00,
+    pricingUnit: 'Per Hour',
+    dailyCapacity: 15,
+    isActive: true
+  },
+  {
+    id: 'TRN-003',
+    sku: 'SKU-TRN-LOCAL-HAIL',
+    serviceTitle: 'Local Ride Hailing (DIFC & City Trips)',
+    vendorName: 'Swift Airport Transfers',
+    rideType: 'Local Ride Hailing',
+    description: 'Point-to-point, hourly, multi-stop city rides across Dubai',
+    vehicleModel: 'Tesla Model S Plaid (White · Electric)',
+    rideModeProfile: 'Green',
+    zenPoolEligible: true,
+    aquaAccessEligible: true,
+    onboardExtras: ['WiFi Hotspot', 'Phone Charger', 'Bottled Water'],
+    priceAED: 60.00,
+    pricingUnit: 'Per Trip',
+    dailyCapacity: 100,
+    isActive: true
+  },
+  {
+    id: 'TRN-004',
+    sku: 'SKU-TRN-WEEKEND-SUV',
+    serviceTitle: 'Weekend SUV — Jebel Jais Drive',
+    vendorName: 'Apex Luxury Fleet',
+    rideType: 'Rent a Car',
+    description: 'Self-drive, daily & weekly luxury SUV rental packages',
+    vehicleModel: 'Range Rover Sport HSE 2024 (Silver)',
+    rideModeProfile: 'Relaxed',
+    zenPoolEligible: true,
+    aquaAccessEligible: true,
+    onboardExtras: ['Child Safety Seat', 'All-Wheel Drive Package', 'GPS Navigation'],
+    priceAED: 1050.00,
+    pricingUnit: '3-Day Package',
+    dailyCapacity: 10,
+    isActive: true
+  }
+];
+
+// Structured Housekeeping Catalog
 const initialHousekeepingCatalog: HousekeepingServiceItem[] = [
   {
     id: 'HKP-001',
@@ -168,76 +246,6 @@ const initialHousekeepingCatalog: HousekeepingServiceItem[] = [
     isIncludedInStay: false,
     dailyCapacity: 15,
     isActive: true
-  },
-  {
-    id: 'HKP-003',
-    sku: 'SKU-HKP-KITCHEN',
-    serviceTitle: 'Kitchen Cleaning',
-    vendorName: 'Sparkle Cleaners',
-    serviceType: 'Targeted Service',
-    description: 'Full kitchen deep clean including appliances, counters, and cabinets',
-    durationFormatted: '1 hour',
-    durationMinutes: 60,
-    priceAED: 60.00,
-    isIncludedInStay: false,
-    dailyCapacity: 25,
-    isActive: true
-  },
-  {
-    id: 'HKP-004',
-    sku: 'SKU-HKP-LINEN',
-    serviceTitle: 'Linen Change',
-    vendorName: 'Elite Housekeeping Co',
-    serviceType: 'Targeted Service',
-    description: 'Fresh bed linen, pillowcases, and duvet cover replacement',
-    durationFormatted: '30 min',
-    durationMinutes: 30,
-    priceAED: 40.00,
-    isIncludedInStay: false,
-    dailyCapacity: 50,
-    isActive: true
-  },
-  {
-    id: 'HKP-005',
-    sku: 'SKU-HKP-TURNDOWN',
-    serviceTitle: 'Turndown Service',
-    vendorName: 'Elite Housekeeping Co',
-    serviceType: 'Evening Service',
-    description: 'Evening turndown with chocolates, water, and ambient lighting setup',
-    durationFormatted: '20 min',
-    durationMinutes: 20,
-    priceAED: 30.00,
-    isIncludedInStay: false,
-    dailyCapacity: 30,
-    isActive: true
-  },
-  {
-    id: 'HKP-006',
-    sku: 'SKU-HKP-TOWELS',
-    serviceTitle: 'Extra Towels',
-    vendorName: 'Elite Housekeeping Co',
-    serviceType: 'Amenity Refill',
-    description: 'Additional bath towels, hand towels, and face cloths delivered to your suite',
-    durationFormatted: '15 min',
-    durationMinutes: 15,
-    priceAED: 25.00,
-    isIncludedInStay: false,
-    dailyCapacity: 80,
-    isActive: true
-  },
-  {
-    id: 'HKP-007',
-    sku: 'SKU-HKP-TOILETRIES',
-    serviceTitle: 'Toiletries Refill',
-    vendorName: 'Elite Housekeeping Co',
-    serviceType: 'Amenity Refill',
-    description: 'Restock of premium shampoo, conditioner, body wash, soap, and dental kit',
-    durationFormatted: '15 min',
-    durationMinutes: 15,
-    priceAED: 35.00,
-    isIncludedInStay: false,
-    dailyCapacity: 100,
-    isActive: true
   }
 ];
 
@@ -255,116 +263,96 @@ const initialLaundryCatalog: LaundryServiceItem[] = [
     packagingStyle: 'Hanger',
     dailyCapacity: 250,
     isActive: true
-  },
-  {
-    id: 'LND-102',
-    sku: 'SKU-LND-SUIT-DC',
-    itemName: "2-Piece Business Suit",
-    vendorName: 'QuickWash Laundry',
-    subCategory: 'Suits & Outerwear',
-    serviceMethod: 'Dry Cleaning',
-    unitPriceAED: 55.00,
-    expressPriceAED: 85.00,
-    packagingStyle: 'Garment Bag',
-    dailyCapacity: 80,
-    isActive: true
-  },
-  {
-    id: 'LND-103',
-    sku: 'SKU-LND-DRESS-DC',
-    itemName: "Evening Dress / Silk Gown",
-    vendorName: 'QuickWash Laundry',
-    subCategory: 'Delicates',
-    serviceMethod: 'Dry Cleaning',
-    unitPriceAED: 65.00,
-    expressPriceAED: 100.00,
-    packagingStyle: 'Garment Bag',
-    dailyCapacity: 50,
-    isActive: true
   }
 ];
 
 const VendorInventory = () => {
+  const [transportationCatalog, setTransportationCatalog] = useState<TransportationServiceItem[]>(initialTransportationCatalog);
   const [housekeepingCatalog, setHousekeepingCatalog] = useState<HousekeepingServiceItem[]>(initialHousekeepingCatalog);
   const [laundryCatalog, setLaundryCatalog] = useState<LaundryServiceItem[]>(initialLaundryCatalog);
-  const [selectedCategory, setSelectedCategory] = useState<ServiceCategory>('House keeping');
+  
+  const [selectedCategory, setSelectedCategory] = useState<ServiceCategory>('Transportation');
   const [searchTerm, setSearchTerm] = useState('');
-  const [hkFilter, setHkFilter] = useState('all');
+  const [transportRideTypeFilter, setTransportRideTypeFilter] = useState('all');
 
-  // Modals state for Housekeeping
-  const [isAddHKOpen, setIsAddHKOpen] = useState(false);
-  const [isEditHKOpen, setIsEditHKOpen] = useState(false);
-  const [editingHKItem, setEditingHKItem] = useState<HousekeepingServiceItem | null>(null);
+  // Modals state for Transportation
+  const [isAddTrnOpen, setIsAddTrnOpen] = useState(false);
+  const [isEditTrnOpen, setIsEditTrnOpen] = useState(false);
+  const [editingTrnItem, setEditingTrnItem] = useState<TransportationServiceItem | null>(null);
 
-  const [hkFormData, setHkFormData] = useState<HousekeepingServiceItem>({
+  const [trnFormData, setTrnFormData] = useState<TransportationServiceItem>({
     id: '',
     sku: '',
     serviceTitle: '',
-    vendorName: 'Sparkle Cleaners',
-    serviceType: 'Targeted Service',
+    vendorName: 'Swift Airport Transfers',
+    rideType: 'Airport Transfer',
     description: '',
-    durationFormatted: '30 min',
-    durationMinutes: 30,
-    priceAED: 40,
-    isIncludedInStay: false,
+    vehicleModel: 'Mercedes S-Class Maybach',
+    rideModeProfile: 'Business',
+    zenPoolEligible: true,
+    aquaAccessEligible: true,
+    onboardExtras: ['WiFi Hotspot', 'Phone Charger', 'Bottled Water'],
+    priceAED: 180,
+    pricingUnit: 'Per Trip',
     dailyCapacity: 30,
     isActive: true
   });
 
-  const filteredHousekeepingItems = housekeepingCatalog.filter(item => {
+  const filteredTransportationItems = transportationCatalog.filter(item => {
     const matchesSearch = 
       item.serviceTitle.toLowerCase().includes(searchTerm.toLowerCase()) ||
       item.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      item.vehicleModel.toLowerCase().includes(searchTerm.toLowerCase()) ||
       item.sku.toLowerCase().includes(searchTerm.toLowerCase()) ||
       item.vendorName.toLowerCase().includes(searchTerm.toLowerCase());
 
-    const matchesType = hkFilter === 'all' || item.serviceType === hkFilter;
+    const matchesRideType = transportRideTypeFilter === 'all' || item.rideType === transportRideTypeFilter;
 
-    return matchesSearch && matchesType;
+    return matchesSearch && matchesRideType;
   });
 
-  const handleAddHousekeepingItem = (e: React.FormEvent) => {
+  const handleAddTransportationItem = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!hkFormData.serviceTitle || !hkFormData.sku) {
+    if (!trnFormData.serviceTitle || !trnFormData.sku) {
       showError("Please enter Service Title and SKU.");
       return;
     }
 
-    const newItem: HousekeepingServiceItem = {
-      ...hkFormData,
-      id: `HKP-00${housekeepingCatalog.length + 1}`
+    const newItem: TransportationServiceItem = {
+      ...trnFormData,
+      id: `TRN-00${transportationCatalog.length + 1}`
     };
 
-    setHousekeepingCatalog([...housekeepingCatalog, newItem]);
-    setIsAddHKOpen(false);
-    showSuccess(`Added "${newItem.serviceTitle}" to Housekeeping Services Catalog.`);
+    setTransportationCatalog([...transportationCatalog, newItem]);
+    setIsAddTrnOpen(false);
+    showSuccess(`Added "${newItem.serviceTitle}" to Transportation Hub Catalog.`);
   };
 
-  const handleOpenEditHK = (item: HousekeepingServiceItem) => {
-    setEditingHKItem(item);
-    setHkFormData(item);
-    setIsEditHKOpen(true);
+  const handleOpenEditTrn = (item: TransportationServiceItem) => {
+    setEditingTrnItem(item);
+    setTrnFormData(item);
+    setIsEditTrnOpen(true);
   };
 
-  const handleUpdateHKItem = (e: React.FormEvent) => {
+  const handleUpdateTrnItem = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!editingHKItem) return;
+    if (!editingTrnItem) return;
 
-    setHousekeepingCatalog(prev => prev.map(item => {
-      if (item.id === editingHKItem.id) {
-        return hkFormData;
+    setTransportationCatalog(prev => prev.map(item => {
+      if (item.id === editingTrnItem.id) {
+        return trnFormData;
       }
       return item;
     }));
 
-    setIsEditHKOpen(false);
-    setEditingHKItem(null);
-    showSuccess(`Updated Housekeeping Service "${hkFormData.serviceTitle}".`);
+    setIsEditTrnOpen(false);
+    setEditingTrnItem(null);
+    showSuccess(`Updated Transportation offering "${trnFormData.serviceTitle}".`);
   };
 
-  const handleDeleteHKItem = (id: string, name: string) => {
-    setHousekeepingCatalog(prev => prev.filter(i => i.id !== id));
-    showSuccess(`Removed "${name}" from Housekeeping Catalog.`);
+  const handleDeleteTrnItem = (id: string, name: string) => {
+    setTransportationCatalog(prev => prev.filter(i => i.id !== id));
+    showSuccess(`Removed "${name}" from Transportation Catalog.`);
   };
 
   return (
@@ -373,47 +361,47 @@ const VendorInventory = () => {
       <div className="grid gap-4 md:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-xs font-medium">Housekeeping Services</CardTitle>
-            <Home className="h-4 w-4 text-primary" />
+            <CardTitle className="text-xs font-medium">Transportation Offerings</CardTitle>
+            <CarTaxiFront className="h-4 w-4 text-primary" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{housekeepingCatalog.length}</div>
-            <p className="text-xs text-muted-foreground mt-1">Configured Service Offerings</p>
+            <div className="text-2xl font-bold">{transportationCatalog.length}</div>
+            <p className="text-xs text-muted-foreground mt-1">Configured Ride Services</p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-xs font-medium">Base Complimentary Service</CardTitle>
+            <CardTitle className="text-xs font-medium">Zen Pool & Aqua Access</CardTitle>
             <Sparkles className="h-4 w-4 text-emerald-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-emerald-600">Daily Cleaning</div>
-            <p className="text-xs text-muted-foreground mt-1">Included in Guest Stay</p>
+            <div className="text-2xl font-bold text-emerald-600">100% Eligible</div>
+            <p className="text-xs text-muted-foreground mt-1">All rides meet tier criteria</p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-xs font-medium">Avg Add-on Price</CardTitle>
-            <Tag className="h-4 w-4 text-primary" />
+            <CardTitle className="text-xs font-medium">Core Service Modes</CardTitle>
+            <Navigation className="h-4 w-4 text-primary" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">AED 54.00</div>
-            <p className="text-xs text-muted-foreground mt-1">Add-on service requests</p>
+            <div className="text-2xl font-bold">4 Ride Types</div>
+            <p className="text-xs text-muted-foreground mt-1">Airport, Local, Taxi, Rental</p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-xs font-medium">Daily Staff Slots</CardTitle>
+            <CardTitle className="text-xs font-medium">Fleet Daily Trips</CardTitle>
             <CheckCircle2 className="h-4 w-4 text-emerald-500" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-emerald-600">
-              {housekeepingCatalog.reduce((sum, item) => sum + item.dailyCapacity, 0)} Requests/Day
+              {transportationCatalog.reduce((sum, item) => sum + item.dailyCapacity, 0)} Trips/Day
             </div>
-            <p className="text-xs text-muted-foreground mt-1">Active vendor capacity</p>
+            <p className="text-xs text-muted-foreground mt-1">Active fleet capacity</p>
           </CardContent>
         </Card>
       </div>
@@ -429,139 +417,173 @@ const VendorInventory = () => {
               </CardDescription>
             </div>
 
-            {selectedCategory === 'House keeping' && (
-              <Dialog open={isAddHKOpen} onOpenChange={setIsAddHKOpen}>
+            {selectedCategory === 'Transportation' && (
+              <Dialog open={isAddTrnOpen} onOpenChange={setIsAddTrnOpen}>
                 <DialogTrigger asChild>
                   <Button className="gap-2 shrink-0">
-                    <Plus className="w-4 h-4" /> Add Housekeeping Service
+                    <Plus className="w-4 h-4" /> Add Transportation Ride Service
                   </Button>
                 </DialogTrigger>
-                <DialogContent className="sm:max-w-[500px]">
-                  <form onSubmit={handleAddHousekeepingItem}>
+                <DialogContent className="sm:max-w-[550px]">
+                  <form onSubmit={handleAddTransportationItem}>
                     <DialogHeader>
-                      <DialogTitle>Add Housekeeping Service Offering</DialogTitle>
+                      <DialogTitle>Add Transportation Offering (Ride Service)</DialogTitle>
                       <DialogDescription>
-                        Configure service details, duration, pricing, and guest mobile display options.
+                        Configure ride type, ride settings profile, Zen Pool/Aqua eligibility, and vehicle details.
                       </DialogDescription>
                     </DialogHeader>
 
                     <div className="grid gap-4 py-4 text-xs">
                       <div className="grid grid-cols-2 gap-3">
                         <div className="space-y-1.5">
-                          <Label htmlFor="hk-sku">SKU Code</Label>
+                          <Label htmlFor="trn-sku">SKU Code</Label>
                           <Input 
-                            id="hk-sku" 
-                            placeholder="e.g. SKU-HKP-CLEAN" 
-                            value={hkFormData.sku}
-                            onChange={e => setHkFormData({...hkFormData, sku: e.target.value})}
+                            id="trn-sku" 
+                            placeholder="e.g. SKU-TRN-AIRPORT" 
+                            value={trnFormData.sku}
+                            onChange={e => setTrnFormData({...trnFormData, sku: e.target.value})}
                             required
                           />
                         </div>
                         <div className="space-y-1.5">
-                          <Label htmlFor="hk-vendor">Assigned Vendor</Label>
+                          <Label htmlFor="trn-vendor">Assigned Chauffeur / Fleet Vendor</Label>
                           <Select 
-                            value={hkFormData.vendorName}
-                            onValueChange={v => setHkFormData({...hkFormData, vendorName: v})}
+                            value={trnFormData.vendorName}
+                            onValueChange={v => setTrnFormData({...trnFormData, vendorName: v})}
                           >
-                            <SelectTrigger id="hk-vendor"><SelectValue /></SelectTrigger>
+                            <SelectTrigger id="trn-vendor"><SelectValue /></SelectTrigger>
                             <SelectContent>
-                              <SelectItem value="Sparkle Cleaners">Sparkle Cleaners</SelectItem>
-                              <SelectItem value="Elite Housekeeping Co">Elite Housekeeping Co</SelectItem>
+                              <SelectItem value="Swift Airport Transfers">Swift Airport Transfers</SelectItem>
+                              <SelectItem value="Apex Luxury Fleet">Apex Luxury Fleet</SelectItem>
                             </SelectContent>
                           </Select>
                         </div>
                       </div>
 
                       <div className="space-y-1.5">
-                        <Label htmlFor="hk-title">Service Title</Label>
+                        <Label htmlFor="trn-title">Service Title</Label>
                         <Input 
-                          id="hk-title" 
-                          placeholder="e.g. Deep Cleaning" 
-                          value={hkFormData.serviceTitle}
-                          onChange={e => setHkFormData({...hkFormData, serviceTitle: e.target.value})}
+                          id="trn-title" 
+                          placeholder="e.g. Airport Transfer (DXB & AUH)" 
+                          value={trnFormData.serviceTitle}
+                          onChange={e => setTrnFormData({...trnFormData, serviceTitle: e.target.value})}
                           required
                         />
                       </div>
 
                       <div className="grid grid-cols-2 gap-3">
                         <div className="space-y-1.5">
-                          <Label htmlFor="hk-type">Service Type</Label>
+                          <Label htmlFor="trn-type">Ride Type (Transportation Category)</Label>
                           <Select 
-                            value={hkFormData.serviceType}
-                            onValueChange={(v: any) => setHkFormData({...hkFormData, serviceType: v})}
+                            value={trnFormData.rideType}
+                            onValueChange={(v: any) => setTrnFormData({...trnFormData, rideType: v})}
                           >
-                            <SelectTrigger id="hk-type"><SelectValue /></SelectTrigger>
+                            <SelectTrigger id="trn-type"><SelectValue /></SelectTrigger>
                             <SelectContent>
-                              <SelectItem value="Daily Service">Daily Service</SelectItem>
-                              <SelectItem value="Deep Cleaning">Deep Cleaning</SelectItem>
-                              <SelectItem value="Targeted Service">Targeted Service</SelectItem>
-                              <SelectItem value="Amenity Refill">Amenity Refill</SelectItem>
-                              <SelectItem value="Evening Service">Evening Service</SelectItem>
+                              <SelectItem value="Airport Transfer">Airport Transfer</SelectItem>
+                              <SelectItem value="Local Ride Hailing">Local Ride Hailing</SelectItem>
+                              <SelectItem value="Premium Private Taxi">Premium Private Taxi</SelectItem>
+                              <SelectItem value="Rent a Car">Rent a Car</SelectItem>
                             </SelectContent>
                           </Select>
                         </div>
 
                         <div className="space-y-1.5">
-                          <Label htmlFor="hk-dur">Estimated Duration</Label>
-                          <Input 
-                            id="hk-dur" 
-                            placeholder="e.g. 90 min, 3 hours" 
-                            value={hkFormData.durationFormatted}
-                            onChange={e => setHkFormData({...hkFormData, durationFormatted: e.target.value})}
-                            required
-                          />
+                          <Label htmlFor="trn-profile">Ride Setting Profile Preset</Label>
+                          <Select 
+                            value={trnFormData.rideModeProfile}
+                            onValueChange={(v: any) => setTrnFormData({...trnFormData, rideModeProfile: v})}
+                          >
+                            <SelectTrigger id="trn-profile"><SelectValue /></SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="Business">Business</SelectItem>
+                              <SelectItem value="Relaxed">Relaxed</SelectItem>
+                              <SelectItem value="VIP">VIP</SelectItem>
+                              <SelectItem value="Green">Green</SelectItem>
+                              <SelectItem value="Focus">Focus</SelectItem>
+                            </SelectContent>
+                          </Select>
                         </div>
                       </div>
 
                       <div className="space-y-1.5">
-                        <Label htmlFor="hk-desc">Description for Guest Mobile App</Label>
+                        <Label htmlFor="trn-vehicle">Assigned Vehicle Model & License Tag</Label>
+                        <Input 
+                          id="trn-vehicle" 
+                          placeholder="e.g. Range Rover Sport · Silver · C 21987" 
+                          value={trnFormData.vehicleModel}
+                          onChange={e => setTrnFormData({...trnFormData, vehicleModel: e.target.value})}
+                          required
+                        />
+                      </div>
+
+                      <div className="space-y-1.5">
+                        <Label htmlFor="trn-desc">Description for Guest Mobile App</Label>
                         <Textarea 
-                          id="hk-desc" 
-                          placeholder="Describe the service scope shown to guests..." 
-                          value={hkFormData.description}
-                          onChange={e => setHkFormData({...hkFormData, description: e.target.value})}
+                          id="trn-desc" 
+                          placeholder="Describe ride scope (e.g. Meet & greet, one-way/round-trip DXB & AUH)..." 
+                          value={trnFormData.description}
+                          onChange={e => setTrnFormData({...trnFormData, description: e.target.value})}
                           required
                         />
                       </div>
 
                       <div className="grid grid-cols-2 gap-3">
                         <div className="space-y-1.5">
-                          <Label htmlFor="hk-price">Price (AED)</Label>
+                          <Label htmlFor="trn-price">Base Price (AED)</Label>
                           <Input 
-                            id="hk-price" 
+                            id="trn-price" 
                             type="number"
                             step="1.00"
-                            disabled={hkFormData.isIncludedInStay}
-                            value={hkFormData.isIncludedInStay ? 0 : hkFormData.priceAED}
-                            onChange={e => setHkFormData({...hkFormData, priceAED: Number(e.target.value)})}
+                            value={trnFormData.priceAED}
+                            onChange={e => setTrnFormData({...trnFormData, priceAED: Number(e.target.value)})}
                           />
                         </div>
 
                         <div className="space-y-1.5">
-                          <Label htmlFor="hk-cap">Daily Request Capacity</Label>
-                          <Input 
-                            id="hk-cap" 
-                            type="number"
-                            value={hkFormData.dailyCapacity}
-                            onChange={e => setHkFormData({...hkFormData, dailyCapacity: Number(e.target.value)})}
-                          />
+                          <Label htmlFor="trn-unit">Pricing Unit</Label>
+                          <Select 
+                            value={trnFormData.pricingUnit}
+                            onValueChange={(v: any) => setTrnFormData({...trnFormData, pricingUnit: v})}
+                          >
+                            <SelectTrigger id="trn-unit"><SelectValue /></SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="Per Trip">Per Trip</SelectItem>
+                              <SelectItem value="Per Hour">Per Hour</SelectItem>
+                              <SelectItem value="Per Day">Per Day</SelectItem>
+                              <SelectItem value="3-Day Package">3-Day Package</SelectItem>
+                            </SelectContent>
+                          </Select>
                         </div>
                       </div>
 
-                      <div className="flex items-center space-x-2 pt-2 border-t">
-                        <Switch 
-                          id="hk-included"
-                          checked={hkFormData.isIncludedInStay}
-                          onCheckedChange={v => setHkFormData({...hkFormData, isIncludedInStay: v, priceAED: v ? 0 : 40})}
-                        />
-                        <Label htmlFor="hk-included" className="cursor-pointer text-xs font-semibold">
-                          Mark as Included in Stay (AED 0 Complimentary)
-                        </Label>
+                      <div className="flex items-center justify-between pt-2 border-t text-xs">
+                        <div className="flex items-center space-x-2">
+                          <Switch 
+                            id="trn-zen"
+                            checked={trnFormData.zenPoolEligible}
+                            onCheckedChange={v => setTrnFormData({...trnFormData, zenPoolEligible: v})}
+                          />
+                          <Label htmlFor="trn-zen" className="cursor-pointer font-semibold text-amber-900">
+                            Zen Pool Eligible
+                          </Label>
+                        </div>
+
+                        <div className="flex items-center space-x-2">
+                          <Switch 
+                            id="trn-aqua"
+                            checked={trnFormData.aquaAccessEligible}
+                            onCheckedChange={v => setTrnFormData({...trnFormData, aquaAccessEligible: v})}
+                          />
+                          <Label htmlFor="trn-aqua" className="cursor-pointer font-semibold text-cyan-900">
+                            Aqua Access
+                          </Label>
+                        </div>
                       </div>
                     </div>
 
                     <DialogFooter>
-                      <Button type="submit" className="w-full">Save Housekeeping Service</Button>
+                      <Button type="submit" className="w-full">Save Ride Offering</Button>
                     </DialogFooter>
                   </form>
                 </DialogContent>
@@ -597,18 +619,17 @@ const VendorInventory = () => {
 
             {/* Filter Controls */}
             <div className="flex items-center gap-2 w-full xl:w-auto">
-              {selectedCategory === 'House keeping' && (
-                <Select value={hkFilter} onValueChange={setHkFilter}>
-                  <SelectTrigger className="w-[170px] h-9 text-xs">
-                    <SelectValue placeholder="All Service Types" />
+              {selectedCategory === 'Transportation' && (
+                <Select value={transportRideTypeFilter} onValueChange={setTransportRideTypeFilter}>
+                  <SelectTrigger className="w-[180px] h-9 text-xs">
+                    <SelectValue placeholder="All Ride Types" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">All Service Types</SelectItem>
-                    <SelectItem value="Daily Service">Daily Service</SelectItem>
-                    <SelectItem value="Deep Cleaning">Deep Cleaning</SelectItem>
-                    <SelectItem value="Targeted Service">Targeted Service</SelectItem>
-                    <SelectItem value="Amenity Refill">Amenity Refill</SelectItem>
-                    <SelectItem value="Evening Service">Evening Service</SelectItem>
+                    <SelectItem value="all">All Ride Types</SelectItem>
+                    <SelectItem value="Airport Transfer">Airport Transfer</SelectItem>
+                    <SelectItem value="Local Ride Hailing">Local Ride Hailing</SelectItem>
+                    <SelectItem value="Premium Private Taxi">Premium Private Taxi</SelectItem>
+                    <SelectItem value="Rent a Car">Rent a Car</SelectItem>
                   </SelectContent>
                 </Select>
               )}
@@ -616,7 +637,7 @@ const VendorInventory = () => {
               <div className="relative w-full xl:w-60 shrink-0">
                 <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                 <Input
-                  placeholder="Search service title..."
+                  placeholder="Search ride service or vehicle..."
                   value={searchTerm}
                   onChange={e => setSearchTerm(e.target.value)}
                   className="pl-8 h-9 text-xs"
@@ -627,8 +648,109 @@ const VendorInventory = () => {
         </CardHeader>
 
         <CardContent className="pt-2">
-          {selectedCategory === 'House keeping' ? (
-            /* TAILORED HOUSEKEEPING SERVICE CATALOG TABLE (MATCHES FRONTEND APP) */
+          {selectedCategory === 'Transportation' ? (
+            /* TAILORED TRANSPORTATION HUB CATALOG TABLE (MATCHES FRONTEND APP) */
+            <div className="rounded-md border overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow className="bg-muted/30">
+                    <TableHead>SKU</TableHead>
+                    <TableHead>Ride Service Title</TableHead>
+                    <TableHead>Ride Type</TableHead>
+                    <TableHead>Assigned Vehicle / Fleet ID</TableHead>
+                    <TableHead>Eligibility Badges</TableHead>
+                    <TableHead>Ride Profile Preset</TableHead>
+                    <TableHead>Onboard Extras</TableHead>
+                    <TableHead>Rate (AED)</TableHead>
+                    <TableHead className="text-center">Daily Capacity</TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {filteredTransportationItems.map(item => (
+                    <TableRow key={item.id} className="hover:bg-muted/50 transition-colors">
+                      <TableCell className="font-mono text-xs font-bold">{item.sku}</TableCell>
+                      <TableCell>
+                        <div>
+                          <p className="font-bold text-xs text-foreground">{item.serviceTitle}</p>
+                          <p className="text-[10px] text-muted-foreground truncate max-w-[220px]">{item.description}</p>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant="outline" className="text-[10px] bg-primary/5 text-primary border-primary/20">
+                          {item.rideType}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="text-xs font-semibold text-foreground">
+                        {item.vehicleModel}
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex flex-col gap-1">
+                          {item.zenPoolEligible && (
+                            <Badge variant="outline" className="text-[9px] bg-amber-50 text-amber-900 border-amber-300 w-fit py-0">
+                              <Crown className="w-2.5 h-2.5 mr-1 text-amber-600" /> Zen Pool eligible
+                            </Badge>
+                          )}
+                          {item.aquaAccessEligible && (
+                            <Badge variant="outline" className="text-[9px] bg-cyan-50 text-cyan-900 border-cyan-300 w-fit py-0">
+                              <Sparkles className="w-2.5 h-2.5 mr-1 text-cyan-600" /> Aqua access
+                            </Badge>
+                          )}
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <Badge className={`text-[10px] font-bold ${
+                          item.rideModeProfile === 'Business' ? 'bg-slate-900 text-white' :
+                          item.rideModeProfile === 'VIP' ? 'bg-amber-600 text-white' :
+                          item.rideModeProfile === 'Green' ? 'bg-emerald-600 text-white' : 'bg-blue-600 text-white'
+                        }`}>
+                          {item.rideModeProfile}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex flex-wrap gap-1 max-w-[200px]">
+                          {item.onboardExtras.map((ex, idx) => (
+                            <Badge key={idx} variant="secondary" className="text-[9px] px-1 py-0 font-normal">
+                              {ex}
+                            </Badge>
+                          ))}
+                        </div>
+                      </TableCell>
+                      <TableCell className="text-xs font-bold text-foreground">
+                        AED {item.priceAED.toFixed(2)} <span className="text-[10px] font-normal text-muted-foreground">/ {item.pricingUnit}</span>
+                      </TableCell>
+                      <TableCell className="text-center font-mono text-xs font-bold">
+                        {item.dailyCapacity} Trips/Day
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <div className="flex justify-end items-center gap-1">
+                          <Button 
+                            variant="ghost" 
+                            size="icon" 
+                            className="h-7 w-7 text-muted-foreground hover:text-foreground"
+                            onClick={() => handleOpenEditTrn(item)}
+                            title="Edit Service Offering"
+                          >
+                            <Edit2 className="w-3.5 h-3.5" />
+                          </Button>
+                          <Button 
+                            variant="ghost" 
+                            size="icon" 
+                            className="h-7 w-7 text-destructive hover:text-destructive"
+                            onClick={() => handleDeleteTrnItem(item.id, item.serviceTitle)}
+                            title="Delete Offering"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          ) : selectedCategory === 'House keeping' ? (
+            /* TAILORED HOUSEKEEPING SERVICE CATALOG TABLE */
             <div className="rounded-md border overflow-x-auto">
               <Table>
                 <TableHeader>
@@ -641,70 +763,19 @@ const VendorInventory = () => {
                     <TableHead>Vendor Provider</TableHead>
                     <TableHead>Price (AED)</TableHead>
                     <TableHead className="text-center">Daily Capacity</TableHead>
-                    <TableHead className="text-right">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {filteredHousekeepingItems.map(item => (
-                    <TableRow key={item.id} className="hover:bg-muted/50 transition-colors">
+                  {housekeepingCatalog.map(item => (
+                    <TableRow key={item.id}>
                       <TableCell className="font-mono text-xs font-bold">{item.sku}</TableCell>
-                      <TableCell>
-                        <div className="flex items-center gap-2">
-                          <p className="font-bold text-xs text-foreground">{item.serviceTitle}</p>
-                          {item.isIncludedInStay && (
-                            <Badge className="bg-emerald-100 text-emerald-800 border-emerald-300 text-[9px] px-1.5 py-0">
-                              Included
-                            </Badge>
-                          )}
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <Badge variant="outline" className="text-[10px] bg-primary/5 text-primary border-primary/20">
-                          {item.serviceType}
-                        </Badge>
-                      </TableCell>
-                      <TableCell className="text-xs text-muted-foreground max-w-[280px]">
-                        {item.description}
-                      </TableCell>
-                      <TableCell className="text-xs font-medium font-mono">
-                        <div className="flex items-center gap-1.5">
-                          <Clock className="w-3.5 h-3.5 text-muted-foreground" />
-                          <span>{item.durationFormatted}</span>
-                        </div>
-                      </TableCell>
-                      <TableCell className="text-xs font-medium text-muted-foreground">{item.vendorName}</TableCell>
-                      <TableCell className="text-xs font-bold">
-                        {item.isIncludedInStay ? (
-                          <span className="text-emerald-600 font-bold">Included</span>
-                        ) : (
-                          <span className="text-foreground">AED {item.priceAED.toFixed(2)}</span>
-                        )}
-                      </TableCell>
-                      <TableCell className="text-center font-mono text-xs font-bold">
-                        {item.dailyCapacity} Requests/Day
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <div className="flex justify-end items-center gap-1">
-                          <Button 
-                            variant="ghost" 
-                            size="icon" 
-                            className="h-7 w-7 text-muted-foreground hover:text-foreground"
-                            onClick={() => handleOpenEditHK(item)}
-                            title="Edit Offering"
-                          >
-                            <Edit2 className="w-3.5 h-3.5" />
-                          </Button>
-                          <Button 
-                            variant="ghost" 
-                            size="icon" 
-                            className="h-7 w-7 text-destructive hover:text-destructive"
-                            onClick={() => handleDeleteHKItem(item.id, item.serviceTitle)}
-                            title="Delete Offering"
-                          >
-                            <Trash2 className="w-3.5 h-3.5" />
-                          </Button>
-                        </div>
-                      </TableCell>
+                      <TableCell className="font-bold text-xs">{item.serviceTitle}</TableCell>
+                      <TableCell><Badge variant="outline" className="text-[10px]">{item.serviceType}</Badge></TableCell>
+                      <TableCell className="text-xs text-muted-foreground">{item.description}</TableCell>
+                      <TableCell className="text-xs font-mono">{item.durationFormatted}</TableCell>
+                      <TableCell className="text-xs">{item.vendorName}</TableCell>
+                      <TableCell className="text-xs font-bold">AED {item.priceAED.toFixed(2)}</TableCell>
+                      <TableCell className="text-center font-mono text-xs">{item.dailyCapacity} Requests/Day</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
@@ -747,103 +818,93 @@ const VendorInventory = () => {
               <Boxes className="w-10 h-10 text-muted-foreground mx-auto mb-2 opacity-50" />
               <h4 className="font-bold text-sm">Custom Inventory for {selectedCategory}</h4>
               <p className="text-xs text-muted-foreground max-w-sm mx-auto mt-1">
-                Select the Housekeeping or Laundry tabs above to view synchronized service offerings and pricing catalogs.
+                Select the Transportation Hub, Housekeeping, or Laundry tabs above to view synchronized service offerings and pricing catalogs.
               </p>
             </div>
           )}
         </CardContent>
       </Card>
 
-      {/* Edit Housekeeping Dialog */}
-      <Dialog open={isEditHKOpen} onOpenChange={setIsEditHKOpen}>
-        <DialogContent className="sm:max-w-[500px]">
-          {editingHKItem && (
-            <form onSubmit={handleUpdateHKItem}>
+      {/* Edit Transportation Dialog */}
+      <Dialog open={isEditTrnOpen} onOpenChange={setIsEditTrnOpen}>
+        <DialogContent className="sm:max-w-[550px]">
+          {editingTrnItem && (
+            <form onSubmit={handleUpdateTrnItem}>
               <DialogHeader>
-                <DialogTitle>Edit Housekeeping Offering: {editingHKItem.serviceTitle}</DialogTitle>
-                <DialogDescription>Modify service scope, price, and duration.</DialogDescription>
+                <DialogTitle>Edit Transportation Offering: {editingTrnItem.serviceTitle}</DialogTitle>
+                <DialogDescription>Modify ride details, rates, and vehicle specifications.</DialogDescription>
               </DialogHeader>
 
               <div className="grid gap-4 py-4 text-xs">
                 <div className="grid grid-cols-2 gap-3">
                   <div className="space-y-1.5">
-                    <Label htmlFor="edit-hk-sku">SKU Code</Label>
+                    <Label htmlFor="edit-trn-sku">SKU Code</Label>
                     <Input 
-                      id="edit-hk-sku" 
-                      value={hkFormData.sku}
-                      onChange={e => setHkFormData({...hkFormData, sku: e.target.value})}
+                      id="edit-trn-sku" 
+                      value={trnFormData.sku}
+                      onChange={e => setTrnFormData({...trnFormData, sku: e.target.value})}
                       required
                     />
                   </div>
                   <div className="space-y-1.5">
-                    <Label htmlFor="edit-hk-vendor">Vendor</Label>
+                    <Label htmlFor="edit-trn-vendor">Vendor</Label>
                     <Select 
-                      value={hkFormData.vendorName}
-                      onValueChange={v => setHkFormData({...hkFormData, vendorName: v})}
+                      value={trnFormData.vendorName}
+                      onValueChange={v => setTrnFormData({...trnFormData, vendorName: v})}
                     >
-                      <SelectTrigger id="edit-hk-vendor"><SelectValue /></SelectTrigger>
+                      <SelectTrigger id="edit-trn-vendor"><SelectValue /></SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="Sparkle Cleaners">Sparkle Cleaners</SelectItem>
-                        <SelectItem value="Elite Housekeeping Co">Elite Housekeeping Co</SelectItem>
+                        <SelectItem value="Swift Airport Transfers">Swift Airport Transfers</SelectItem>
+                        <SelectItem value="Apex Luxury Fleet">Apex Luxury Fleet</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
                 </div>
 
                 <div className="space-y-1.5">
-                  <Label htmlFor="edit-hk-title">Service Title</Label>
+                  <Label htmlFor="edit-trn-title">Service Title</Label>
                   <Input 
-                    id="edit-hk-title" 
-                    value={hkFormData.serviceTitle}
-                    onChange={e => setHkFormData({...hkFormData, serviceTitle: e.target.value})}
+                    id="edit-trn-title" 
+                    value={trnFormData.serviceTitle}
+                    onChange={e => setTrnFormData({...trnFormData, serviceTitle: e.target.value})}
                     required
                   />
                 </div>
 
                 <div className="grid grid-cols-2 gap-3">
                   <div className="space-y-1.5">
-                    <Label htmlFor="edit-hk-dur">Duration</Label>
+                    <Label htmlFor="edit-trn-price">Base Price (AED)</Label>
                     <Input 
-                      id="edit-hk-dur" 
-                      value={hkFormData.durationFormatted}
-                      onChange={e => setHkFormData({...hkFormData, durationFormatted: e.target.value})}
+                      id="edit-trn-price" 
+                      type="number"
+                      step="1.00"
+                      value={trnFormData.priceAED}
+                      onChange={e => setTrnFormData({...trnFormData, priceAED: Number(e.target.value)})}
                     />
                   </div>
                   <div className="space-y-1.5">
-                    <Label htmlFor="edit-hk-price">Price (AED)</Label>
+                    <Label htmlFor="edit-trn-cap">Daily Trip Capacity</Label>
                     <Input 
-                      id="edit-hk-price" 
+                      id="edit-trn-cap" 
                       type="number"
-                      disabled={hkFormData.isIncludedInStay}
-                      value={hkFormData.isIncludedInStay ? 0 : hkFormData.priceAED}
-                      onChange={e => setHkFormData({...hkFormData, priceAED: Number(e.target.value)})}
+                      value={trnFormData.dailyCapacity}
+                      onChange={e => setTrnFormData({...trnFormData, dailyCapacity: Number(e.target.value)})}
                     />
                   </div>
                 </div>
 
                 <div className="space-y-1.5">
-                  <Label htmlFor="edit-hk-desc">Description</Label>
+                  <Label htmlFor="edit-trn-desc">Description</Label>
                   <Textarea 
-                    id="edit-hk-desc" 
-                    value={hkFormData.description}
-                    onChange={e => setHkFormData({...hkFormData, description: e.target.value})}
+                    id="edit-trn-desc" 
+                    value={trnFormData.description}
+                    onChange={e => setTrnFormData({...trnFormData, description: e.target.value})}
                   />
-                </div>
-
-                <div className="flex items-center space-x-2 pt-2 border-t">
-                  <Switch 
-                    id="edit-hk-inc"
-                    checked={hkFormData.isIncludedInStay}
-                    onCheckedChange={v => setHkFormData({...hkFormData, isIncludedInStay: v, priceAED: v ? 0 : 40})}
-                  />
-                  <Label htmlFor="edit-hk-inc" className="cursor-pointer text-xs font-semibold">
-                    Mark as Included in Stay (Complimentary)
-                  </Label>
                 </div>
               </div>
 
               <DialogFooter>
-                <Button type="submit" className="w-full">Update Service Offering</Button>
+                <Button type="submit" className="w-full">Update Transportation Offering</Button>
               </DialogFooter>
             </form>
           )}
