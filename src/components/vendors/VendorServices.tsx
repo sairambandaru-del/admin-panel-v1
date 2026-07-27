@@ -9,7 +9,6 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
   Dialog, 
   DialogContent, 
@@ -21,8 +20,6 @@ import {
 import { 
   Truck, 
   Search, 
-  Clock, 
-  CheckCircle2, 
   DollarSign, 
   MessageSquare, 
   AlertTriangle,
@@ -37,7 +34,6 @@ import {
   Utensils,
   Stethoscope,
   ShoppingBag,
-  Sparkles,
   Home,
   ChevronRight,
   ShieldCheck,
@@ -194,189 +190,76 @@ const SERVICE_PIPELINES: Record<ServiceCategory, Array<{ id: string; title: stri
   ]
 };
 
-const initialVendorBookings: VendorServiceBooking[] = [
-  {
-    id: "VS-8804",
-    vendorName: "QuickWash Laundry",
-    category: "Laundry",
-    serviceTitle: "Express Dry Clean & Laundry",
-    guestName: "Elena Rostova",
-    unitAddress: "Downtown Suite 402",
-    dateScheduled: "2024-05-21 10:00",
-    status: "Under processing",
-    costNumeric: 220,
-    costDisplay: "AED 220.00"
-  },
-  {
-    id: "VS-8806",
-    vendorName: "Spin Cycle Dry Cleaners",
-    category: "Laundry",
-    serviceTitle: "Suits & Evening Gown Pressing",
-    guestName: "Alexander Wright",
-    unitAddress: "Downtown Suite 402",
-    dateScheduled: "2024-05-21 14:00",
-    status: "Picked up",
-    costNumeric: 180,
-    costDisplay: "AED 180.00"
-  },
-  {
-    id: "VS-8807",
-    vendorName: "Sparkle Cleaners",
-    category: "House keeping",
-    serviceTitle: "Full Apartment Turnover Cleaning",
-    guestName: "Michael Chen",
-    unitAddress: "Marina Penthouse 12B",
-    dateScheduled: "2024-05-22 11:00",
-    status: "Enquiry",
-    strConfirmed: false,
-    costNumeric: 350,
-    costDisplay: "AED 350.00"
-  },
-  {
-    id: "VS-8801",
-    vendorName: "Apex Luxury Fleet",
-    category: "Car rental",
-    serviceTitle: "Luxury SUV Rental (Range Rover)",
-    guestName: "Alexander Wright",
-    unitAddress: "Downtown Suite 402",
-    dateScheduled: "2024-05-20 14:00",
-    status: "In progress",
-    costNumeric: 1200,
-    costDisplay: "AED 1,200.00"
-  },
-  {
-    id: "VS-8810",
-    vendorName: "Swift Airport Transfers",
-    category: "Transportation",
-    serviceTitle: "Executive Chauffeur Terminal 3 Transfer",
-    guestName: "Emma Watson",
-    unitAddress: "Terminal 3 -> Suite 402",
-    dateScheduled: "2024-05-21 09:00",
-    status: "Confirmed",
-    costNumeric: 350,
-    costDisplay: "AED 350.00"
-  },
-  {
-    id: "VS-8802",
-    vendorName: "Gourmet Chef Collective",
-    category: "Chef on call",
-    serviceTitle: "Personal Chef 3-Course Dinner",
-    guestName: "Robert Taylor",
-    unitAddress: "Palm Jumeirah Villa 05",
-    dateScheduled: "2024-05-23 19:30",
-    status: "Menu finalized",
-    costNumeric: 1800,
-    costDisplay: "AED 1,800.00"
-  },
-  {
-    id: "VS-8811",
-    vendorName: "Feast & Fete Catering",
-    category: "In-house catering",
-    serviceTitle: "Executive Board Buffet Catering (15 Pax)",
-    guestName: "David Miller",
-    unitAddress: "Downtown Penthouse 12B",
-    dateScheduled: "2024-05-24 12:00",
-    status: "Confirmed",
-    costNumeric: 3200,
-    costDisplay: "AED 3,200.00"
-  },
-  {
-    id: "VS-8803",
-    vendorName: "Zen Spa & Wellness",
-    category: "Wellness",
-    serviceTitle: "In-Suite Swedish Massage & Aromatherapy",
-    guestName: "Sophia Martinez",
-    unitAddress: "Marina Bay Penthouse 12B",
-    dateScheduled: "2024-05-24 16:00",
-    status: "Confirmed",
-    costNumeric: 650,
-    costDisplay: "AED 650.00"
-  },
-  {
-    id: "VS-8805",
-    vendorName: "FreshMart Express",
-    category: "Grocery",
-    serviceTitle: "Organic Grocery Basket Supply",
-    guestName: "Sarah Jenkins",
-    unitAddress: "Marina Bay Penthouse 12B",
-    dateScheduled: "2024-05-22 08:30",
-    status: "Packing the cart",
-    costNumeric: 310,
-    costDisplay: "AED 310.00"
-  },
-  {
-    id: "VS-8808",
-    vendorName: "MedCall Pro Services",
-    category: "Doctor on call",
-    serviceTitle: "In-Room Doctor Consultation",
-    guestName: "David Miller",
-    unitAddress: "Skyline Suite 101",
-    dateScheduled: "2024-05-20 18:00",
-    status: "Arrived",
-    costNumeric: 500,
-    costDisplay: "AED 500.00"
-  },
-  {
-    id: "VS-8812",
-    vendorName: "Bistro Express",
-    category: "Food delivery",
-    serviceTitle: "Gourmet Italian Dinner Delivery",
-    guestName: "John Doe",
-    unitAddress: "Skyline Suite 101",
-    dateScheduled: "2024-05-21 20:00",
-    status: "Preparing",
-    costNumeric: 240,
-    costDisplay: "AED 240.00"
-  },
-  {
-    id: "VS-8813",
-    vendorName: "WeWork Global Pass",
-    category: "Co-working",
-    serviceTitle: "Dedicated Desk Day Pass",
-    guestName: "Mike Ross",
-    unitAddress: "DIFC Business Tower",
-    dateScheduled: "2024-05-22 09:00",
-    status: "Confirmed",
-    costNumeric: 150,
-    costDisplay: "AED 150.00"
-  },
-  {
-    id: "VS-8814",
-    vendorName: "Desert Safari Adventures",
-    category: "Leisure activities",
-    serviceTitle: "VIP Desert Safari & Quad Biking",
-    guestName: "Tony Stark",
-    unitAddress: "Burj Khalifa Suite",
-    dateScheduled: "2024-05-23 15:00",
-    status: "Confirmed",
-    costNumeric: 1200,
-    costDisplay: "AED 1,200.00"
-  },
-  {
-    id: "VS-8815",
-    vendorName: "Zuma Fine Dining",
-    category: "Dining",
-    serviceTitle: "VIP Tasting Menu Table Reservation",
-    guestName: "Bruce Wayne",
-    unitAddress: "DIFC Gate Village",
-    dateScheduled: "2024-05-22 21:00",
-    status: "Confirmed",
-    costNumeric: 950,
-    costDisplay: "AED 950.00"
-  },
-  {
-    id: "VS-8816",
-    vendorName: "Skyline Property Management",
-    category: "Short term rental",
-    serviceTitle: "Luxury 2BR Suite Stay",
-    guestName: "Alexander Wright",
-    unitAddress: "Skyline Suite 402",
-    dateScheduled: "2024-05-20",
-    status: "Checked in",
-    costNumeric: 4250,
-    costDisplay: "AED 4,250.00"
-  }
-];
+// Seed helper to generate at least two realistic bookings for EVERY status in ALL 14 categories
+const generateCategoryBookings = (): VendorServiceBooking[] => {
+  const result: VendorServiceBooking[] = [];
+  let counter = 1000;
+
+  const guests = [
+    { name: "Alexander Wright", unit: "Downtown Suite 402" },
+    { name: "Elena Rostova", unit: "Marina Penthouse 12B" },
+    { name: "Michael Chen", unit: "Palm Jumeirah Villa 05" },
+    { name: "Sarah Jenkins", unit: "Skyline Tower 101" },
+    { name: "Emma Watson", unit: "Executive Loft 304" },
+    { name: "David Miller", unit: "Beachside Villa 12" },
+    { name: "Robert Taylor", unit: "Business Bay Suite 802" },
+    { name: "Sophia Martinez", unit: "DIFC Gate Residence 04" }
+  ];
+
+  const vendorMap: Record<ServiceCategory, { vendor1: string; vendor2: string; title: string; priceBase: number }> = {
+    'Short term rental': { vendor1: 'Skyline Property Mgmt', vendor2: 'Oasis Luxury Stays', title: 'Luxury Suite Stay', priceBase: 1200 },
+    'Leisure activities': { vendor1: 'Desert Safari Adventures', vendor2: 'Ocean Blue Yacht Charters', title: 'VIP Leisure Experience', priceBase: 650 },
+    'Dining': { vendor1: 'Zuma Fine Dining', vendor2: 'Nobu Restaurant', title: 'Tasting Menu Reservation', priceBase: 450 },
+    'Co-working': { vendor1: 'WeWork Global Pass', vendor2: 'Regus Executive Hub', title: 'Dedicated Desk Pass', priceBase: 150 },
+    'Wellness': { vendor1: 'Zen Spa & Wellness', vendor2: 'Serenity Care', title: 'In-Suite Massage & Therapy', priceBase: 500 },
+    'Laundry': { vendor1: 'QuickWash Laundry', vendor2: 'Spin Cycle Dry Cleaners', title: 'Dry Clean & Pressing', priceBase: 180 },
+    'Car rental': { vendor1: 'Apex Luxury Fleet', vendor2: 'Hertz Select Fleet', title: 'Luxury SUV Rental', priceBase: 950 },
+    'Transportation': { vendor1: 'Swift Airport Transfers', vendor2: 'Elite Chauffeurs', title: 'Terminal Chauffeur Service', priceBase: 350 },
+    'Chef on call': { vendor1: 'Gourmet Chef Collective', vendor2: 'Le Cordon Bleu Chefs', title: '3-Course Gourmet Dinner', priceBase: 1500 },
+    'In-house catering': { vendor1: 'Feast & Fete Catering', vendor2: 'Grand Banquet Services', title: 'Executive Event Catering', priceBase: 2500 },
+    'Doctor on call': { vendor1: 'MedCall Pro Services', vendor2: 'First Response Medical', title: 'In-Room Doctor Consultation', priceBase: 450 },
+    'Grocery': { vendor1: 'FreshMart Express', vendor2: 'Carrefour Super Express', title: 'Organic Grocery Delivery', priceBase: 220 },
+    'Food delivery': { vendor1: 'Bistro Express', vendor2: 'Urban Bites Delivery', title: 'Gourmet Meal Delivery', priceBase: 160 },
+    'House keeping': { vendor1: 'Sparkle Cleaners', vendor2: 'Elite Housekeeping Co', title: 'Full Turnover Cleaning', priceBase: 300 }
+  };
+
+  const categories = Object.keys(SERVICE_PIPELINES) as ServiceCategory[];
+
+  categories.forEach((cat) => {
+    const pipeline = SERVICE_PIPELINES[cat];
+    const meta = vendorMap[cat];
+
+    pipeline.forEach((statusObj) => {
+      // Create 2 bookings per status
+      for (let i = 1; i <= 2; i++) {
+        counter++;
+        const guestObj = guests[(counter) % guests.length];
+        const vendor = i === 1 ? meta.vendor1 : meta.vendor2;
+        const price = meta.priceBase + (i * 25) + ((counter % 5) * 10);
+
+        const isHousekeepingConfirmed = cat === 'House keeping' && statusObj.id !== 'Enquiry';
+
+        result.push({
+          id: `VS-${counter}`,
+          vendorName: vendor,
+          category: cat,
+          serviceTitle: `${meta.title} #${i}`,
+          guestName: guestObj.name,
+          unitAddress: guestObj.unit,
+          dateScheduled: `2024-05-${20 + (counter % 8)} 10:30`,
+          status: statusObj.id,
+          strConfirmed: cat === 'House keeping' ? isHousekeepingConfirmed : true,
+          costNumeric: price,
+          costDisplay: `AED ${price.toFixed(2)}`
+        });
+      }
+    });
+  });
+
+  return result;
+};
+
+const initialVendorBookings: VendorServiceBooking[] = generateCategoryBookings();
 
 const CATEGORY_TABS: Array<{ id: ServiceCategory; label: string; icon: React.ElementType }> = [
   { id: 'Laundry', label: 'Laundry', icon: Shirt },
@@ -775,16 +658,19 @@ const VendorServices = () => {
                                 </div>
                                 
                                 <div className="flex items-center gap-1" onClick={e => e.stopPropagation()}>
-                                  <Button 
-                                    variant="outline" 
-                                    size="sm" 
-                                    className="h-7 text-[10px] gap-1 px-2 border-amber-300 bg-amber-50 text-amber-900 hover:bg-amber-100"
-                                    title="Raise Exception & Revised Price"
-                                    onClick={(e) => handleOpenRaiseException(b, e)}
-                                  >
-                                    <AlertTriangle className="w-3 h-3 text-amber-600" />
-                                    <span>Exception</span>
-                                  </Button>
+                                  {/* Exception button rendered only for Laundry category */}
+                                  {b.category === 'Laundry' && (
+                                    <Button 
+                                      variant="outline" 
+                                      size="sm" 
+                                      className="h-7 text-[10px] gap-1 px-2 border-amber-300 bg-amber-50 text-amber-900 hover:bg-amber-100"
+                                      title="Raise Exception & Revised Price"
+                                      onClick={(e) => handleOpenRaiseException(b, e)}
+                                    >
+                                      <AlertTriangle className="w-3 h-3 text-amber-600" />
+                                      <span>Exception</span>
+                                    </Button>
+                                  )}
                                   <Button 
                                     variant="ghost" 
                                     size="icon" 
@@ -912,15 +798,18 @@ const VendorServices = () => {
                                 </Button>
                               )}
 
-                              <Button 
-                                variant="outline" 
-                                size="sm" 
-                                className="h-8 gap-1 text-xs border-amber-300 bg-amber-50 text-amber-900 hover:bg-amber-100"
-                                onClick={(e) => handleOpenRaiseException(booking, e)}
-                              >
-                                <AlertTriangle className="w-3.5 h-3.5 text-amber-600" />
-                                <span>Exception</span>
-                              </Button>
+                              {/* Exception button rendered only for Laundry category */}
+                              {booking.category === 'Laundry' && (
+                                <Button 
+                                  variant="outline" 
+                                  size="sm" 
+                                  className="h-8 gap-1 text-xs border-amber-300 bg-amber-50 text-amber-900 hover:bg-amber-100"
+                                  onClick={(e) => handleOpenRaiseException(booking, e)}
+                                >
+                                  <AlertTriangle className="w-3.5 h-3.5 text-amber-600" />
+                                  <span>Exception</span>
+                                </Button>
+                              )}
 
                               <Button 
                                 variant="ghost" 
