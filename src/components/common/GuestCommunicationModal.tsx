@@ -7,14 +7,12 @@ import {
   DialogHeader,
   DialogTitle,
   DialogDescription,
-  DialogFooter,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
   MessageSquare, 
   Send, 
@@ -22,14 +20,25 @@ import {
   Building2, 
   Calendar, 
   Clock, 
-  Phone, 
-  Mail, 
-  ShieldCheck, 
   Lock,
   Sparkles,
-  Paperclip
+  AlertTriangle,
+  CheckCircle2,
+  XCircle,
+  ArrowRight,
+  Receipt
 } from 'lucide-react';
-import { showSuccess } from '@/utils/toast';
+import { showSuccess, showError } from '@/utils/toast';
+
+export interface ServiceException {
+  id: string;
+  reason: string;
+  details: string;
+  originalCost: number;
+  proposedCost: number;
+  status: 'Pending Guest Approval' | 'Approved' | 'Declined';
+  createdAt: string;
+}
 
 export interface BookingCommsData {
   id: string;
@@ -40,6 +49,9 @@ export interface BookingCommsData {
   serviceCategory?: string;
   dates?: string;
   status?: string;
+  pendingException?: ServiceException | null;
+  onApproveException?: (bookingId: string, newCost: number) => void;
+  onDeclineException?: (bookingId: string) => void;
 }
 
 interface Message {
@@ -49,6 +61,8 @@ interface Message {
   text: string;
   timestamp: string;
   isInternal?: boolean;
+  isExceptionCard?: boolean;
+  exceptionData?: ServiceException;
 }
 
 interface GuestCommunicationModalProps {
@@ -65,6 +79,29 @@ const getMockMessages = (booking: BookingCommsData | null): Message[] => {
   const name = booking.guestName || 'Guest';
 
   const messagesByCategory: Record<string, Message[]> = {
+    'Laundry': [
+      {
+        id: '1',
+        sender: 'System',
+        senderName: 'Straizen System',
+        text: `Laundry service order ${booking.id} dispatched to QuickWash Laundry. Picked up from unit.`,
+        timestamp: 'May 21, 10:00 AM'
+      },
+      {
+        id: '2',
+        sender: 'Guest',
+        senderName: name,
+        text: `Hi! Please make sure the silk shirts are dry cleaned on low heat. Thank you!`,
+        timestamp: 'May 21, 10:15 AM'
+      },
+      {
+        id: '3',
+        sender: 'Vendor',
+        senderName: 'QuickWash Laundry Specialist',
+        text: `Hello ${name.split(' ')[0]}. We received your laundry bag. Our team is inspecting the items now.`,
+        timestamp: 'May 21, 10:30 AM'
+      }
+    ],
     'Short Term Rentals': [
       {
         id: '1',
@@ -84,81 +121,13 @@ const getMockMessages = (booking: BookingCommsData | null): Message[] => {
         id: '3',
         sender: 'Host/Admin',
         senderName: 'Straizen Support',
-        text: `Hello ${name.split(' ')[0]}! We'll do our best to accommodate. Housekeeping is scheduled to finish by 12:30 PM. We will notify you as soon as the keycode is activated.`,
+        text: `Hello ${name.split(' ')[0]}! We'll do our best to accommodate. Keycode will be activated at 12:30 PM.`,
         timestamp: 'May 18, 11:05 AM'
-      },
-      {
-        id: '4',
-        sender: 'Guest',
-        senderName: name,
-        text: `That would be fantastic, thank you so much! Also, could we get two extra sets of towels?`,
-        timestamp: 'May 18, 11:20 AM'
-      },
-      {
-        id: '5',
-        sender: 'Host/Admin',
-        senderName: 'Straizen Concierge',
-        text: `Noted! Additional towels have been added to the housekeeping instruction list.`,
-        timestamp: 'May 18, 11:45 AM'
-      }
-    ],
-    'Car Rentals': [
-      {
-        id: '1',
-        sender: 'System',
-        senderName: 'Straizen System',
-        text: `Vehicle reservation confirmed. Delivery location: Terminal 3 Arrival Gate.`,
-        timestamp: 'May 19, 08:00 AM'
-      },
-      {
-        id: '2',
-        sender: 'Guest',
-        senderName: name,
-        text: `Hi, will the driver meet me inside the arrival hall with a name sign?`,
-        timestamp: 'May 19, 08:45 AM'
-      },
-      {
-        id: '3',
-        sender: 'Vendor',
-        senderName: 'Apex Luxury Fleet Support',
-        text: `Yes, Mr./Ms. ${name.split(' ')[1] || name}. Our representative will hold a sign with your name right at Exit 2. Vehicle is sanitized and ready.`,
-        timestamp: 'May 19, 09:12 AM'
-      },
-      {
-        id: '4',
-        sender: 'Guest',
-        senderName: name,
-        text: `Great, flight Emirates EK202 just landed on time. Heading through immigration now.`,
-        timestamp: 'May 19, 09:50 AM'
-      }
-    ],
-    'In House Catering': [
-      {
-        id: '1',
-        sender: 'Guest',
-        senderName: name,
-        text: `Hello! For the catering service on our stay, two guests have severe shellfish allergies. Can we ensure a completely nut and shellfish-free preparation?`,
-        timestamp: 'May 17, 02:15 PM'
-      },
-      {
-        id: '2',
-        sender: 'Vendor',
-        senderName: 'Feast & Fete Chef',
-        text: `Absolutely. We take dietary restrictions very seriously. All appetizers and main courses for your menu will be prepped in a segregated area.`,
-        timestamp: 'May 17, 03:00 PM'
-      },
-      {
-        id: '3',
-        sender: 'Host/Admin',
-        senderName: 'Straizen Quality Team',
-        text: `Internal Note: Verified allergy precautions with Chef Poulain. Approved.`,
-        timestamp: 'May 17, 03:10 PM',
-        isInternal: true
       }
     ]
   };
 
-  return messagesByCategory[category] || [
+  const initialMsgs = messagesByCategory[category] || [
     {
       id: '1',
       sender: 'System',
@@ -170,17 +139,12 @@ const getMockMessages = (booking: BookingCommsData | null): Message[] => {
       id: '2',
       sender: 'Guest',
       senderName: name,
-      text: `Hi! Looking forward to our service booking. Please let us know if you need any additional confirmation details.`,
+      text: `Hi! Looking forward to our service booking.`,
       timestamp: 'May 18, 09:30 AM'
-    },
-    {
-      id: '3',
-      sender: 'Host/Admin',
-      senderName: 'Straizen Support',
-      text: `Welcome! Everything is set up for your scheduled time. Feel free to message us here if you have any questions before arrival.`,
-      timestamp: 'May 18, 10:00 AM'
     }
   ];
+
+  return initialMsgs;
 };
 
 export const GuestCommunicationModal: React.FC<GuestCommunicationModalProps> = ({
@@ -193,11 +157,15 @@ export const GuestCommunicationModal: React.FC<GuestCommunicationModalProps> = (
   const [messages, setMessages] = useState<Message[]>(getMockMessages(booking));
   const [newMessage, setNewMessage] = useState('');
   const [activeTab, setActiveTab] = useState<'guest' | 'internal'>('guest');
+  const [activeException, setActiveException] = useState<ServiceException | null>(
+    booking.pendingException || null
+  );
 
-  // Reset messages when booking changes
+  // Sync state when booking changes
   React.useEffect(() => {
     setMessages(getMockMessages(booking));
-  }, [booking?.id]);
+    setActiveException(booking.pendingException || null);
+  }, [booking?.id, booking?.pendingException]);
 
   const handleSendMessage = (e: React.FormEvent) => {
     e.preventDefault();
@@ -205,7 +173,7 @@ export const GuestCommunicationModal: React.FC<GuestCommunicationModalProps> = (
 
     const newEntry: Message = {
       id: Date.now().toString(),
-      sender: activeTab === 'internal' ? 'Host/Admin' : 'Host/Admin',
+      sender: 'Host/Admin',
       senderName: activeTab === 'internal' ? 'Admin Note' : 'Straizen Support',
       text: newMessage.trim(),
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
@@ -215,6 +183,79 @@ export const GuestCommunicationModal: React.FC<GuestCommunicationModalProps> = (
     setMessages(prev => [...prev, newEntry]);
     setNewMessage('');
     showSuccess(activeTab === 'internal' ? 'Internal note added' : 'Message sent to guest');
+  };
+
+  const handleGuestApproveException = () => {
+    if (!activeException || !booking) return;
+
+    const newCost = activeException.proposedCost;
+
+    // 1. Update internal state
+    const updatedException: ServiceException = {
+      ...activeException,
+      status: 'Approved'
+    };
+    setActiveException(updatedException);
+
+    // 2. Add confirmation message to the chat
+    const confirmMsg: Message = {
+      id: Date.now().toString(),
+      sender: 'Guest',
+      senderName: booking.guestName,
+      text: `✅ Price adjustment approved for AED ${newCost.toFixed(2)}. Please proceed with the service.`,
+      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+    };
+
+    const vendorNotifyMsg: Message = {
+      id: (Date.now() + 1).toString(),
+      sender: 'System',
+      senderName: 'Straizen System',
+      text: `Update sent to Vendor: Guest approved the revised price of AED ${newCost.toFixed(2)}. Service booking updated.`,
+      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+    };
+
+    setMessages(prev => [...prev, confirmMsg, vendorNotifyMsg]);
+
+    // 3. Trigger parent callback
+    if (booking.onApproveException) {
+      booking.onApproveException(booking.id, newCost);
+    }
+
+    showSuccess(`Guest approved revised price of AED ${newCost.toFixed(2)}. Vendor notified!`);
+  };
+
+  const handleGuestDeclineException = () => {
+    if (!activeException || !booking) return;
+
+    const updatedException: ServiceException = {
+      ...activeException,
+      status: 'Declined'
+    };
+    setActiveException(updatedException);
+
+    const declineMsg: Message = {
+      id: Date.now().toString(),
+      sender: 'Guest',
+      senderName: booking.guestName,
+      text: `❌ Price adjustment declined. Please proceed with original service scope or contact me.`,
+      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+    };
+
+    const vendorNotifyMsg: Message = {
+      id: (Date.now() + 1).toString(),
+      sender: 'System',
+      senderName: 'Straizen System',
+      text: `Update sent to Vendor: Guest declined price adjustment. Original booking price maintained.`,
+      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+    };
+
+    setMessages(prev => [...prev, declineMsg, vendorNotifyMsg]);
+
+    if (booking.onDeclineException) {
+      booking.onDeclineException(booking.id);
+    }
+
+    showError(`Price revision request declined. Vendor notified.`);
   };
 
   const visibleMessages = messages.filter(m => activeTab === 'internal' ? true : !m.isInternal);
@@ -236,7 +277,7 @@ export const GuestCommunicationModal: React.FC<GuestCommunicationModalProps> = (
                 </Badge>
               </div>
               <DialogDescription className="text-xs">
-                Thread history with guest and service provider
+                Mobile Guest App Sync & Vendor Service Communication Thread
               </DialogDescription>
             </div>
             {booking.status && (
@@ -284,12 +325,87 @@ export const GuestCommunicationModal: React.FC<GuestCommunicationModalProps> = (
               </TabsTrigger>
             </TabsList>
             <div className="text-[11px] text-muted-foreground flex items-center gap-1">
-              <Clock className="w-3 h-3 text-emerald-500" /> Real-time Sync Active
+              <Clock className="w-3 h-3 text-emerald-500" /> Mobile App Live Sync
             </div>
           </div>
 
           {/* Scrollable Message Thread */}
-          <div className="flex-1 p-4 overflow-y-auto space-y-4 min-h-[250px] max-h-[360px] bg-background">
+          <div className="flex-1 p-4 overflow-y-auto space-y-4 min-h-[250px] max-h-[380px] bg-background">
+            {/* Active Exception / Price Adjustment Banner for Mobile App View */}
+            {activeException && (
+              <div className="border-2 border-amber-300 bg-amber-50/90 rounded-xl p-4 shadow-sm space-y-3">
+                <div className="flex items-start justify-between gap-2 border-b border-amber-200/80 pb-2">
+                  <div className="flex items-center gap-2">
+                    <AlertTriangle className="w-5 h-5 text-amber-600 shrink-0" />
+                    <div>
+                      <h4 className="font-bold text-xs text-amber-900">Vendor Exception & Price Revision Request</h4>
+                      <p className="text-[11px] text-amber-700">Raised on {activeException.createdAt}</p>
+                    </div>
+                  </div>
+                  <Badge variant="outline" className="bg-amber-100 text-amber-800 border-amber-300 text-[10px]">
+                    {activeException.status}
+                  </Badge>
+                </div>
+
+                <div className="space-y-1.5 text-xs text-amber-950">
+                  <p className="font-semibold text-amber-900">Reason: <span className="font-medium text-amber-950">{activeException.reason}</span></p>
+                  <p className="text-amber-800 leading-relaxed bg-amber-100/50 p-2 rounded border border-amber-200/60">
+                    "{activeException.details}"
+                  </p>
+                </div>
+
+                {/* Price Breakdown Pill */}
+                <div className="flex items-center justify-between bg-white/80 p-3 rounded-lg border border-amber-200">
+                  <div>
+                    <span className="text-[10px] text-muted-foreground uppercase font-bold tracking-wider">Original Price</span>
+                    <p className="text-xs line-through text-muted-foreground font-semibold">AED {activeException.originalCost.toFixed(2)}</p>
+                  </div>
+                  <ArrowRight className="w-4 h-4 text-amber-600" />
+                  <div className="text-right">
+                    <span className="text-[10px] text-amber-700 uppercase font-bold tracking-wider">New Proposed Price</span>
+                    <p className="text-sm font-bold text-emerald-600">AED {activeException.proposedCost.toFixed(2)}</p>
+                  </div>
+                </div>
+
+                {/* Interactive Action Buttons for Mobile Guest Frontend */}
+                {activeException.status === 'Pending Guest Approval' ? (
+                  <div className="pt-1 flex flex-col sm:flex-row gap-2">
+                    <Button 
+                      size="sm" 
+                      className="flex-1 gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs h-9"
+                      onClick={handleGuestApproveException}
+                    >
+                      <CheckCircle2 className="w-4 h-4" />
+                      Approve AED {activeException.proposedCost.toFixed(2)}
+                    </Button>
+                    <Button 
+                      size="sm" 
+                      variant="outline" 
+                      className="flex-1 gap-1.5 text-rose-700 border-rose-200 hover:bg-rose-50 text-xs h-9"
+                      onClick={handleGuestDeclineException}
+                    >
+                      <XCircle className="w-4 h-4" />
+                      Decline Request
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="text-center py-1 text-xs font-semibold text-amber-900 border-t border-amber-200 pt-2 flex items-center justify-center gap-1.5">
+                    {activeException.status === 'Approved' ? (
+                      <>
+                        <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                        <span>Price Update Approved. Vendor notified in system.</span>
+                      </>
+                    ) : (
+                      <>
+                        <XCircle className="w-4 h-4 text-rose-600" />
+                        <span>Price Update Declined by Guest.</span>
+                      </>
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
+
             {visibleMessages.length === 0 ? (
               <div className="text-center py-12 text-muted-foreground text-xs">
                 No messages yet in this thread.
@@ -303,10 +419,10 @@ export const GuestCommunicationModal: React.FC<GuestCommunicationModalProps> = (
                 if (isSystem) {
                   return (
                     <div key={msg.id} className="flex justify-center my-2">
-                      <div className="bg-muted/60 text-muted-foreground text-[11px] px-3 py-1 rounded-full border flex items-center gap-1.5">
-                        <Sparkles className="w-3 h-3 text-primary" />
+                      <div className="bg-muted/60 text-muted-foreground text-[11px] px-3 py-1 rounded-full border flex items-center gap-1.5 text-center max-w-[90%]">
+                        <Sparkles className="w-3 h-3 text-primary shrink-0" />
                         <span>{msg.text}</span>
-                        <span className="text-[9px] opacity-70">({msg.timestamp})</span>
+                        <span className="text-[9px] opacity-70 shrink-0">({msg.timestamp})</span>
                       </div>
                     </div>
                   );
@@ -333,7 +449,7 @@ export const GuestCommunicationModal: React.FC<GuestCommunicationModalProps> = (
                         <span className="font-semibold text-foreground">{msg.senderName}</span>
                         {isInternal && (
                           <Badge variant="outline" className="text-[9px] py-0 px-1 bg-amber-50 text-amber-700 border-amber-200">
-                            Internal
+                            Internal Note
                           </Badge>
                         )}
                         <span className="text-muted-foreground text-[10px]">{msg.timestamp}</span>
