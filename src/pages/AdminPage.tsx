@@ -21,6 +21,7 @@ import BookingQuotation from '@/components/inventory/BookingQuotation';
 import VendorRegistry from '@/components/vendors/VendorRegistry';
 import VendorOnboarding from '@/components/vendors/VendorOnboarding';
 import VendorServices from '@/components/vendors/VendorServices';
+import VendorInventory from '@/components/vendors/VendorInventory';
 import VendorPerformance from '@/components/vendors/VendorPerformance';
 import VendorSOA from '@/components/vendors/VendorSOA';
 import Invoicing from '@/components/finance/Invoicing';
@@ -60,6 +61,7 @@ const AdminPage = () => {
     if (path === '/vendors/registry') return <VendorRegistry />;
     if (path === '/vendors/onboarding') return <VendorOnboarding />;
     if (path === '/vendors/services') return <VendorServices />;
+    if (path === '/vendors/inventory') return <VendorInventory />;
     if (path === '/vendors/performance') return <VendorPerformance />;
     if (path === '/vendors/accounts') return <VendorSOA />;
 
@@ -113,7 +115,7 @@ const AdminPage = () => {
     if (path.startsWith('/dashboard')) return "Overview of performance and operations for the Straizen team.";
     if (path.startsWith('/corporate')) return "Manage corporate accounts, policies, and travel auditing.";
     if (path.startsWith('/inventory')) return "Track unit availability, status, and PMS synchronization.";
-    if (path.startsWith('/vendors')) return "Manage vendor registry, services, and performance.";
+    if (path.startsWith('/vendors')) return "Manage vendor registry, services, inventory, and performance.";
     if (path.startsWith('/finance')) return "Financial reporting, invoicing, and payout management.";
     if (path.startsWith('/settings')) return "System configuration, corporate boundaries, and user permissions.";
     return "Manage your platform here.";
