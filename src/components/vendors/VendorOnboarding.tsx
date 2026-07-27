@@ -18,10 +18,8 @@ import {
   FileText, 
   Upload, 
   CheckCircle2, 
-  AlertCircle, 
   ArrowRight, 
   ArrowLeft, 
-  Plus, 
   Trash2, 
   ShieldCheck, 
   Clock,
@@ -46,7 +44,7 @@ const initialApplications: OnboardingApplication[] = [
   {
     id: 'ONB-001',
     companyName: 'Apex Luxury Fleet',
-    category: 'Car Rentals',
+    category: 'Car rental',
     contactPerson: 'James Bond',
     email: 'james@apexfleet.com',
     status: 'Pending Review',
@@ -56,7 +54,7 @@ const initialApplications: OnboardingApplication[] = [
   {
     id: 'ONB-002',
     companyName: 'Feast & Fete Catering',
-    category: 'In House Catering',
+    category: 'In-house catering',
     contactPerson: 'Amelie Poulain',
     email: 'amelie@feastfete.com',
     status: 'Approved',
@@ -94,7 +92,7 @@ const VendorOnboarding = () => {
   const [formData, setFormData] = useState({
     companyName: '',
     tradeLicense: '',
-    category: 'House Keeping',
+    category: 'House keeping',
     contactName: '',
     email: '',
     phone: '',
@@ -169,7 +167,7 @@ const VendorOnboarding = () => {
     setFormData({
       companyName: '',
       tradeLicense: '',
-      category: 'House Keeping',
+      category: 'House keeping',
       contactName: '',
       email: '',
       phone: '',
@@ -207,7 +205,7 @@ const VendorOnboarding = () => {
       <div className="flex justify-between items-center">
         <div>
           <h3 className="text-lg font-semibold">Vendor Onboarding</h3>
-          <p className="text-sm text-muted-foreground">Onboard new service providers and manage pending registration applications.</p>
+          <p className="text-sm text-muted-foreground">Onboard new service providers across all 14 service categories.</p>
         </div>
         <div className="flex bg-muted p-1 rounded-lg border">
           <Button 
@@ -333,15 +331,20 @@ const VendorOnboarding = () => {
                           <SelectValue placeholder="Select category" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="Short Term Rentals">Short Term Rentals</SelectItem>
-                          <SelectItem value="Car Rentals">Car Rentals</SelectItem>
-                          <SelectItem value="House Keeping">House Keeping</SelectItem>
-                          <SelectItem value="Laundry">Laundry</SelectItem>
-                          <SelectItem value="Food Delivery">Food Delivery</SelectItem>
-                          <SelectItem value="Grocery">Grocery</SelectItem>
-                          <SelectItem value="Doctor on Call">Doctor on Call</SelectItem>
-                          <SelectItem value="In House Catering">In House Catering</SelectItem>
+                          <SelectItem value="Short term rental">Short term rental</SelectItem>
+                          <SelectItem value="Leisure activities">Leisure activities</SelectItem>
+                          <SelectItem value="Dining">Dining</SelectItem>
+                          <SelectItem value="Co-working">Co-working</SelectItem>
                           <SelectItem value="Wellness">Wellness</SelectItem>
+                          <SelectItem value="Laundry">Laundry</SelectItem>
+                          <SelectItem value="Car rental">Car rental</SelectItem>
+                          <SelectItem value="Transportation">Transportation</SelectItem>
+                          <SelectItem value="Chef on call">Chef on call</SelectItem>
+                          <SelectItem value="In-house catering">In-house catering</SelectItem>
+                          <SelectItem value="Doctor on call">Doctor on call</SelectItem>
+                          <SelectItem value="Grocery">Grocery</SelectItem>
+                          <SelectItem value="Food delivery">Food delivery</SelectItem>
+                          <SelectItem value="House keeping">House keeping</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
@@ -389,7 +392,7 @@ const VendorOnboarding = () => {
                     <Label htmlFor="pricingDetails">Describe Services & Pricing Structure <span className="text-destructive">*</span></Label>
                     <Textarea 
                       id="pricingDetails" 
-                      placeholder="Describe the services you offer, base rates, capacity, and any additional fees (e.g., Standard Cleaning: AED 150, Deep Cleaning: AED 250)..." 
+                      placeholder="Describe the services you offer, base rates, capacity, and any additional fees..." 
                       className="min-h-[150px]"
                       value={formData.pricingDetails}
                       onChange={e => setFormData({...formData, pricingDetails: e.target.value})}
@@ -482,7 +485,7 @@ const VendorOnboarding = () => {
                       </div>
                       <div>
                         <p className="text-muted-foreground font-medium">Service Category</p>
-                        <p className="font-semibold text-sm mt-0.5">{formData.category}</p>
+                        <p className="font-semibold text-sm mt-0.5 capitalize">{formData.category}</p>
                       </div>
                       <div>
                         <p className="text-muted-foreground font-medium">Primary Contact</p>
@@ -582,7 +585,7 @@ const VendorOnboarding = () => {
                       <TableCell className="font-bold">{app.id}</TableCell>
                       <TableCell className="font-semibold">{app.companyName}</TableCell>
                       <TableCell>
-                        <Badge variant="outline" className="bg-primary/5 text-primary border-primary/20">
+                        <Badge variant="outline" className="bg-primary/5 text-primary border-primary/20 capitalize">
                           {app.category}
                         </Badge>
                       </TableCell>

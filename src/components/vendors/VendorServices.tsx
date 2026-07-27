@@ -40,95 +40,80 @@ import {
   Sparkles,
   Home,
   ChevronRight,
-  ShieldCheck
+  ShieldCheck,
+  Compass,
+  UtensilsCrossed,
+  Laptop,
+  HeartPulse,
+  ChefHat,
+  ShoppingBasket,
+  CarTaxiFront,
+  Building
 } from 'lucide-react';
 import { showSuccess, showError } from '@/utils/toast';
 import GuestCommunicationModal, { BookingCommsData, ServiceException } from '@/components/common/GuestCommunicationModal';
 
+export type ServiceCategory = 
+  | 'Short term rental'
+  | 'Leisure activities'
+  | 'Dining'
+  | 'Co-working'
+  | 'Wellness'
+  | 'Laundry'
+  | 'Car rental'
+  | 'Transportation'
+  | 'Chef on call'
+  | 'In-house catering'
+  | 'Doctor on call'
+  | 'Grocery'
+  | 'Food delivery'
+  | 'House keeping';
+
 interface VendorServiceBooking {
   id: string;
   vendorName: string;
-  category: 
-    | 'Short Term Rental'
-    | 'Leisure & Wellness'
-    | 'House Keeping'
-    | 'Food Delivery'
-    | 'Grocery'
-    | 'Doctor on Call'
-    | 'Chef & Catering'
-    | 'Car Rental & Transport'
-    | 'Laundry';
+  category: ServiceCategory;
   serviceTitle: string;
   guestName: string;
   unitAddress: string;
   dateScheduled: string;
   status: string;
-  strConfirmed?: boolean; // Required for House Keeping rule
+  strConfirmed?: boolean;
   costNumeric: number;
   costDisplay: string;
   pendingException?: ServiceException | null;
 }
 
-// Category Specific Status Pipelines (Strictly mapped as requested)
-const SERVICE_PIPELINES: Record<string, Array<{ id: string; title: string; color: string }>> = {
-  'Short Term Rental': [
+// Category Specific Status Pipelines (Mapped strictly per requirement)
+const SERVICE_PIPELINES: Record<ServiceCategory, Array<{ id: string; title: string; color: string }>> = {
+  'Short term rental': [
     { id: 'Enquiry', title: 'Enquiry', color: 'border-blue-400 bg-blue-50/60' },
     { id: 'Confirmed', title: 'Confirmed', color: 'border-indigo-400 bg-indigo-50/60' },
     { id: 'Checked in', title: 'Checked in', color: 'border-emerald-400 bg-emerald-50/60' },
     { id: 'Checked out', title: 'Checked out', color: 'border-slate-300 bg-slate-50/60' },
     { id: 'Cancelled', title: 'Cancelled', color: 'border-rose-400 bg-rose-50/60' }
   ],
-  'Leisure & Wellness': [
+  'Leisure activities': [
     { id: 'Enquiry', title: 'Enquiry', color: 'border-blue-400 bg-blue-50/60' },
     { id: 'Confirmed', title: 'Confirmed', color: 'border-indigo-400 bg-indigo-50/60' },
     { id: 'Completed', title: 'Completed', color: 'border-emerald-400 bg-emerald-50/60' },
     { id: 'Cancelled', title: 'Cancelled', color: 'border-rose-400 bg-rose-50/60' }
   ],
-  'House Keeping': [
-    { id: 'Enquiry', title: 'Enquiry', color: 'border-blue-400 bg-blue-50/60' },
-    { id: 'Confirmed', title: 'Confirmed (STR Approved)', color: 'border-emerald-400 bg-emerald-50/60' },
-    { id: 'Scheduled', title: 'Scheduled', color: 'border-amber-400 bg-amber-50/60' },
-    { id: 'In Progress', title: 'In Progress', color: 'border-purple-400 bg-purple-50/60' },
-    { id: 'Completed', title: 'Completed', color: 'border-slate-300 bg-slate-50/60' },
-    { id: 'Cancelled', title: 'Cancelled', color: 'border-rose-400 bg-rose-50/60' }
-  ],
-  'Food Delivery': [
-    { id: 'Order placed', title: 'Order Placed', color: 'border-blue-400 bg-blue-50/60' },
-    { id: 'Accepted', title: 'Accepted', color: 'border-indigo-400 bg-indigo-50/60' },
-    { id: 'Preparing', title: 'Preparing', color: 'border-amber-400 bg-amber-50/60' },
-    { id: 'Ready for pickup', title: 'Ready for Pickup', color: 'border-cyan-400 bg-cyan-50/60' },
-    { id: 'Out for delivery', title: 'Out for Delivery', color: 'border-purple-400 bg-purple-50/60' },
-    { id: 'Delivered', title: 'Delivered', color: 'border-emerald-400 bg-emerald-50/60' },
-    { id: 'Cancelled', title: 'Cancelled', color: 'border-rose-400 bg-rose-50/60' }
-  ],
-  'Grocery': [
-    { id: 'Order placed', title: 'Order Placed', color: 'border-blue-400 bg-blue-50/60' },
-    { id: 'Packing the cart', title: 'Packing the Cart', color: 'border-amber-400 bg-amber-50/60' },
-    { id: 'Out for delivery', title: 'Out for Delivery', color: 'border-purple-400 bg-purple-50/60' },
-    { id: 'Delivered', title: 'Delivered', color: 'border-emerald-400 bg-emerald-50/60' },
-    { id: 'Cancelled', title: 'Cancelled', color: 'border-rose-400 bg-rose-50/60' }
-  ],
-  'Doctor on Call': [
-    { id: 'Enquiry', title: 'Enquiry', color: 'border-blue-400 bg-blue-50/60' },
-    { id: 'Arrived', title: 'Arrived at Unit', color: 'border-cyan-400 bg-cyan-50/60' },
-    { id: 'Consultation active', title: 'Consultation Active', color: 'border-purple-400 bg-purple-50/60' },
-    { id: 'Treatment & documentation', title: 'Treatment & Documentation', color: 'border-amber-400 bg-amber-50/60' },
-    { id: 'Completed', title: 'Completed', color: 'border-emerald-400 bg-emerald-50/60' },
-    { id: 'Follow-up', title: 'Follow-up Required', color: 'border-indigo-400 bg-indigo-50/60' },
-    { id: 'Cancelled', title: 'Cancelled', color: 'border-rose-400 bg-rose-50/60' }
-  ],
-  'Chef & Catering': [
+  'Dining': [
     { id: 'Enquiry', title: 'Enquiry', color: 'border-blue-400 bg-blue-50/60' },
     { id: 'Confirmed', title: 'Confirmed', color: 'border-indigo-400 bg-indigo-50/60' },
-    { id: 'Menu finalized', title: 'Menu Finalized', color: 'border-cyan-400 bg-cyan-50/60' },
-    { id: 'In Progress', title: 'In Progress', color: 'border-amber-400 bg-amber-50/60' },
     { id: 'Completed', title: 'Completed', color: 'border-emerald-400 bg-emerald-50/60' },
     { id: 'Cancelled', title: 'Cancelled', color: 'border-rose-400 bg-rose-50/60' }
   ],
-  'Car Rental & Transport': [
+  'Co-working': [
     { id: 'Enquiry', title: 'Enquiry', color: 'border-blue-400 bg-blue-50/60' },
     { id: 'Confirmed', title: 'Confirmed', color: 'border-indigo-400 bg-indigo-50/60' },
-    { id: 'In Progress', title: 'In Progress', color: 'border-amber-400 bg-amber-50/60' },
+    { id: 'Completed', title: 'Completed', color: 'border-emerald-400 bg-emerald-50/60' },
+    { id: 'Cancelled', title: 'Cancelled', color: 'border-rose-400 bg-rose-50/60' }
+  ],
+  'Wellness': [
+    { id: 'Enquiry', title: 'Enquiry', color: 'border-blue-400 bg-blue-50/60' },
+    { id: 'Confirmed', title: 'Confirmed', color: 'border-indigo-400 bg-indigo-50/60' },
     { id: 'Completed', title: 'Completed', color: 'border-emerald-400 bg-emerald-50/60' },
     { id: 'Cancelled', title: 'Cancelled', color: 'border-rose-400 bg-rose-50/60' }
   ],
@@ -143,6 +128,69 @@ const SERVICE_PIPELINES: Record<string, Array<{ id: string; title: string; color
     { id: 'Delivered', title: 'Delivered', color: 'border-emerald-400 bg-emerald-50/60' },
     { id: 'Exception raised', title: 'Exception Raised', color: 'border-rose-400 bg-rose-50/60' },
     { id: 'Claim under review', title: 'Claim Under Review', color: 'border-rose-600 bg-rose-100/60' }
+  ],
+  'Car rental': [
+    { id: 'Enquiry', title: 'Enquiry', color: 'border-blue-400 bg-blue-50/60' },
+    { id: 'Confirmed', title: 'Confirmed', color: 'border-indigo-400 bg-indigo-50/60' },
+    { id: 'In progress', title: 'In Progress', color: 'border-amber-400 bg-amber-50/60' },
+    { id: 'Completed', title: 'Completed', color: 'border-emerald-400 bg-emerald-50/60' },
+    { id: 'Cancelled', title: 'Cancelled', color: 'border-rose-400 bg-rose-50/60' }
+  ],
+  'Transportation': [
+    { id: 'Enquiry', title: 'Enquiry', color: 'border-blue-400 bg-blue-50/60' },
+    { id: 'Confirmed', title: 'Confirmed', color: 'border-indigo-400 bg-indigo-50/60' },
+    { id: 'In progress', title: 'In Progress', color: 'border-amber-400 bg-amber-50/60' },
+    { id: 'Completed', title: 'Completed', color: 'border-emerald-400 bg-emerald-50/60' },
+    { id: 'Cancelled', title: 'Cancelled', color: 'border-rose-400 bg-rose-50/60' }
+  ],
+  'Chef on call': [
+    { id: 'Enquiry', title: 'Enquiry', color: 'border-blue-400 bg-blue-50/60' },
+    { id: 'Confirmed', title: 'Confirmed', color: 'border-indigo-400 bg-indigo-50/60' },
+    { id: 'Menu finalized', title: 'Menu Finalized', color: 'border-cyan-400 bg-cyan-50/60' },
+    { id: 'In progress', title: 'In Progress', color: 'border-amber-400 bg-amber-50/60' },
+    { id: 'Completed', title: 'Completed', color: 'border-emerald-400 bg-emerald-50/60' },
+    { id: 'Cancelled', title: 'Cancelled', color: 'border-rose-400 bg-rose-50/60' }
+  ],
+  'In-house catering': [
+    { id: 'Enquiry', title: 'Enquiry', color: 'border-blue-400 bg-blue-50/60' },
+    { id: 'Confirmed', title: 'Confirmed', color: 'border-indigo-400 bg-indigo-50/60' },
+    { id: 'Menu finalized', title: 'Menu Finalized', color: 'border-cyan-400 bg-cyan-50/60' },
+    { id: 'In progress', title: 'In Progress', color: 'border-amber-400 bg-amber-50/60' },
+    { id: 'Completed', title: 'Completed', color: 'border-emerald-400 bg-emerald-50/60' },
+    { id: 'Cancelled', title: 'Cancelled', color: 'border-rose-400 bg-rose-50/60' }
+  ],
+  'Doctor on call': [
+    { id: 'Enquiry', title: 'Enquiry', color: 'border-blue-400 bg-blue-50/60' },
+    { id: 'Arrived', title: 'Arrived at Unit', color: 'border-cyan-400 bg-cyan-50/60' },
+    { id: 'Consultation active', title: 'Consultation Active', color: 'border-purple-400 bg-purple-50/60' },
+    { id: 'Treatment & documentation', title: 'Treatment & Documentation', color: 'border-amber-400 bg-amber-50/60' },
+    { id: 'Completed', title: 'Completed', color: 'border-emerald-400 bg-emerald-50/60' },
+    { id: 'Follow-up', title: 'Follow-up Required', color: 'border-indigo-400 bg-indigo-50/60' },
+    { id: 'Cancelled', title: 'Cancelled', color: 'border-rose-400 bg-rose-50/60' }
+  ],
+  'Grocery': [
+    { id: 'Order placed', title: 'Order Placed', color: 'border-blue-400 bg-blue-50/60' },
+    { id: 'Packing the cart', title: 'Packing the Cart', color: 'border-amber-400 bg-amber-50/60' },
+    { id: 'Out for delivery', title: 'Out for Delivery', color: 'border-purple-400 bg-purple-50/60' },
+    { id: 'Delivered', title: 'Delivered', color: 'border-emerald-400 bg-emerald-50/60' },
+    { id: 'Cancelled', title: 'Cancelled', color: 'border-rose-400 bg-rose-50/60' }
+  ],
+  'Food delivery': [
+    { id: 'Order placed', title: 'Order Placed', color: 'border-blue-400 bg-blue-50/60' },
+    { id: 'Accepted', title: 'Accepted', color: 'border-indigo-400 bg-indigo-50/60' },
+    { id: 'Preparing', title: 'Preparing', color: 'border-amber-400 bg-amber-50/60' },
+    { id: 'Ready for pickup', title: 'Ready for Pickup', color: 'border-cyan-400 bg-cyan-50/60' },
+    { id: 'Out for delivery', title: 'Out for Delivery', color: 'border-purple-400 bg-purple-50/60' },
+    { id: 'Delivered', title: 'Delivered', color: 'border-emerald-400 bg-emerald-50/60' },
+    { id: 'Cancelled', title: 'Cancelled', color: 'border-rose-400 bg-rose-50/60' }
+  ],
+  'House keeping': [
+    { id: 'Enquiry', title: 'Enquiry', color: 'border-blue-400 bg-blue-50/60' },
+    { id: 'Confirmed', title: 'Confirmed (STR Approved)', color: 'border-emerald-400 bg-emerald-50/60' },
+    { id: 'Scheduled', title: 'Scheduled', color: 'border-amber-400 bg-amber-50/60' },
+    { id: 'In progress', title: 'In Progress', color: 'border-purple-400 bg-purple-50/60' },
+    { id: 'Completed', title: 'Completed', color: 'border-slate-300 bg-slate-50/60' },
+    { id: 'Cancelled', title: 'Cancelled', color: 'border-rose-400 bg-rose-50/60' }
   ]
 };
 
@@ -174,45 +222,69 @@ const initialVendorBookings: VendorServiceBooking[] = [
   {
     id: "VS-8807",
     vendorName: "Sparkle Cleaners",
-    category: "House Keeping",
+    category: "House keeping",
     serviceTitle: "Full Apartment Turnover Cleaning",
     guestName: "Michael Chen",
     unitAddress: "Marina Penthouse 12B",
     dateScheduled: "2024-05-22 11:00",
     status: "Enquiry",
-    strConfirmed: false, // STR confirmation required
+    strConfirmed: false,
     costNumeric: 350,
     costDisplay: "AED 350.00"
   },
   {
     id: "VS-8801",
     vendorName: "Apex Luxury Fleet",
-    category: "Car Rental & Transport",
-    serviceTitle: "Airport Transfer - Chauffeur Service",
+    category: "Car rental",
+    serviceTitle: "Luxury SUV Rental (Range Rover)",
     guestName: "Alexander Wright",
-    unitAddress: "Terminal 3 -> Suite 402",
+    unitAddress: "Downtown Suite 402",
     dateScheduled: "2024-05-20 14:00",
-    status: "In Progress",
-    costNumeric: 450,
-    costDisplay: "AED 450.00"
+    status: "In progress",
+    costNumeric: 1200,
+    costDisplay: "AED 1,200.00"
+  },
+  {
+    id: "VS-8810",
+    vendorName: "Swift Airport Transfers",
+    category: "Transportation",
+    serviceTitle: "Executive Chauffeur Terminal 3 Transfer",
+    guestName: "Emma Watson",
+    unitAddress: "Terminal 3 -> Suite 402",
+    dateScheduled: "2024-05-21 09:00",
+    status: "Confirmed",
+    costNumeric: 350,
+    costDisplay: "AED 350.00"
   },
   {
     id: "VS-8802",
-    vendorName: "Feast & Fete Catering",
-    category: "Chef & Catering",
-    serviceTitle: "3-Course Private Chef Dinner",
+    vendorName: "Gourmet Chef Collective",
+    category: "Chef on call",
+    serviceTitle: "Personal Chef 3-Course Dinner",
     guestName: "Robert Taylor",
     unitAddress: "Palm Jumeirah Villa 05",
     dateScheduled: "2024-05-23 19:30",
     status: "Menu finalized",
-    costNumeric: 2400,
-    costDisplay: "AED 2,400.00"
+    costNumeric: 1800,
+    costDisplay: "AED 1,800.00"
+  },
+  {
+    id: "VS-8811",
+    vendorName: "Feast & Fete Catering",
+    category: "In-house catering",
+    serviceTitle: "Executive Board Buffet Catering (15 Pax)",
+    guestName: "David Miller",
+    unitAddress: "Downtown Penthouse 12B",
+    dateScheduled: "2024-05-24 12:00",
+    status: "Confirmed",
+    costNumeric: 3200,
+    costDisplay: "AED 3,200.00"
   },
   {
     id: "VS-8803",
     vendorName: "Zen Spa & Wellness",
-    category: "Leisure & Wellness",
-    serviceTitle: "In-Suite Massage & Aromatherapy",
+    category: "Wellness",
+    serviceTitle: "In-Suite Swedish Massage & Aromatherapy",
     guestName: "Sophia Martinez",
     unitAddress: "Marina Bay Penthouse 12B",
     dateScheduled: "2024-05-24 16:00",
@@ -222,9 +294,9 @@ const initialVendorBookings: VendorServiceBooking[] = [
   },
   {
     id: "VS-8805",
-    vendorName: "FreshCart Grocery Delivery",
+    vendorName: "FreshMart Express",
     category: "Grocery",
-    serviceTitle: "Organic Breakfast Basket Supply",
+    serviceTitle: "Organic Grocery Basket Supply",
     guestName: "Sarah Jenkins",
     unitAddress: "Marina Bay Penthouse 12B",
     dateScheduled: "2024-05-22 08:30",
@@ -234,22 +306,99 @@ const initialVendorBookings: VendorServiceBooking[] = [
   },
   {
     id: "VS-8808",
-    vendorName: "MedCall Pro",
-    category: "Doctor on Call",
-    serviceTitle: "In-Room General Consultation",
+    vendorName: "MedCall Pro Services",
+    category: "Doctor on call",
+    serviceTitle: "In-Room Doctor Consultation",
     guestName: "David Miller",
     unitAddress: "Skyline Suite 101",
     dateScheduled: "2024-05-20 18:00",
     status: "Arrived",
     costNumeric: 500,
     costDisplay: "AED 500.00"
+  },
+  {
+    id: "VS-8812",
+    vendorName: "Bistro Express",
+    category: "Food delivery",
+    serviceTitle: "Gourmet Italian Dinner Delivery",
+    guestName: "John Doe",
+    unitAddress: "Skyline Suite 101",
+    dateScheduled: "2024-05-21 20:00",
+    status: "Preparing",
+    costNumeric: 240,
+    costDisplay: "AED 240.00"
+  },
+  {
+    id: "VS-8813",
+    vendorName: "WeWork Global Pass",
+    category: "Co-working",
+    serviceTitle: "Dedicated Desk Day Pass",
+    guestName: "Mike Ross",
+    unitAddress: "DIFC Business Tower",
+    dateScheduled: "2024-05-22 09:00",
+    status: "Confirmed",
+    costNumeric: 150,
+    costDisplay: "AED 150.00"
+  },
+  {
+    id: "VS-8814",
+    vendorName: "Desert Safari Adventures",
+    category: "Leisure activities",
+    serviceTitle: "VIP Desert Safari & Quad Biking",
+    guestName: "Tony Stark",
+    unitAddress: "Burj Khalifa Suite",
+    dateScheduled: "2024-05-23 15:00",
+    status: "Confirmed",
+    costNumeric: 1200,
+    costDisplay: "AED 1,200.00"
+  },
+  {
+    id: "VS-8815",
+    vendorName: "Zuma Fine Dining",
+    category: "Dining",
+    serviceTitle: "VIP Tasting Menu Table Reservation",
+    guestName: "Bruce Wayne",
+    unitAddress: "DIFC Gate Village",
+    dateScheduled: "2024-05-22 21:00",
+    status: "Confirmed",
+    costNumeric: 950,
+    costDisplay: "AED 950.00"
+  },
+  {
+    id: "VS-8816",
+    vendorName: "Skyline Property Management",
+    category: "Short term rental",
+    serviceTitle: "Luxury 2BR Suite Stay",
+    guestName: "Alexander Wright",
+    unitAddress: "Skyline Suite 402",
+    dateScheduled: "2024-05-20",
+    status: "Checked in",
+    costNumeric: 4250,
+    costDisplay: "AED 4,250.00"
   }
+];
+
+const CATEGORY_TABS: Array<{ id: ServiceCategory; label: string; icon: React.ElementType }> = [
+  { id: 'Laundry', label: 'Laundry', icon: Shirt },
+  { id: 'House keeping', label: 'House Keeping', icon: Home },
+  { id: 'Car rental', label: 'Car Rental', icon: Car },
+  { id: 'Transportation', label: 'Transportation', icon: CarTaxiFront },
+  { id: 'Chef on call', label: 'Chef on Call', icon: ChefHat },
+  { id: 'In-house catering', label: 'Catering', icon: Utensils },
+  { id: 'Doctor on call', label: 'Doctor on Call', icon: Stethoscope },
+  { id: 'Grocery', label: 'Grocery', icon: ShoppingBasket },
+  { id: 'Food delivery', label: 'Food Delivery', icon: ShoppingBag },
+  { id: 'Co-working', label: 'Co-working', icon: Laptop },
+  { id: 'Wellness', label: 'Wellness', icon: HeartPulse },
+  { id: 'Dining', label: 'Dining', icon: UtensilsCrossed },
+  { id: 'Leisure activities', label: 'Leisure', icon: Compass },
+  { id: 'Short term rental', label: 'Short Term Rental', icon: Building }
 ];
 
 const VendorServices = () => {
   const [bookings, setBookings] = useState<VendorServiceBooking[]>(initialVendorBookings);
   const [viewMode, setViewMode] = useState<'table' | 'kanban'>('kanban');
-  const [selectedCategory, setSelectedCategory] = useState<string>('Laundry');
+  const [selectedCategory, setSelectedCategory] = useState<ServiceCategory>('Laundry');
   const [searchTerm, setSearchTerm] = useState('');
 
   // Guest Chat & Invoice Modal State
@@ -267,7 +416,7 @@ const VendorServices = () => {
   const activePipeline = SERVICE_PIPELINES[selectedCategory] || SERVICE_PIPELINES['Laundry'];
 
   const filteredBookings = bookings.filter(booking => {
-    const matchesCategory = selectedCategory === 'All' || booking.category === selectedCategory;
+    const matchesCategory = booking.category === selectedCategory;
     const matchesSearch = 
       booking.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
       booking.guestName.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -391,8 +540,7 @@ const VendorServices = () => {
   };
 
   const handleAdvanceStatus = (booking: VendorServiceBooking, nextStatus: string) => {
-    // Check HK special rule
-    if (booking.category === 'House Keeping' && nextStatus === 'Confirmed' && !booking.strConfirmed) {
+    if (booking.category === 'House keeping' && nextStatus === 'Confirmed' && !booking.strConfirmed) {
       showError("Housekeeping booking must be confirmed by the Short Term Rental company admin first.");
       return;
     }
@@ -414,20 +562,20 @@ const VendorServices = () => {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{bookings.length}</div>
-            <p className="text-xs text-muted-foreground mt-1">Dispatched across categories</p>
+            <p className="text-xs text-muted-foreground mt-1">Across 14 categories</p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-xs font-medium">Laundry Orders</CardTitle>
-            <Shirt className="h-4 w-4 text-indigo-500" />
+            <CardTitle className="text-xs font-medium">Active Category</CardTitle>
+            <Badge variant="outline" className="text-[10px] font-mono">{selectedCategory}</Badge>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-indigo-700">
-              {bookings.filter(b => b.category === 'Laundry').length}
+            <div className="text-2xl font-bold text-primary">
+              {filteredBookings.length}
             </div>
-            <p className="text-xs text-muted-foreground mt-1">10-Stage Service Pipeline</p>
+            <p className="text-xs text-muted-foreground mt-1">Orders in category</p>
           </CardContent>
         </Card>
 
@@ -438,15 +586,15 @@ const VendorServices = () => {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-amber-600">
-              {bookings.filter(b => b.category === 'House Keeping' && !b.strConfirmed).length}
+              {bookings.filter(b => b.category === 'House keeping' && !b.strConfirmed).length}
             </div>
-            <p className="text-xs text-muted-foreground mt-1">Housekeeping STR Admin Approval</p>
+            <p className="text-xs text-muted-foreground mt-1">Housekeeping STR Approval</p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-xs font-medium">Total Vendor Volume</CardTitle>
+            <CardTitle className="text-xs font-medium">Total Service Volume</CardTitle>
             <DollarSign className="h-4 w-4 text-primary" />
           </CardHeader>
           <CardContent>
@@ -463,9 +611,9 @@ const VendorServices = () => {
         <CardHeader className="pb-3">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div>
-              <CardTitle className="text-lg">Vendor Service Dispatch & Kanban Workflows</CardTitle>
+              <CardTitle className="text-lg">Vendor Services Dispatch & Kanban Pipelines</CardTitle>
               <CardDescription>
-                Category-specific status mappings for Laundry, Housekeeping, Doctor on Call, Catering, Transportation & Grocery.
+                Full support for all 14 service categories with individual status workflows and STR confirmation controls.
               </CardDescription>
             </div>
 
@@ -492,46 +640,40 @@ const VendorServices = () => {
             </div>
           </div>
 
-          {/* Category Selector Tabs */}
+          {/* 14 Category Scrollable Tabs Bar */}
           <div className="pt-4 border-t mt-4 flex flex-col xl:flex-row items-start xl:items-center justify-between gap-3">
-            <Tabs value={selectedCategory} onValueChange={setSelectedCategory} className="w-full xl:w-auto overflow-x-auto pb-1">
-              <TabsList className="bg-muted/80 h-9 p-1 flex-nowrap w-max">
-                <TabsTrigger value="Laundry" className="text-xs gap-1.5 px-3">
-                  <Shirt className="w-3.5 h-3.5 text-indigo-600" />
-                  Laundry ({bookings.filter(b => b.category === 'Laundry').length})
-                </TabsTrigger>
-                <TabsTrigger value="House Keeping" className="text-xs gap-1.5 px-3">
-                  <Home className="w-3.5 h-3.5 text-blue-600" />
-                  House Keeping
-                </TabsTrigger>
-                <TabsTrigger value="Car Rental & Transport" className="text-xs gap-1.5 px-3">
-                  <Car className="w-3.5 h-3.5 text-cyan-600" />
-                  Car Rental & Transport
-                </TabsTrigger>
-                <TabsTrigger value="Chef & Catering" className="text-xs gap-1.5 px-3">
-                  <Utensils className="w-3.5 h-3.5 text-amber-600" />
-                  Chef & Catering
-                </TabsTrigger>
-                <TabsTrigger value="Doctor on Call" className="text-xs gap-1.5 px-3">
-                  <Stethoscope className="w-3.5 h-3.5 text-rose-600" />
-                  Doctor on Call
-                </TabsTrigger>
-                <TabsTrigger value="Grocery" className="text-xs gap-1.5 px-3">
-                  <ShoppingBag className="w-3.5 h-3.5 text-emerald-600" />
-                  Grocery
-                </TabsTrigger>
-                <TabsTrigger value="Leisure & Wellness" className="text-xs gap-1.5 px-3">
-                  <Sparkles className="w-3.5 h-3.5 text-purple-600" />
-                  Leisure & Wellness
-                </TabsTrigger>
-                <TabsTrigger value="Short Term Rental" className="text-xs gap-1.5 px-3">
-                  STR
-                </TabsTrigger>
-              </TabsList>
-            </Tabs>
+            <div className="w-full xl:w-auto overflow-x-auto pb-1">
+              <div className="flex gap-1.5 bg-muted/80 p-1.5 rounded-lg border min-w-max">
+                {CATEGORY_TABS.map(tab => {
+                  const Icon = tab.icon;
+                  const count = bookings.filter(b => b.category === tab.id).length;
+                  const isActive = selectedCategory === tab.id;
+
+                  return (
+                    <button
+                      key={tab.id}
+                      onClick={() => setSelectedCategory(tab.id)}
+                      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-all ${
+                        isActive 
+                          ? 'bg-background text-foreground shadow-xs border font-bold' 
+                          : 'text-muted-foreground hover:bg-background/50 hover:text-foreground'
+                      }`}
+                    >
+                      <Icon className={`w-3.5 h-3.5 ${isActive ? 'text-primary' : 'opacity-70'}`} />
+                      <span>{tab.label}</span>
+                      {count > 0 && (
+                        <span className="ml-1 text-[10px] px-1.5 py-0.2 rounded-full bg-primary/10 text-primary font-mono font-bold">
+                          {count}
+                        </span>
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
 
             {/* Search Input */}
-            <div className="relative w-full xl:w-64">
+            <div className="relative w-full xl:w-64 shrink-0">
               <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input
                 placeholder="Search order ID, guest, vendor..."
@@ -545,7 +687,7 @@ const VendorServices = () => {
 
         <CardContent className="pt-2">
           {viewMode === 'kanban' ? (
-            /* KANBAN BOARD VIEW (Horizontal scroll container with fixed non-overlapping columns) */
+            /* KANBAN BOARD VIEW (Horizontal scroll with fixed-width column cards) */
             <div className="w-full overflow-x-auto pb-4">
               <div className="flex gap-4 min-w-max">
                 {activePipeline.map(col => {
@@ -579,7 +721,7 @@ const VendorServices = () => {
                             >
                               <div className="flex justify-between items-start gap-1">
                                 <span className="font-mono font-bold text-xs">{b.id}</span>
-                                <Badge variant="outline" className="text-[9px] px-1.5 py-0 bg-primary/5 text-primary border-primary/20">
+                                <Badge variant="outline" className="text-[9px] px-1.5 py-0 bg-primary/5 text-primary border-primary/20 capitalize">
                                   {b.category}
                                 </Badge>
                               </div>
@@ -607,7 +749,7 @@ const VendorServices = () => {
                               </div>
 
                               {/* Housekeeping Special Rule Indicator */}
-                              {b.category === 'House Keeping' && !b.strConfirmed && (
+                              {b.category === 'House keeping' && !b.strConfirmed && (
                                 <div className="p-2 bg-amber-50 rounded border border-amber-200 text-[10px] space-y-1.5">
                                   <p className="font-semibold text-amber-900 flex items-center gap-1">
                                     <ShieldCheck className="w-3 h-3 text-amber-600" />
@@ -690,7 +832,7 @@ const VendorServices = () => {
                   <TableRow>
                     <TableHead>Booking ID</TableHead>
                     <TableHead>Vendor</TableHead>
-                    <TableHead>Service Category</TableHead>
+                    <TableHead>Category</TableHead>
                     <TableHead>Service Title</TableHead>
                     <TableHead>Guest & Unit</TableHead>
                     <TableHead>Scheduled Date</TableHead>
@@ -703,7 +845,7 @@ const VendorServices = () => {
                   {filteredBookings.length === 0 ? (
                     <TableRow>
                       <TableCell colSpan={9} className="text-center py-8 text-muted-foreground text-xs">
-                        No service bookings match your search.
+                        No service bookings match your category or search filter.
                       </TableCell>
                     </TableRow>
                   ) : (
@@ -716,7 +858,7 @@ const VendorServices = () => {
                         <TableCell className="font-bold text-xs font-mono">{booking.id}</TableCell>
                         <TableCell className="font-semibold text-xs">{booking.vendorName}</TableCell>
                         <TableCell>
-                          <Badge variant="outline" className="text-[10px] bg-primary/5 text-primary border-primary/20">
+                          <Badge variant="outline" className="text-[10px] bg-primary/5 text-primary border-primary/20 capitalize">
                             {booking.category}
                           </Badge>
                         </TableCell>
@@ -735,7 +877,7 @@ const VendorServices = () => {
                             <Badge variant="secondary" className="text-[10px] font-semibold">
                               {booking.status}
                             </Badge>
-                            {booking.category === 'House Keeping' && !booking.strConfirmed && (
+                            {booking.category === 'House keeping' && !booking.strConfirmed && (
                               <span className="block text-[9px] text-amber-600 font-bold">Awaiting STR Admin Approval</span>
                             )}
                           </div>
@@ -743,7 +885,7 @@ const VendorServices = () => {
                         <TableCell className="font-bold text-xs">{booking.costDisplay}</TableCell>
                         <TableCell className="text-right" onClick={(e) => e.stopPropagation()}>
                           <div className="flex justify-end gap-1.5">
-                            {booking.category === 'House Keeping' && !booking.strConfirmed && (
+                            {booking.category === 'House keeping' && !booking.strConfirmed && (
                               <Button 
                                 size="sm" 
                                 className="h-8 text-xs bg-emerald-600 hover:bg-emerald-700 text-white"
