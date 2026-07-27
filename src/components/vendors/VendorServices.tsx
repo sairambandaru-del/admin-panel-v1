@@ -643,7 +643,7 @@ const VendorServices = () => {
                                     className="w-full text-[10px] h-6 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold"
                                     onClick={(e) => handleConfirmSTRHousekeeping(b.id, e)}
                                   >
-                                    Approve as STR Admin
+                                    Approve
                                   </Button>
                                 </div>
                               )}
