@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
   Dialog, 
   DialogContent, 
@@ -25,14 +26,17 @@ import {
   DollarSign, 
   MessageSquare, 
   AlertTriangle,
-  ArrowRight,
   ShieldAlert,
   Kanban,
   List,
-  Receipt,
   User,
   MapPin,
-  Calendar
+  Calendar,
+  Shirt,
+  Car,
+  Utensils,
+  Sparkles,
+  ChevronRight
 } from 'lucide-react';
 import { showSuccess, showError } from '@/utils/toast';
 import GuestCommunicationModal, { BookingCommsData, ServiceException } from '@/components/common/GuestCommunicationModal';
@@ -40,16 +44,46 @@ import GuestCommunicationModal, { BookingCommsData, ServiceException } from '@/c
 interface VendorServiceBooking {
   id: string;
   vendorName: string;
-  category: string;
+  category: 'Laundry' | 'Car Rentals' | 'In House Catering' | 'Wellness' | 'Grocery' | 'House Keeping';
   serviceTitle: string;
   guestName: string;
   unitAddress: string;
   dateScheduled: string;
-  status: 'Scheduled' | 'In Progress' | 'Completed' | 'Cancelled' | 'Exception Raised' | 'Price Updated';
+  status: string; // Dynamic status based on category
   costNumeric: number;
   costDisplay: string;
   pendingException?: ServiceException | null;
 }
+
+// Service Category Specific Status Pipelines
+const SERVICE_PIPELINES: Record<string, Array<{ id: string; title: string; color: string }>> = {
+  'Laundry': [
+    { id: 'Pickup Scheduled', title: 'Pickup Scheduled', color: 'border-blue-400 bg-blue-50/60' },
+    { id: 'In Wash / Dry Clean', title: 'In Wash / Dry Clean', color: 'border-amber-400 bg-amber-50/60' },
+    { id: 'Exception Raised', title: 'Exception Raised', color: 'border-rose-400 bg-rose-50/60' },
+    { id: 'Out for Delivery', title: 'Out for Delivery', color: 'border-purple-400 bg-purple-50/60' },
+    { id: 'Delivered', title: 'Delivered & Complete', color: 'border-emerald-400 bg-emerald-50/60' }
+  ],
+  'Car Rentals': [
+    { id: 'Reserved', title: 'Reserved', color: 'border-blue-400 bg-blue-50/60' },
+    { id: 'Vehicle Prepped', title: 'Vehicle Prepped', color: 'border-indigo-400 bg-indigo-50/60' },
+    { id: 'Chauffeur En Route', title: 'Chauffeur En Route', color: 'border-amber-400 bg-amber-50/60' },
+    { id: 'Trip Completed', title: 'Trip Completed', color: 'border-emerald-400 bg-emerald-50/60' }
+  ],
+  'In House Catering': [
+    { id: 'Booking Confirmed', title: 'Booking Confirmed', color: 'border-blue-400 bg-blue-50/60' },
+    { id: 'Ingredients Prepped', title: 'Ingredients Prepped', color: 'border-amber-400 bg-amber-50/60' },
+    { id: 'Chef On-Site', title: 'Chef On-Site', color: 'border-purple-400 bg-purple-50/60' },
+    { id: 'Service Completed', title: 'Service Completed', color: 'border-emerald-400 bg-emerald-50/60' }
+  ],
+  'General': [
+    { id: 'Scheduled', title: 'Scheduled', color: 'border-blue-400 bg-blue-50/60' },
+    { id: 'In Progress', title: 'In Progress', color: 'border-amber-400 bg-amber-50/60' },
+    { id: 'Exception Raised', title: 'Exception Raised', color: 'border-rose-400 bg-rose-50/60' },
+    { id: 'Price Approved', title: 'Price Approved', color: 'border-indigo-400 bg-indigo-50/60' },
+    { id: 'Completed', title: 'Completed', color: 'border-emerald-400 bg-emerald-50/60' }
+  ]
+};
 
 const initialVendorBookings: VendorServiceBooking[] = [
   {
@@ -60,9 +94,21 @@ const initialVendorBookings: VendorServiceBooking[] = [
     guestName: "Elena Rostova",
     unitAddress: "Downtown Suite 402",
     dateScheduled: "2024-05-21 10:00",
-    status: "In Progress",
+    status: "In Wash / Dry Clean",
     costNumeric: 220,
     costDisplay: "AED 220.00"
+  },
+  {
+    id: "VS-8806",
+    vendorName: "Spin Cycle Dry Cleaners",
+    category: "Laundry",
+    serviceTitle: "Suits & Evening Gown Pressing",
+    guestName: "Alexander Wright",
+    unitAddress: "Downtown Suite 402",
+    dateScheduled: "2024-05-21 14:00",
+    status: "Pickup Scheduled",
+    costNumeric: 180,
+    costDisplay: "AED 180.00"
   },
   {
     id: "VS-8801",
@@ -70,9 +116,9 @@ const initialVendorBookings: VendorServiceBooking[] = [
     category: "Car Rentals",
     serviceTitle: "Airport Transfer - Chauffeur Service",
     guestName: "Alexander Wright",
-    unitAddress: "Terminal 3 -> Downtown Suite 402",
+    unitAddress: "Terminal 3 -> Suite 402",
     dateScheduled: "2024-05-20 14:00",
-    status: "In Progress",
+    status: "Chauffeur En Route",
     costNumeric: 450,
     costDisplay: "AED 450.00"
   },
@@ -84,7 +130,7 @@ const initialVendorBookings: VendorServiceBooking[] = [
     guestName: "Robert Taylor",
     unitAddress: "Palm Jumeirah Villa 05",
     dateScheduled: "2024-05-23 19:30",
-    status: "Scheduled",
+    status: "Ingredients Prepped",
     costNumeric: 2400,
     costDisplay: "AED 2,400.00"
   },
@@ -114,19 +160,11 @@ const initialVendorBookings: VendorServiceBooking[] = [
   }
 ];
 
-const KANBAN_STATUSES: Array<{ id: VendorServiceBooking['status']; title: string; color: string }> = [
-  { id: 'Scheduled', title: 'Scheduled', color: 'border-blue-400 bg-blue-50/50' },
-  { id: 'In Progress', title: 'In Progress', color: 'border-amber-400 bg-amber-50/50' },
-  { id: 'Exception Raised', title: 'Exception Raised', color: 'border-rose-400 bg-rose-50/50' },
-  { id: 'Price Updated', title: 'Price Updated', color: 'border-emerald-400 bg-emerald-50/50' },
-  { id: 'Completed', title: 'Completed', color: 'border-slate-300 bg-slate-50/50' },
-];
-
 const VendorServices = () => {
   const [bookings, setBookings] = useState<VendorServiceBooking[]>(initialVendorBookings);
   const [viewMode, setViewMode] = useState<'table' | 'kanban'>('kanban');
+  const [selectedCategory, setSelectedCategory] = useState<string>('Laundry'); // Default category focus
   const [searchTerm, setSearchTerm] = useState('');
-  const [categoryFilter, setCategoryFilter] = useState('all');
   const [statusFilter, setStatusFilter] = useState('all');
 
   // Guest Chat & Invoice Modal State
@@ -140,17 +178,20 @@ const VendorServices = () => {
   const [exceptionDetails, setExceptionDetails] = useState('');
   const [proposedPrice, setProposedPrice] = useState<string>('');
 
+  // Active Pipeline Columns based on selected category tab
+  const activePipeline = SERVICE_PIPELINES[selectedCategory] || SERVICE_PIPELINES['General'];
+
   const filteredBookings = bookings.filter(booking => {
+    const matchesCategory = selectedCategory === 'All' || booking.category === selectedCategory;
     const matchesSearch = 
       booking.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
       booking.guestName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       booking.vendorName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       booking.serviceTitle.toLowerCase().includes(searchTerm.toLowerCase());
 
-    const matchesCategory = categoryFilter === 'all' || booking.category === categoryFilter;
     const matchesStatus = statusFilter === 'all' || booking.status === statusFilter;
 
-    return matchesSearch && matchesCategory && matchesStatus;
+    return matchesCategory && matchesSearch && matchesStatus;
   });
 
   const handleOpenComms = (booking: VendorServiceBooking) => {
@@ -170,7 +211,7 @@ const VendorServices = () => {
               ...b,
               costNumeric: newCost,
               costDisplay: `AED ${newCost.toFixed(2)}`,
-              status: 'Price Updated',
+              status: b.category === 'Laundry' ? 'In Wash / Dry Clean' : 'Price Approved',
               pendingException: b.pendingException ? {
                 ...b.pendingException,
                 status: 'Approved'
@@ -204,7 +245,7 @@ const VendorServices = () => {
     setProposedPrice((booking.costNumeric + 90).toString());
     setExceptionDetails(
       booking.category === 'Laundry' 
-        ? "Bag contained 3 additional delicate silk items requiring specialized dry cleaning."
+        ? "Laundry bag contained 3 additional delicate silk blouses requiring specialized dry clean treatment."
         : "Additional service scope requested upon inspection."
     );
     setIsExceptionDialogOpen(true);
@@ -242,7 +283,7 @@ const VendorServices = () => {
     }));
 
     setIsExceptionDialogOpen(false);
-    showSuccess(`Exception raised for ${exceptionBooking.id}. Notification sent to guest in mobile app!`);
+    showSuccess(`Exception raised for ${exceptionBooking.id}. Notification sent to guest on mobile app!`);
 
     handleOpenComms({
       ...exceptionBooking,
@@ -251,16 +292,16 @@ const VendorServices = () => {
     });
   };
 
-  const handleUpdateStatus = (bookingId: string, newStatus: VendorServiceBooking['status']) => {
+  const handleAdvanceStatus = (booking: VendorServiceBooking, nextStatus: string) => {
     setBookings(prev => prev.map(b => 
-      b.id === bookingId ? { ...b, status: newStatus } : b
+      b.id === booking.id ? { ...b, status: nextStatus } : b
     ));
-    showSuccess(`Order ${bookingId} status updated to ${newStatus}.`);
+    showSuccess(`Order ${booking.id} advanced to "${nextStatus}".`);
   };
 
   return (
     <div className="space-y-6">
-      {/* Header Stat Cards */}
+      {/* Stat Bar */}
       <div className="grid gap-4 md:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -269,58 +310,58 @@ const VendorServices = () => {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{bookings.length}</div>
-            <p className="text-xs text-muted-foreground mt-1">Scheduled & In Progress</p>
+            <p className="text-xs text-muted-foreground mt-1">Dispatched across vendors</p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-xs font-medium">Exceptions Pending Guest</CardTitle>
+            <CardTitle className="text-xs font-medium">Pending Exceptions</CardTitle>
             <AlertTriangle className="h-4 w-4 text-amber-500" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-amber-600">
-              {bookings.filter(b => b.pendingException?.status === 'Pending Guest Approval').length}
+              {bookings.filter(b => b.status === 'Exception Raised').length}
             </div>
-            <p className="text-xs text-muted-foreground mt-1">Awaiting price revision approval</p>
+            <p className="text-xs text-muted-foreground mt-1">Awaiting guest price approval</p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-xs font-medium">Fulfilled Today</CardTitle>
-            <CheckCircle2 className="h-4 w-4 text-green-500" />
+            <CardTitle className="text-xs font-medium">Laundry Orders</CardTitle>
+            <Shirt className="h-4 w-4 text-indigo-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
-              {bookings.filter(b => b.status === 'Completed').length}
+            <div className="text-2xl font-bold text-indigo-700">
+              {bookings.filter(b => b.category === 'Laundry').length}
             </div>
-            <p className="text-xs text-muted-foreground mt-1">Successfully completed</p>
+            <p className="text-xs text-muted-foreground mt-1">Dry clean & wash orders</p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-xs font-medium">Total Vendor Volume</CardTitle>
+            <CardTitle className="text-xs font-medium">Total Volume</CardTitle>
             <DollarSign className="h-4 w-4 text-primary" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
               AED {bookings.reduce((sum, b) => sum + b.costNumeric, 0).toFixed(2)}
             </div>
-            <p className="text-xs text-muted-foreground mt-1">Live service volume</p>
+            <p className="text-xs text-muted-foreground mt-1">Active vendor volume</p>
           </CardContent>
         </Card>
       </div>
 
-      {/* Main Vendor Bookings Header & Switcher */}
+      {/* Main Vendor Dispatch Board */}
       <Card>
         <CardHeader className="pb-3">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div>
-              <CardTitle className="text-lg">Vendor Service Dispatch & Kanban</CardTitle>
+              <CardTitle className="text-lg">Vendor Service Dispatch & Workflows</CardTitle>
               <CardDescription>
-                Manage service execution in Table or Kanban view. Raise exceptions with price revisions and inspect guest invoices.
+                Category-specific Kanban status pipelines (Laundry, Car Rentals, Catering, etc.) with Exception & Price Revision management.
               </CardDescription>
             </div>
 
@@ -347,165 +388,162 @@ const VendorServices = () => {
             </div>
           </div>
 
-          {/* Filters Bar */}
-          <div className="flex flex-wrap items-center gap-3 pt-4">
-            <div className="relative flex-1 min-w-[200px]">
+          {/* Category Selector Tabs */}
+          <div className="pt-4 border-t mt-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+            <Tabs value={selectedCategory} onValueChange={setSelectedCategory} className="w-full sm:w-auto">
+              <TabsList className="bg-muted/80 h-9 p-1">
+                <TabsTrigger value="Laundry" className="text-xs gap-1.5 px-3">
+                  <Shirt className="w-3.5 h-3.5 text-indigo-600" />
+                  Laundry ({bookings.filter(b => b.category === 'Laundry').length})
+                </TabsTrigger>
+                <TabsTrigger value="Car Rentals" className="text-xs gap-1.5 px-3">
+                  <Car className="w-3.5 h-3.5 text-blue-600" />
+                  Car Rentals
+                </TabsTrigger>
+                <TabsTrigger value="In House Catering" className="text-xs gap-1.5 px-3">
+                  <Utensils className="w-3.5 h-3.5 text-amber-600" />
+                  Catering
+                </TabsTrigger>
+                <TabsTrigger value="All" className="text-xs px-3">
+                  All Services
+                </TabsTrigger>
+              </TabsList>
+            </Tabs>
+
+            {/* Search Input */}
+            <div className="relative w-full sm:w-64">
               <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input
-                placeholder="Search vendor, service, guest..."
+                placeholder="Search vendor, guest, order ID..."
                 value={searchTerm}
                 onChange={e => setSearchTerm(e.target.value)}
                 className="pl-8 h-9 text-xs"
               />
             </div>
-
-            <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-              <SelectTrigger className="w-[180px] h-9 text-xs">
-                <SelectValue placeholder="Category" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Categories</SelectItem>
-                <SelectItem value="Laundry">Laundry Services</SelectItem>
-                <SelectItem value="Car Rentals">Car Rentals</SelectItem>
-                <SelectItem value="In House Catering">In House Catering</SelectItem>
-                <SelectItem value="Wellness">Wellness</SelectItem>
-                <SelectItem value="Grocery">Grocery</SelectItem>
-              </SelectContent>
-            </Select>
-
-            <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger className="w-[160px] h-9 text-xs">
-                <SelectValue placeholder="Status" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Statuses</SelectItem>
-                <SelectItem value="Scheduled">Scheduled</SelectItem>
-                <SelectItem value="In Progress">In Progress</SelectItem>
-                <SelectItem value="Exception Raised">Exception Raised</SelectItem>
-                <SelectItem value="Price Updated">Price Updated</SelectItem>
-                <SelectItem value="Completed">Completed</SelectItem>
-              </SelectContent>
-            </Select>
           </div>
         </CardHeader>
 
         <CardContent className="pt-2">
           {viewMode === 'kanban' ? (
-            /* KANBAN BOARD VIEW */
-            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4 overflow-x-auto pb-4">
-              {KANBAN_STATUSES.map(col => {
-                const columnBookings = filteredBookings.filter(b => b.status === col.id);
+            /* KANBAN BOARD VIEW (Scrollable row with non-overlapping fixed-width columns) */
+            <div className="w-full overflow-x-auto pb-4">
+              <div className="flex gap-4 min-w-max">
+                {activePipeline.map(col => {
+                  const columnBookings = filteredBookings.filter(b => b.status === col.id);
 
-                return (
-                  <div key={col.id} className="flex flex-col rounded-xl border bg-muted/20 min-w-[240px]">
-                    <div className={`p-3 border-b rounded-t-xl flex justify-between items-center ${col.color}`}>
-                      <h4 className="font-bold text-xs tracking-tight">{col.title}</h4>
-                      <Badge variant="outline" className="text-[10px] bg-background font-mono">
-                        {columnBookings.length}
-                      </Badge>
-                    </div>
+                  return (
+                    <div 
+                      key={col.id} 
+                      className="w-72 shrink-0 flex flex-col rounded-xl border bg-muted/20 min-h-[480px]"
+                    >
+                      {/* Column Header */}
+                      <div className={`p-3 border-b rounded-t-xl flex justify-between items-center ${col.color}`}>
+                        <h4 className="font-bold text-xs tracking-tight text-foreground">{col.title}</h4>
+                        <Badge variant="outline" className="text-[10px] bg-background font-mono font-bold">
+                          {columnBookings.length}
+                        </Badge>
+                      </div>
 
-                    <div className="p-2 space-y-3 flex-1 overflow-y-auto max-h-[620px]">
-                      {columnBookings.length === 0 ? (
-                        <div className="h-24 flex items-center justify-center text-[11px] text-muted-foreground border border-dashed rounded-lg">
-                          No orders
-                        </div>
-                      ) : (
-                        columnBookings.map(b => (
-                          <Card 
-                            key={b.id} 
-                            className="p-3 space-y-2 cursor-pointer hover:border-primary/60 transition-all shadow-2xs group bg-card"
-                            onClick={() => handleOpenComms(b)}
-                          >
-                            <div className="flex justify-between items-start">
-                              <span className="font-mono font-bold text-[11px]">{b.id}</span>
-                              <Badge variant="outline" className="text-[9px] px-1 py-0 bg-primary/5 text-primary border-primary/20">
-                                {b.category}
-                              </Badge>
-                            </div>
-
-                            <div>
-                              <p className="font-bold text-xs text-foreground group-hover:text-primary transition-colors leading-tight">
-                                {b.serviceTitle}
-                              </p>
-                              <p className="text-[10px] text-muted-foreground mt-0.5">{b.vendorName}</p>
-                            </div>
-
-                            <div className="space-y-1 text-[11px] border-t border-b py-2 text-muted-foreground">
-                              <div className="flex items-center gap-1 text-foreground font-medium">
-                                <User className="w-3 h-3 text-primary shrink-0" />
-                                <span className="truncate">{b.guestName}</span>
+                      {/* Column Card Body */}
+                      <div className="p-2 space-y-3 flex-1 overflow-y-auto max-h-[620px]">
+                        {columnBookings.length === 0 ? (
+                          <div className="h-28 flex flex-col items-center justify-center text-[11px] text-muted-foreground border border-dashed rounded-lg bg-background/50">
+                            <span>No orders in this stage</span>
+                          </div>
+                        ) : (
+                          columnBookings.map(b => (
+                            <Card 
+                              key={b.id} 
+                              className="p-3.5 space-y-2.5 cursor-pointer hover:border-primary/60 transition-all shadow-2xs group bg-card"
+                              onClick={() => handleOpenComms(b)}
+                            >
+                              <div className="flex justify-between items-start gap-1">
+                                <span className="font-mono font-bold text-xs">{b.id}</span>
+                                <Badge variant="outline" className="text-[9px] px-1.5 py-0 bg-indigo-50 text-indigo-700 border-indigo-200">
+                                  {b.category}
+                                </Badge>
                               </div>
-                              <div className="flex items-center gap-1 truncate">
-                                <MapPin className="w-3 h-3 text-muted-foreground shrink-0" />
-                                <span className="truncate">{b.unitAddress}</span>
-                              </div>
-                              <div className="flex items-center gap-1 font-mono text-[10px]">
-                                <Calendar className="w-3 h-3 text-muted-foreground shrink-0" />
-                                <span>{b.dateScheduled}</span>
-                              </div>
-                            </div>
 
-                            <div className="flex justify-between items-center pt-1">
-                              <span className="font-bold text-xs text-primary">{b.costDisplay}</span>
-                              
-                              <div className="flex items-center gap-1" onClick={e => e.stopPropagation()}>
+                              <div>
+                                <p className="font-bold text-xs text-foreground group-hover:text-primary transition-colors leading-snug">
+                                  {b.serviceTitle}
+                                </p>
+                                <p className="text-[11px] text-muted-foreground mt-0.5">{b.vendorName}</p>
+                              </div>
+
+                              <div className="space-y-1 text-[11px] border-t border-b py-2 text-muted-foreground">
+                                <div className="flex items-center gap-1.5 text-foreground font-medium">
+                                  <User className="w-3.5 h-3.5 text-primary shrink-0" />
+                                  <span className="truncate">{b.guestName}</span>
+                                </div>
+                                <div className="flex items-center gap-1.5 truncate">
+                                  <MapPin className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
+                                  <span className="truncate">{b.unitAddress}</span>
+                                </div>
+                                <div className="flex items-center gap-1.5 font-mono text-[10px]">
+                                  <Calendar className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
+                                  <span>{b.dateScheduled}</span>
+                                </div>
+                              </div>
+
+                              {/* Price & Action Triggers */}
+                              <div className="flex justify-between items-center pt-1">
+                                <div>
+                                  <span className="font-bold text-xs text-primary">{b.costDisplay}</span>
+                                  {b.pendingException?.status === 'Approved' && (
+                                    <span className="block text-[9px] text-emerald-600 font-bold">Price Approved</span>
+                                  )}
+                                </div>
+                                
+                                <div className="flex items-center gap-1" onClick={e => e.stopPropagation()}>
+                                  <Button 
+                                    variant="outline" 
+                                    size="sm" 
+                                    className="h-7 text-[10px] gap-1 px-2 border-amber-300 bg-amber-50 text-amber-900 hover:bg-amber-100"
+                                    title="Raise Exception & Revised Price"
+                                    onClick={(e) => handleOpenRaiseException(b, e)}
+                                  >
+                                    <AlertTriangle className="w-3 h-3 text-amber-600" />
+                                    <span>Exception</span>
+                                  </Button>
+                                  <Button 
+                                    variant="ghost" 
+                                    size="icon" 
+                                    className="h-7 w-7 text-primary hover:bg-primary/10"
+                                    title="View Guest Chat & Invoice"
+                                    onClick={() => handleOpenComms(b)}
+                                  >
+                                    <MessageSquare className="w-3.5 h-3.5" />
+                                  </Button>
+                                </div>
+                              </div>
+
+                              {/* Status Advance Trigger */}
+                              {col.id !== activePipeline[activePipeline.length - 1].id && col.id !== 'Exception Raised' && (
                                 <Button 
+                                  size="sm" 
                                   variant="ghost" 
-                                  size="icon" 
-                                  className="h-7 w-7 text-amber-700 hover:bg-amber-50"
-                                  title="Raise Exception & Price Revision"
-                                  onClick={(e) => handleOpenRaiseException(b, e)}
+                                  className="w-full text-[10px] h-7 mt-1 text-primary hover:bg-primary/5 border border-dashed border-primary/30 flex items-center justify-between"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    const currIdx = activePipeline.findIndex(p => p.id === col.id);
+                                    if (currIdx !== -1 && currIdx + 1 < activePipeline.length) {
+                                      handleAdvanceStatus(b, activePipeline[currIdx + 1].id);
+                                    }
+                                  }}
                                 >
-                                  <AlertTriangle className="w-3.5 h-3.5" />
+                                  <span>Move to next stage</span>
+                                  <ChevronRight className="w-3 h-3" />
                                 </Button>
-                                <Button 
-                                  variant="ghost" 
-                                  size="icon" 
-                                  className="h-7 w-7 text-primary hover:bg-primary/10"
-                                  title="View Guest Chat & Invoice"
-                                  onClick={() => handleOpenComms(b)}
-                                >
-                                  <MessageSquare className="w-3.5 h-3.5" />
-                                </Button>
-                              </div>
-                            </div>
-
-                            {/* Status advance button */}
-                            {b.status === 'Scheduled' && (
-                              <Button 
-                                size="sm" 
-                                variant="outline" 
-                                className="w-full text-[10px] h-7 mt-1 border-amber-300 text-amber-900 bg-amber-50 hover:bg-amber-100"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleUpdateStatus(b.id, 'In Progress');
-                                }}
-                              >
-                                Start Order
-                              </Button>
-                            )}
-
-                            {b.status === 'In Progress' && (
-                              <Button 
-                                size="sm" 
-                                variant="outline" 
-                                className="w-full text-[10px] h-7 mt-1 border-emerald-300 text-emerald-900 bg-emerald-50 hover:bg-emerald-100"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleUpdateStatus(b.id, 'Completed');
-                                }}
-                              >
-                                Mark Completed
-                              </Button>
-                            )}
-                          </Card>
-                        ))
-                      )}
+                              )}
+                            </Card>
+                          ))
+                        )}
+                      </div>
                     </div>
-                  </div>
-                );
-              })}
+                  );
+                })}
+              </div>
             </div>
           ) : (
             /* TABLE VIEW */
@@ -533,7 +571,6 @@ const VendorServices = () => {
                   ) : (
                     filteredBookings.map((booking) => {
                       const hasPendingException = booking.pendingException?.status === 'Pending Guest Approval';
-                      const isLaundry = booking.category === 'Laundry';
 
                       return (
                         <TableRow 
@@ -545,7 +582,7 @@ const VendorServices = () => {
                           <TableCell>
                             <div>
                               <p className="font-semibold text-xs">{booking.vendorName}</p>
-                              <Badge variant="outline" className={`text-[9px] ${isLaundry ? 'bg-indigo-50 text-indigo-700 border-indigo-200' : 'bg-primary/5 text-primary border-primary/20'}`}>
+                              <Badge variant="outline" className="text-[9px] bg-indigo-50 text-indigo-700 border-indigo-200">
                                 {booking.category}
                               </Badge>
                             </div>
@@ -562,14 +599,9 @@ const VendorServices = () => {
                           <TableCell className="text-xs font-mono">{booking.dateScheduled}</TableCell>
                           <TableCell>
                             <Badge variant={
-                              booking.status === 'Completed' ? 'default' :
-                              booking.status === 'Scheduled' ? 'secondary' :
-                              booking.status === 'Exception Raised' ? 'destructive' :
-                              booking.status === 'Price Updated' ? 'default' : 'outline'
-                            } className={
-                              booking.status === 'In Progress' ? 'bg-amber-100 text-amber-800 border-amber-300' : 
-                              booking.status === 'Price Updated' ? 'bg-emerald-100 text-emerald-800 border-emerald-300' : ''
-                            }>
+                              booking.status.includes('Complete') || booking.status.includes('Delivered') ? 'default' :
+                              booking.status === 'Exception Raised' ? 'destructive' : 'outline'
+                            } className="text-[10px]">
                               {booking.status}
                             </Badge>
                           </TableCell>
@@ -587,7 +619,7 @@ const VendorServices = () => {
                               <Button 
                                 variant="outline" 
                                 size="sm" 
-                                className={`h-8 gap-1 text-xs ${isLaundry ? 'border-amber-300 bg-amber-50 text-amber-900 hover:bg-amber-100' : 'text-amber-800 hover:bg-amber-50'}`}
+                                className="h-8 gap-1 text-xs border-amber-300 bg-amber-50 text-amber-900 hover:bg-amber-100"
                                 onClick={(e) => handleOpenRaiseException(booking, e)}
                                 title="Raise Exception & Revised Price"
                               >
@@ -714,7 +746,7 @@ const VendorServices = () => {
                     )}
                   </div>
                   <p className="text-[10px] text-amber-800">
-                    Once submitted, the guest receives an in-app prompt in their mobile view to approve or decline the new price of AED {parseFloat(proposedPrice) || 0}.
+                    Once submitted, the guest receives an in-app prompt on their mobile app to approve or decline the new price of AED {parseFloat(proposedPrice) || 0}.
                   </p>
                 </div>
               </div>
