@@ -84,7 +84,7 @@ interface VendorServiceBooking {
   pendingException?: ServiceException | null;
 }
 
-// Category Specific Status Pipelines (Mapped strictly per requirement)
+// Category Specific Status Pipelines
 const SERVICE_PIPELINES: Record<ServiceCategory, Array<{ id: string; title: string; color: string }>> = {
   'Short term rental': [
     { id: 'Enquiry', title: 'Enquiry', color: 'border-blue-400 bg-blue-50/60' },
@@ -548,7 +548,7 @@ const VendorServices = () => {
     setBookings(prev => prev.map(b => 
       b.id === booking.id ? { ...b, status: nextStatus } : b
     ));
-    showSuccess(`Order ${booking.id} advanced to "${nextStatus}".`);
+    showSuccess(`Order ${booking.id} updated to "${nextStatus}".`);
   };
 
   return (
@@ -849,75 +849,93 @@ const VendorServices = () => {
                       </TableCell>
                     </TableRow>
                   ) : (
-                    filteredBookings.map((booking) => (
-                      <TableRow 
-                        key={booking.id} 
-                        className="cursor-pointer hover:bg-muted/50 transition-colors"
-                        onClick={() => handleOpenComms(booking)}
-                      >
-                        <TableCell className="font-bold text-xs font-mono">{booking.id}</TableCell>
-                        <TableCell className="font-semibold text-xs">{booking.vendorName}</TableCell>
-                        <TableCell>
-                          <Badge variant="outline" className="text-[10px] bg-primary/5 text-primary border-primary/20 capitalize">
-                            {booking.category}
-                          </Badge>
-                        </TableCell>
-                        <TableCell className="text-xs font-medium max-w-[180px] truncate">
-                          {booking.serviceTitle}
-                        </TableCell>
-                        <TableCell>
-                          <div>
-                            <p className="font-semibold text-xs">{booking.guestName}</p>
-                            <p className="text-[10px] text-muted-foreground truncate max-w-[160px]">{booking.unitAddress}</p>
-                          </div>
-                        </TableCell>
-                        <TableCell className="text-xs font-mono">{booking.dateScheduled}</TableCell>
-                        <TableCell>
-                          <div className="space-y-1">
-                            <Badge variant="secondary" className="text-[10px] font-semibold">
-                              {booking.status}
+                    filteredBookings.map((booking) => {
+                      const categoryPipeline = SERVICE_PIPELINES[booking.category] || SERVICE_PIPELINES['Laundry'];
+
+                      return (
+                        <TableRow 
+                          key={booking.id} 
+                          className="cursor-pointer hover:bg-muted/50 transition-colors"
+                          onClick={() => handleOpenComms(booking)}
+                        >
+                          <TableCell className="font-bold text-xs font-mono">{booking.id}</TableCell>
+                          <TableCell className="font-semibold text-xs">{booking.vendorName}</TableCell>
+                          <TableCell>
+                            <Badge variant="outline" className="text-[10px] bg-primary/5 text-primary border-primary/20 capitalize">
+                              {booking.category}
                             </Badge>
-                            {booking.category === 'House keeping' && !booking.strConfirmed && (
-                              <span className="block text-[9px] text-amber-600 font-bold">Awaiting STR Admin Approval</span>
-                            )}
-                          </div>
-                        </TableCell>
-                        <TableCell className="font-bold text-xs">{booking.costDisplay}</TableCell>
-                        <TableCell className="text-right" onClick={(e) => e.stopPropagation()}>
-                          <div className="flex justify-end gap-1.5">
-                            {booking.category === 'House keeping' && !booking.strConfirmed && (
-                              <Button 
-                                size="sm" 
-                                className="h-8 text-xs bg-emerald-600 hover:bg-emerald-700 text-white"
-                                onClick={(e) => handleConfirmSTRHousekeeping(booking.id, e)}
+                          </TableCell>
+                          <TableCell className="text-xs font-medium max-w-[180px] truncate">
+                            {booking.serviceTitle}
+                          </TableCell>
+                          <TableCell>
+                            <div>
+                              <p className="font-semibold text-xs">{booking.guestName}</p>
+                              <p className="text-[10px] text-muted-foreground truncate max-w-[160px]">{booking.unitAddress}</p>
+                            </div>
+                          </TableCell>
+                          <TableCell className="text-xs font-mono">{booking.dateScheduled}</TableCell>
+                          <TableCell onClick={(e) => e.stopPropagation()}>
+                            <div className="space-y-1">
+                              {/* Interactive Status Selector */}
+                              <Select 
+                                value={booking.status} 
+                                onValueChange={(newStatus) => handleAdvanceStatus(booking, newStatus)}
                               >
-                                Approve STR
+                                <SelectTrigger className="h-7 text-[11px] font-medium w-[150px] bg-background border-primary/20 hover:border-primary/50 transition-colors">
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {categoryPipeline.map((p) => (
+                                    <SelectItem key={p.id} value={p.id} className="text-xs">
+                                      {p.title}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+
+                              {booking.category === 'House keeping' && !booking.strConfirmed && (
+                                <span className="block text-[9px] text-amber-600 font-bold">Awaiting STR Admin Approval</span>
+                              )}
+                            </div>
+                          </TableCell>
+                          <TableCell className="font-bold text-xs">{booking.costDisplay}</TableCell>
+                          <TableCell className="text-right" onClick={(e) => e.stopPropagation()}>
+                            <div className="flex justify-end gap-1.5">
+                              {booking.category === 'House keeping' && !booking.strConfirmed && (
+                                <Button 
+                                  size="sm" 
+                                  className="h-8 text-xs bg-emerald-600 hover:bg-emerald-700 text-white"
+                                  onClick={(e) => handleConfirmSTRHousekeeping(booking.id, e)}
+                                >
+                                  Approve STR
+                                </Button>
+                              )}
+
+                              <Button 
+                                variant="outline" 
+                                size="sm" 
+                                className="h-8 gap-1 text-xs border-amber-300 bg-amber-50 text-amber-900 hover:bg-amber-100"
+                                onClick={(e) => handleOpenRaiseException(booking, e)}
+                              >
+                                <AlertTriangle className="w-3.5 h-3.5 text-amber-600" />
+                                <span>Exception</span>
                               </Button>
-                            )}
 
-                            <Button 
-                              variant="outline" 
-                              size="sm" 
-                              className="h-8 gap-1 text-xs border-amber-300 bg-amber-50 text-amber-900 hover:bg-amber-100"
-                              onClick={(e) => handleOpenRaiseException(booking, e)}
-                            >
-                              <AlertTriangle className="w-3.5 h-3.5 text-amber-600" />
-                              <span>Exception</span>
-                            </Button>
-
-                            <Button 
-                              variant="ghost" 
-                              size="sm" 
-                              className="h-8 gap-1.5 text-xs text-primary hover:text-primary hover:bg-primary/10"
-                              onClick={() => handleOpenComms(booking)}
-                            >
-                              <MessageSquare className="w-3.5 h-3.5" />
-                              <span>Chat / Invoice</span>
-                            </Button>
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    ))
+                              <Button 
+                                variant="ghost" 
+                                size="sm" 
+                                className="h-8 gap-1.5 text-xs text-primary hover:text-primary hover:bg-primary/10"
+                                onClick={() => handleOpenComms(booking)}
+                              >
+                                <MessageSquare className="w-3.5 h-3.5" />
+                                <span>Chat / Invoice</span>
+                              </Button>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })
                   )}
                 </TableBody>
               </Table>
