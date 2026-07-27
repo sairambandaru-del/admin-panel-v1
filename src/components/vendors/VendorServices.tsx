@@ -908,7 +908,7 @@ const VendorServices = () => {
                                   className="h-8 text-xs bg-emerald-600 hover:bg-emerald-700 text-white"
                                   onClick={(e) => handleConfirmSTRHousekeeping(booking.id, e)}
                                 >
-                                  Approve STR
+                                  Approve
                                 </Button>
                               )}
 
