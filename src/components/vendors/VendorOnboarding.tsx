@@ -11,6 +11,15 @@ import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { 
+  Dialog, 
+  DialogContent, 
+  DialogDescription, 
+  DialogFooter, 
+  DialogHeader, 
+  DialogTitle, 
+  DialogTrigger 
+} from "@/components/ui/dialog";
+import { 
   Building2, 
   User, 
   Mail, 
@@ -25,9 +34,39 @@ import {
   Clock,
   Eye,
   Check,
-  X
+  X,
+  Send,
+  Link as LinkIcon,
+  Copy,
+  Kanban,
+  List,
+  Sparkles,
+  Search,
+  FileCheck,
+  AlertCircle,
+  Plus
 } from 'lucide-react';
 import { showSuccess, showError } from '@/utils/toast';
+
+export type CRMStage = 
+  | 'New Lead'
+  | 'In Discussion'
+  | 'Contract Sent'
+  | 'Contract Signed'
+  | 'Onboarding Completed';
+
+export interface VendorCRMLead {
+  id: string;
+  companyName: string;
+  category: string;
+  contactPerson: string;
+  email: string;
+  phone: string;
+  stage: CRMStage;
+  onboardingToken?: string;
+  emailSentDate?: string;
+  notes?: string;
+}
 
 interface OnboardingApplication {
   id: string;
@@ -39,6 +78,53 @@ interface OnboardingApplication {
   submittedDate: string;
   documents: string[];
 }
+
+const initialCRMLeads: VendorCRMLead[] = [
+  {
+    id: 'LEAD-101',
+    companyName: 'Apex Luxury Fleet',
+    category: 'Car rental',
+    contactPerson: 'James Bond',
+    email: 'james@apexfleet.com',
+    phone: '+971 50 123 4567',
+    stage: 'Contract Signed',
+    onboardingToken: 'TOK-APEX-8821',
+    emailSentDate: '2024-05-20 14:30',
+    notes: 'Premium fleet supplier. Contract signed for 15% platform commission.'
+  },
+  {
+    id: 'LEAD-102',
+    companyName: 'Gourmet Chef Collective',
+    category: 'Chef on call',
+    contactPerson: 'Chef Auguste',
+    email: 'auguste@gourmetchef.ae',
+    phone: '+971 52 987 6543',
+    stage: 'Contract Sent',
+    notes: 'Awaiting signature from legal team.'
+  },
+  {
+    id: 'LEAD-103',
+    companyName: 'Desert Oasis Yachting',
+    category: 'Leisure activities',
+    contactPerson: 'Capt. Jack Sparrow',
+    email: 'jack@oasisyachts.com',
+    phone: '+971 55 444 3322',
+    stage: 'In Discussion',
+    notes: 'Reviewing category pricing structure.'
+  },
+  {
+    id: 'LEAD-104',
+    companyName: 'Sparkle Cleaners Dubai',
+    category: 'House keeping',
+    contactPerson: 'Sarah Connor',
+    email: 'sarah@sparkleclean.ae',
+    phone: '+971 50 888 9900',
+    stage: 'Onboarding Completed',
+    onboardingToken: 'TOK-SPARKLE-9912',
+    emailSentDate: '2024-05-18 09:15',
+    notes: 'Form filled out and approved into vendor registry.'
+  }
+];
 
 const initialApplications: OnboardingApplication[] = [
   {
@@ -60,35 +146,32 @@ const initialApplications: OnboardingApplication[] = [
     status: 'Approved',
     submittedDate: '2024-05-15',
     documents: ['Trade License.pdf', 'Food Safety Permit.pdf', 'Tax Registration.pdf']
-  },
-  {
-    id: 'ONB-003',
-    companyName: 'Zen Spa & Wellness',
-    category: 'Wellness',
-    contactPerson: 'Yoda Grandmaster',
-    email: 'yoda@zenspa.com',
-    status: 'Pending Review',
-    submittedDate: '2024-05-20',
-    documents: ['Trade License.pdf', 'Therapist Certifications.pdf']
-  },
-  {
-    id: 'ONB-004',
-    companyName: 'QuickWash Laundry',
-    category: 'Laundry',
-    contactPerson: 'John Smith',
-    email: 'john@quickwash.com',
-    status: 'Rejected',
-    submittedDate: '2024-05-10',
-    documents: ['Trade License.pdf']
   }
 ];
 
 const VendorOnboarding = () => {
+  const [activeTab, setActiveTab] = useState<'crm' | 'wizard' | 'queue'>('crm');
+  const [crmLeads, setCrmLeads] = useState<VendorCRMLead[]>(initialCRMLeads);
   const [applications, setApplications] = useState<OnboardingApplication[]>(initialApplications);
-  const [activeTab, setActiveTab] = useState<'wizard' | 'queue'>('wizard');
-  const [step, setStep] = useState(1);
+  const [crmSearch, setCrmSearch] = useState('');
   
-  // Form State
+  // New Lead Dialog
+  const [isNewLeadOpen, setIsNewLeadOpen] = useState(false);
+  const [newLeadForm, setNewLeadForm] = useState({
+    companyName: '',
+    category: 'Car rental',
+    contactPerson: '',
+    email: '',
+    phone: '',
+    notes: ''
+  });
+
+  // Email Sent Modal State
+  const [isEmailSentModalOpen, setIsEmailSentModalOpen] = useState(false);
+  const [lastSentLead, setLastSentLead] = useState<VendorCRMLead | null>(null);
+
+  // Form Wizard State
+  const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
     companyName: '',
     tradeLicense: '',
@@ -103,6 +186,78 @@ const VendorOnboarding = () => {
   });
 
   const [selectedApp, setSelectedApp] = useState<OnboardingApplication | null>(null);
+
+  // CRM Helper: Change Stage
+  const handleStageChange = (leadId: string, newStage: CRMStage) => {
+    setCrmLeads(prev => prev.map(lead => {
+      if (lead.id === leadId) {
+        const isContractSigned = newStage === 'Contract Signed';
+        const token = lead.onboardingToken || `TOK-${lead.companyName.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 6)}-${Math.floor(1000 + Math.random() * 9000)}`;
+        const dateStr = new Date().toLocaleString();
+
+        const updatedLead: VendorCRMLead = {
+          ...lead,
+          stage: newStage,
+          onboardingToken: token,
+          emailSentDate: isContractSigned ? dateStr : lead.emailSentDate
+        };
+
+        if (isContractSigned) {
+          setLastSentLead(updatedLead);
+          setIsEmailSentModalOpen(true);
+          showSuccess(`Contract Signed! Onboarding invitation email sent to ${lead.email}`);
+        } else {
+          showSuccess(`Lead "${lead.companyName}" stage updated to ${newStage}.`);
+        }
+
+        return updatedLead;
+      }
+      return lead;
+    }));
+  };
+
+  const handleCreateLead = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newLeadForm.companyName || !newLeadForm.email || !newLeadForm.contactPerson) {
+      showError("Please fill in company name, contact person, and email.");
+      return;
+    }
+
+    const newLead: VendorCRMLead = {
+      id: `LEAD-${100 + crmLeads.length + 1}`,
+      companyName: newLeadForm.companyName,
+      category: newLeadForm.category,
+      contactPerson: newLeadForm.contactPerson,
+      email: newLeadForm.email,
+      phone: newLeadForm.phone,
+      stage: 'New Lead',
+      notes: newLeadForm.notes
+    };
+
+    setCrmLeads([newLead, ...crmLeads]);
+    setIsNewLeadOpen(false);
+    setNewLeadForm({ companyName: '', category: 'Car rental', contactPerson: '', email: '', phone: '', notes: '' });
+    showSuccess(`Vendor CRM Lead "${newLead.companyName}" created.`);
+  };
+
+  const handleCopyOnboardingLink = (token?: string) => {
+    const link = `https://straizen.app/onboard?token=${token || 'DEMO-TOKEN'}`;
+    navigator.clipboard.writeText(link);
+    showSuccess("Onboarding email link copied to clipboard!");
+  };
+
+  const handleLaunchOnboardingForLead = (lead: VendorCRMLead) => {
+    setFormData(prev => ({
+      ...prev,
+      companyName: lead.companyName,
+      category: lead.category,
+      contactName: lead.contactPerson,
+      email: lead.email,
+      phone: lead.phone
+    }));
+    setActiveTab('wizard');
+    showSuccess(`Pre-filled onboarding form with details for "${lead.companyName}".`);
+  };
 
   const handleNext = () => {
     if (step === 1) {
@@ -161,6 +316,10 @@ const VendorOnboarding = () => {
     };
 
     setApplications([newApp, ...applications]);
+    
+    // Update CRM lead stage to Completed if exists
+    setCrmLeads(prev => prev.map(l => l.email === formData.email ? { ...l, stage: 'Onboarding Completed' } : l));
+
     showSuccess(`Application for "${formData.companyName}" submitted successfully!`);
     
     // Reset Form
@@ -184,7 +343,7 @@ const VendorOnboarding = () => {
     setApplications(prev => prev.map(app => 
       app.id === id ? { ...app, status: 'Approved' } : app
     ));
-    showSuccess(`Application ${id} has been approved. Vendor is now active in the registry.`);
+    showSuccess(`Application ${id} approved. Vendor is active in the registry.`);
     if (selectedApp?.id === id) {
       setSelectedApp(prev => prev ? { ...prev, status: 'Approved' } : null);
     }
@@ -194,27 +353,43 @@ const VendorOnboarding = () => {
     setApplications(prev => prev.map(app => 
       app.id === id ? { ...app, status: 'Rejected' } : app
     ));
-    showError(`Application ${id} has been rejected.`);
+    showError(`Application ${id} rejected.`);
     if (selectedApp?.id === id) {
       setSelectedApp(prev => prev ? { ...prev, status: 'Rejected' } : null);
     }
   };
 
+  const filteredCRMLeads = crmLeads.filter(l => 
+    l.companyName.toLowerCase().includes(crmSearch.toLowerCase()) ||
+    l.contactPerson.toLowerCase().includes(crmSearch.toLowerCase()) ||
+    l.email.toLowerCase().includes(crmSearch.toLowerCase()) ||
+    l.id.toLowerCase().includes(crmSearch.toLowerCase())
+  );
+
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
+      {/* Top Bar with Section Switcher Tabs */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h3 className="text-lg font-semibold">Vendor Onboarding</h3>
-          <p className="text-sm text-muted-foreground">Onboard new service providers across all 14 service categories.</p>
+          <h3 className="text-lg font-semibold">Vendor CRM & Onboarding Pipeline</h3>
+          <p className="text-sm text-muted-foreground">Manage prospective vendor leads, auto-trigger onboarding email links on Contract Signed, and review submissions.</p>
         </div>
         <div className="flex bg-muted p-1 rounded-lg border">
+          <Button 
+            variant={activeTab === 'crm' ? 'secondary' : 'ghost'} 
+            size="sm" 
+            onClick={() => setActiveTab('crm')}
+            className="text-xs h-8 gap-1.5"
+          >
+            <Kanban className="w-3.5 h-3.5" /> Vendor CRM Pipeline
+          </Button>
           <Button 
             variant={activeTab === 'wizard' ? 'secondary' : 'ghost'} 
             size="sm" 
             onClick={() => setActiveTab('wizard')}
-            className="text-xs h-8"
+            className="text-xs h-8 gap-1.5"
           >
-            Onboarding Form
+            <FileText className="w-3.5 h-3.5" /> Onboarding Form
           </Button>
           <Button 
             variant={activeTab === 'queue' ? 'secondary' : 'ghost'} 
@@ -222,7 +397,7 @@ const VendorOnboarding = () => {
             onClick={() => setActiveTab('queue')}
             className="text-xs h-8 gap-1.5"
           >
-            Applications Queue
+            Submissions Queue
             {applications.filter(a => a.status === 'Pending Review').length > 0 && (
               <Badge variant="destructive" className="h-4 min-w-4 px-1 flex items-center justify-center text-[9px]">
                 {applications.filter(a => a.status === 'Pending Review').length}
@@ -232,7 +407,259 @@ const VendorOnboarding = () => {
         </div>
       </div>
 
-      {activeTab === 'wizard' ? (
+      {/* TAB 1: VENDOR CRM PIPELINE */}
+      {activeTab === 'crm' && (
+        <div className="space-y-6">
+          <Card>
+            <CardHeader className="pb-3">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <div>
+                  <CardTitle className="text-base">Prospective Vendor CRM Leads</CardTitle>
+                  <CardDescription className="text-xs">
+                    Marking a vendor lead's stage as <span className="font-bold text-emerald-600 font-mono">"Contract Signed"</span> automatically triggers an invitation email with a unique Onboarding Form link.
+                  </CardDescription>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <div className="relative w-full sm:w-56">
+                    <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      placeholder="Search lead or email..."
+                      value={crmSearch}
+                      onChange={e => setCrmSearch(e.target.value)}
+                      className="pl-8 h-9 text-xs"
+                    />
+                  </div>
+
+                  <Dialog open={isNewLeadOpen} onOpenChange={setIsNewLeadOpen}>
+                    <DialogTrigger asChild>
+                      <Button className="gap-1.5 h-9 text-xs shrink-0">
+                        <Plus className="w-3.5 h-3.5" /> Add CRM Lead
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="sm:max-w-[450px]">
+                      <form onSubmit={handleCreateLead}>
+                        <DialogHeader>
+                          <DialogTitle>Add Prospective Vendor Lead</DialogTitle>
+                          <DialogDescription>
+                            Enter vendor details. You can track discussions and trigger automated onboarding links when contract is signed.
+                          </DialogDescription>
+                        </DialogHeader>
+
+                        <div className="grid gap-3 py-4 text-xs">
+                          <div className="space-y-1">
+                            <Label htmlFor="lead-company">Company Name *</Label>
+                            <Input 
+                              id="lead-company" 
+                              placeholder="e.g. Apex Luxury Fleet" 
+                              value={newLeadForm.companyName}
+                              onChange={e => setNewLeadForm({...newLeadForm, companyName: e.target.value})}
+                              required
+                            />
+                          </div>
+
+                          <div className="grid grid-cols-2 gap-2">
+                            <div className="space-y-1">
+                              <Label htmlFor="lead-cat">Category</Label>
+                              <Select 
+                                value={newLeadForm.category} 
+                                onValueChange={v => setNewLeadForm({...newLeadForm, category: v})}
+                              >
+                                <SelectTrigger id="lead-cat"><SelectValue /></SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="Car rental">Car rental</SelectItem>
+                                  <SelectItem value="Transportation">Transportation</SelectItem>
+                                  <SelectItem value="House keeping">House keeping</SelectItem>
+                                  <SelectItem value="Laundry">Laundry</SelectItem>
+                                  <SelectItem value="Chef on call">Chef on call</SelectItem>
+                                  <SelectItem value="In-house catering">In-house catering</SelectItem>
+                                  <SelectItem value="Wellness">Wellness</SelectItem>
+                                  <SelectItem value="Leisure activities">Leisure activities</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </div>
+
+                            <div className="space-y-1">
+                              <Label htmlFor="lead-contact">Contact Person *</Label>
+                              <Input 
+                                id="lead-contact" 
+                                placeholder="e.g. James Bond" 
+                                value={newLeadForm.contactPerson}
+                                onChange={e => setNewLeadForm({...newLeadForm, contactPerson: e.target.value})}
+                                required
+                              />
+                            </div>
+                          </div>
+
+                          <div className="grid grid-cols-2 gap-2">
+                            <div className="space-y-1">
+                              <Label htmlFor="lead-email">Email Address *</Label>
+                              <Input 
+                                id="lead-email" 
+                                type="email" 
+                                placeholder="contact@company.com" 
+                                value={newLeadForm.email}
+                                onChange={e => setNewLeadForm({...newLeadForm, email: e.target.value})}
+                                required
+                              />
+                            </div>
+
+                            <div className="space-y-1">
+                              <Label htmlFor="lead-phone">Phone Number</Label>
+                              <Input 
+                                id="lead-phone" 
+                                placeholder="+971 50 123 4567" 
+                                value={newLeadForm.phone}
+                                onChange={e => setNewLeadForm({...newLeadForm, phone: e.target.value})}
+                              />
+                            </div>
+                          </div>
+
+                          <div className="space-y-1">
+                            <Label htmlFor="lead-notes">Notes / Deal Terms</Label>
+                            <Textarea 
+                              id="lead-notes" 
+                              placeholder="Initial deal terms, commission rates..." 
+                              value={newLeadForm.notes}
+                              onChange={e => setNewLeadForm({...newLeadForm, notes: e.target.value})}
+                              className="min-h-[60px]"
+                            />
+                          </div>
+                        </div>
+
+                        <DialogFooter>
+                          <Button type="submit" className="w-full">Create Lead</Button>
+                        </DialogFooter>
+                      </form>
+                    </DialogContent>
+                  </Dialog>
+                </div>
+              </div>
+            </CardHeader>
+
+            <CardContent className="p-0">
+              <div className="rounded-md border-t overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow className="bg-muted/30">
+                      <TableHead>Lead ID</TableHead>
+                      <TableHead>Company & Category</TableHead>
+                      <TableHead>Primary Contact</TableHead>
+                      <TableHead>CRM Stage Pipeline</TableHead>
+                      <TableHead>Automated Onboarding Email Link</TableHead>
+                      <TableHead className="text-right">Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {filteredCRMLeads.map((lead) => {
+                      const isSigned = lead.stage === 'Contract Signed' || lead.stage === 'Onboarding Completed';
+
+                      return (
+                        <TableRow key={lead.id} className="hover:bg-muted/30 transition-colors">
+                          <TableCell className="font-mono text-xs font-bold">{lead.id}</TableCell>
+                          <TableCell>
+                            <div>
+                              <p className="font-bold text-xs text-foreground">{lead.companyName}</p>
+                              <Badge variant="outline" className="text-[9px] bg-primary/5 text-primary border-primary/20 capitalize mt-0.5">
+                                {lead.category}
+                              </Badge>
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <div className="text-xs">
+                              <p className="font-semibold">{lead.contactPerson}</p>
+                              <p className="text-[10px] text-muted-foreground">{lead.email}</p>
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <div className="space-y-1">
+                              <Select 
+                                value={lead.stage} 
+                                onValueChange={(val: CRMStage) => handleStageChange(lead.id, val)}
+                              >
+                                <SelectTrigger className={`h-8 text-xs font-bold w-[180px] ${
+                                  lead.stage === 'Contract Signed' ? 'border-emerald-500 bg-emerald-50 text-emerald-900' :
+                                  lead.stage === 'Onboarding Completed' ? 'border-blue-500 bg-blue-50 text-blue-900' :
+                                  'bg-background'
+                                }`}>
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="New Lead" className="text-xs">New Lead</SelectItem>
+                                  <SelectItem value="In Discussion" className="text-xs">In Discussion</SelectItem>
+                                  <SelectItem value="Contract Sent" className="text-xs">Contract Sent</SelectItem>
+                                  <SelectItem value="Contract Signed" className="text-xs font-bold text-emerald-600">
+                                    Contract Signed (Auto-Send Link)
+                                  </SelectItem>
+                                  <SelectItem value="Onboarding Completed" className="text-xs">Onboarding Completed</SelectItem>
+                                </SelectContent>
+                              </Select>
+
+                              {lead.stage === 'Contract Signed' && (
+                                <span className="block text-[9px] text-emerald-600 font-bold flex items-center gap-1">
+                                  <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+                                  Onboarding Email Dispatched
+                                </span>
+                              )}
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            {isSigned ? (
+                              <div className="space-y-1">
+                                <div className="flex items-center gap-1.5">
+                                  <Badge variant="outline" className="bg-emerald-50 text-emerald-800 border-emerald-300 font-mono text-[10px]">
+                                    <Send className="w-2.5 h-2.5 mr-1 text-emerald-600" /> Link Sent
+                                  </Badge>
+                                  <span className="text-[10px] text-muted-foreground font-mono">{lead.emailSentDate || 'Just now'}</span>
+                                </div>
+                                <div className="flex items-center gap-1">
+                                  <Button 
+                                    variant="ghost" 
+                                    size="sm" 
+                                    className="h-6 text-[10px] px-2 text-primary hover:bg-primary/10 gap-1"
+                                    onClick={() => handleCopyOnboardingLink(lead.onboardingToken)}
+                                  >
+                                    <Copy className="w-3 h-3" /> Copy Link
+                                  </Button>
+                                  <Button 
+                                    variant="ghost" 
+                                    size="sm" 
+                                    className="h-6 text-[10px] px-2 text-emerald-600 hover:bg-emerald-50 gap-1"
+                                    onClick={() => handleLaunchOnboardingForLead(lead)}
+                                  >
+                                    <LinkIcon className="w-3 h-3" /> Open Form
+                                  </Button>
+                                </div>
+                              </div>
+                            ) : (
+                              <span className="text-[11px] text-muted-foreground italic">
+                                Update stage to "Contract Signed" to send link
+                              </span>
+                            )}
+                          </TableCell>
+                          <TableCell className="text-right">
+                            <Button 
+                              variant="outline" 
+                              size="sm" 
+                              className="h-8 text-xs gap-1"
+                              onClick={() => handleLaunchOnboardingForLead(lead)}
+                            >
+                              <FileText className="w-3.5 h-3.5" /> Fill Form
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })}
+                  </TableBody>
+                </Table>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
+      {/* TAB 2: VENDOR ONBOARDING WIZARD FORM */}
+      {activeTab === 'wizard' && (
         <div className="grid gap-6 md:grid-cols-4">
           {/* Step Indicator Sidebar */}
           <Card className="md:col-span-1 p-4 h-fit">
@@ -553,8 +980,10 @@ const VendorOnboarding = () => {
             </CardContent>
           </Card>
         </div>
-      ) : (
-        /* Applications Queue Tab */
+      )}
+
+      {/* TAB 3: APPLICATIONS QUEUE */}
+      {activeTab === 'queue' && (
         <div className="grid gap-6 md:grid-cols-3">
           {/* Left side: Applications List */}
           <Card className="md:col-span-2">
@@ -700,6 +1129,79 @@ const VendorOnboarding = () => {
           </div>
         </div>
       )}
+
+      {/* AUTOMATED EMAIL SENT MODAL CONFIRMATION */}
+      <Dialog open={isEmailSentModalOpen} onOpenChange={setIsEmailSentModalOpen}>
+        <DialogContent className="sm:max-w-[480px]">
+          {lastSentLead && (
+            <div>
+              <DialogHeader>
+                <div className="flex items-center gap-2">
+                  <div className="p-2 bg-emerald-100 text-emerald-800 rounded-lg">
+                    <Send className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <DialogTitle className="text-base font-bold text-foreground">
+                      Contract Signed - Automated Email Sent!
+                    </DialogTitle>
+                    <DialogDescription className="text-xs">
+                      Onboarding invitation dispatched to <span className="font-bold text-foreground">{lastSentLead.email}</span>
+                    </DialogDescription>
+                  </div>
+                </div>
+              </DialogHeader>
+
+              <div className="py-4 space-y-4 text-xs">
+                <div className="border-2 border-emerald-200 bg-emerald-50/60 p-3.5 rounded-xl space-y-2">
+                  <div className="flex justify-between items-center">
+                    <span className="font-bold text-emerald-900">{lastSentLead.companyName}</span>
+                    <Badge className="bg-emerald-600 text-white text-[10px]">
+                      Contract Signed
+                    </Badge>
+                  </div>
+                  <p className="text-emerald-800">
+                    The vendor contact ({lastSentLead.contactPerson}) has been emailed a unique registration link to fill out the 4-step Onboarding Form.
+                  </p>
+                </div>
+
+                <div className="space-y-1.5 border rounded-lg p-3 bg-muted/20">
+                  <Label className="text-[10px] uppercase font-bold text-muted-foreground">Unique Vendor Onboarding Link</Label>
+                  <div className="flex items-center gap-2">
+                    <Input 
+                      readOnly 
+                      value={`https://straizen.app/onboard?token=${lastSentLead.onboardingToken}`}
+                      className="font-mono text-xs h-8 bg-background"
+                    />
+                    <Button 
+                      size="sm" 
+                      className="h-8 shrink-0 gap-1"
+                      onClick={() => handleCopyOnboardingLink(lastSentLead.onboardingToken)}
+                    >
+                      <Copy className="w-3.5 h-3.5" /> Copy
+                    </Button>
+                  </div>
+                </div>
+              </div>
+
+              <DialogFooter className="gap-2 sm:gap-0">
+                <Button variant="outline" size="sm" onClick={() => setIsEmailSentModalOpen(false)}>
+                  Close
+                </Button>
+                <Button 
+                  size="sm" 
+                  className="gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white"
+                  onClick={() => {
+                    setIsEmailSentModalOpen(false);
+                    handleLaunchOnboardingForLead(lastSentLead);
+                  }}
+                >
+                  <LinkIcon className="w-3.5 h-3.5" /> Open & Fill Form
+                </Button>
+              </DialogFooter>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
