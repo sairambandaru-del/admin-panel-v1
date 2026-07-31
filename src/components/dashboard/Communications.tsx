@@ -631,90 +631,66 @@ const Communications = () => {
         {/* PANEL 3: MAIN CHAT CANVAS */}
         <div className="flex-1 flex flex-col bg-card min-w-0">
           {/* Header */}
-          <div className="p-3 border-b flex items-center justify-between gap-2 shrink-0 bg-background overflow-hidden min-w-0">
-            {/* Left: Avatar & Guest Info */}
-            <div className="flex items-center gap-2 min-w-0 flex-1 overflow-hidden">
-              <Avatar className="w-8 h-8 border shrink-0">
-                <AvatarFallback className={cn("text-white font-bold text-xs", activeConv.avatarBg)}>
-                  {activeConv.avatar}
-                </AvatarFallback>
-              </Avatar>
+          <div className="p-3 border-b flex items-center justify-end gap-1.5 shrink-0 bg-background overflow-hidden min-w-0">
+            <Select value={activeConv.assignee} onValueChange={handleAssigneeChange}>
+              <SelectTrigger className="h-7 text-[11px] font-semibold w-28 bg-muted/30 shrink-0">
+                <SelectValue placeholder="Assignee" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="Unassigned">Unassigned</SelectItem>
+                <SelectItem value="Sarah Jenkins">Sarah Jenkins</SelectItem>
+                <SelectItem value="Mike Ross">Mike Ross</SelectItem>
+                <SelectItem value="Front Desk">Front Desk</SelectItem>
+                <SelectItem value="Concierge Team">Concierge Team</SelectItem>
+              </SelectContent>
+            </Select>
 
-              <div className="min-w-0 flex-1 overflow-hidden">
-                <div className="flex items-center gap-1.5 min-w-0">
-                  <h3 className="font-bold text-xs text-foreground truncate min-w-0">{activeConv.guestName}</h3>
-                  <Badge variant="outline" className="text-[9px] px-1.5 py-0 bg-primary/5 text-primary border-primary/20 shrink-0 whitespace-nowrap">
-                    {activeConv.status}
-                  </Badge>
-                </div>
-                <p className="text-[10px] text-muted-foreground truncate">
-                  {activeConv.unit || 'No unit assigned'} • {activeConv.phone}
-                </p>
-              </div>
-            </div>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button 
+                  variant="ghost" 
+                  size="icon" 
+                  className="h-7 w-7 text-muted-foreground hover:text-foreground shrink-0"
+                  onClick={() => setShowChatSearch(!showChatSearch)}
+                >
+                  <Search className="w-3.5 h-3.5" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>Search chat</TooltipContent>
+            </Tooltip>
 
-            {/* Right: Controls & Actions */}
-            <div className="flex items-center gap-1 shrink-0">
-              <Select value={activeConv.assignee} onValueChange={handleAssigneeChange}>
-                <SelectTrigger className="h-7 text-[11px] font-semibold w-24 sm:w-28 bg-muted/30 shrink-0">
-                  <SelectValue placeholder="Assignee" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="Unassigned">Unassigned</SelectItem>
-                  <SelectItem value="Sarah Jenkins">Sarah Jenkins</SelectItem>
-                  <SelectItem value="Mike Ross">Mike Ross</SelectItem>
-                  <SelectItem value="Front Desk">Front Desk</SelectItem>
-                  <SelectItem value="Concierge Team">Concierge Team</SelectItem>
-                </SelectContent>
-              </Select>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button 
+                  variant="ghost" 
+                  size="icon" 
+                  className="h-7 w-7 text-muted-foreground hover:text-primary shrink-0"
+                  onClick={() => showSuccess(`Initiating call to ${activeConv.phone}...`)}
+                >
+                  <PhoneCall className="w-3.5 h-3.5" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>Call Guest</TooltipContent>
+            </Tooltip>
 
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button 
-                    variant="ghost" 
-                    size="icon" 
-                    className="h-7 w-7 text-muted-foreground hover:text-foreground shrink-0"
-                    onClick={() => setShowChatSearch(!showChatSearch)}
-                  >
-                    <Search className="w-3.5 h-3.5" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>Search chat</TooltipContent>
-              </Tooltip>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="h-7 text-xs gap-1 border-emerald-300 bg-emerald-50 text-emerald-900 hover:bg-emerald-100 font-bold px-2 shrink-0 whitespace-nowrap"
+              onClick={handleCloseConversation}
+            >
+              <Check className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+              Close
+            </Button>
 
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button 
-                    variant="ghost" 
-                    size="icon" 
-                    className="h-7 w-7 text-muted-foreground hover:text-primary shrink-0"
-                    onClick={() => showSuccess(`Initiating call to ${activeConv.phone}...`)}
-                  >
-                    <PhoneCall className="w-3.5 h-3.5" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>Call Guest</TooltipContent>
-              </Tooltip>
-
-              <Button 
-                variant="outline" 
-                size="sm" 
-                className="h-7 text-xs gap-1 border-emerald-300 bg-emerald-50 text-emerald-900 hover:bg-emerald-100 font-bold px-2 shrink-0 whitespace-nowrap"
-                onClick={handleCloseConversation}
-              >
-                <Check className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                Close
-              </Button>
-
-              <Button 
-                variant="ghost" 
-                size="icon" 
-                className={cn("h-7 w-7 shrink-0", showDrawer ? "text-primary" : "text-muted-foreground")}
-                onClick={() => setShowDrawer(!showDrawer)}
-              >
-                <SlidersHorizontal className="w-3.5 h-3.5" />
-              </Button>
-            </div>
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              className={cn("h-7 w-7 shrink-0", showDrawer ? "text-primary" : "text-muted-foreground")}
+              onClick={() => setShowDrawer(!showDrawer)}
+            >
+              <SlidersHorizontal className="w-3.5 h-3.5" />
+            </Button>
           </div>
 
           {showChatSearch && (
