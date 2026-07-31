@@ -35,7 +35,8 @@ import {
   Wand2, 
   X, 
   Lock, 
-  PhoneCall
+  PhoneCall,
+  Tag
 } from 'lucide-react';
 import { showSuccess } from '@/utils/toast';
 import { cn } from "@/lib/utils";
