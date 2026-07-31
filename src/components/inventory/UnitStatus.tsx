@@ -5,7 +5,8 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { 
   Dialog, 
   DialogContent, 
@@ -18,27 +19,25 @@ import {
   Activity, 
   DollarSign, 
   MapPin, 
-  Building, 
-  Wifi, 
-  Key, 
-  Calendar, 
-  User, 
-  CheckCircle2, 
-  RefreshCw, 
-  Wrench, 
-  ShieldCheck, 
-  Eye, 
   Bed, 
   Bath, 
   Users, 
   Maximize,
-  Sparkles,
   Lock,
-  Clock,
-  ExternalLink,
-  ChevronRight
+  RefreshCw, 
+  Wrench, 
+  ShieldCheck, 
+  Eye, 
+  User, 
+  CheckCircle2, 
+  Upload, 
+  Image as ImageIcon, 
+  X, 
+  Trash2, 
+  Plus,
+  Sparkles
 } from 'lucide-react';
-import { showSuccess } from '@/utils/toast';
+import { showSuccess, showError } from '@/utils/toast';
 
 interface UnitDetail {
   id: string;
@@ -56,6 +55,7 @@ interface UnitDetail {
   lastSync: string;
   smartLockCode: string;
   cleaningStatus: 'Cleaned & Inspected' | 'Pending Clean' | 'In Progress';
+  photos: string[];
   currentBooking?: {
     bookingId: string;
     guestName: string;
@@ -90,6 +90,11 @@ const mockUnits: UnitDetail[] = [
     lastSync: '2 mins ago',
     smartLockCode: '9021-88',
     cleaningStatus: 'Cleaned & Inspected',
+    photos: [
+      'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&fit=crop&w=800&q=80'
+    ],
     upcomingBooking: {
       bookingId: 'BK-9022',
       guestName: 'Sarah Jenkins',
@@ -114,6 +119,10 @@ const mockUnits: UnitDetail[] = [
     lastSync: '5 mins ago',
     smartLockCode: '4412-09',
     cleaningStatus: 'Cleaned & Inspected',
+    photos: [
+      'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1613490493576-7fde63acd811?auto=format&fit=crop&w=800&q=80'
+    ],
     currentBooking: {
       bookingId: 'BK-9021',
       guestName: 'Alexander Wright',
@@ -140,6 +149,10 @@ const mockUnits: UnitDetail[] = [
     lastSync: '12 mins ago',
     smartLockCode: '7721-55',
     cleaningStatus: 'Cleaned & Inspected',
+    photos: [
+      'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80'
+    ],
     amenities: ['Private Garden & BBQ', 'Private Swimming Pool', 'Garage Parking', 'Maid Room', 'High-speed WiFi']
   },
   {
@@ -158,6 +171,9 @@ const mockUnits: UnitDetail[] = [
     lastSync: '1 min ago',
     smartLockCode: '3310-99',
     cleaningStatus: 'In Progress',
+    photos: [
+      'https://images.unsplash.com/photo-1554995207-c18c203602cb?auto=format&fit=crop&w=800&q=80'
+    ],
     amenities: ['Workstation & Monitor', 'High-speed WiFi', 'Gym Access', 'Metro Access', 'Smart TV']
   },
   {
@@ -176,17 +192,64 @@ const mockUnits: UnitDetail[] = [
     lastSync: '8 mins ago',
     smartLockCode: '1102-44',
     cleaningStatus: 'Cleaned & Inspected',
+    photos: [
+      'https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&w=800&q=80'
+    ],
     amenities: ['Mountain View Deck', 'Firepit', 'Stargazing Telescope', 'High-speed WiFi', 'Free Parking']
   }
 ];
 
 const UnitStatus = () => {
+  const [units, setUnits] = useState<UnitDetail[]>(mockUnits);
   const [selectedUnit, setSelectedUnit] = useState<UnitDetail | null>(null);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
 
   const handleUnitClick = (unit: UnitDetail) => {
     setSelectedUnit(unit);
     setIsDetailOpen(true);
+  };
+
+  const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0 || !selectedUnit) return;
+
+    const newPhotoUrls: string[] = [];
+    Array.from(files).forEach((file) => {
+      // Create local object URL for instant preview
+      const objectUrl = URL.createObjectURL(file);
+      newPhotoUrls.push(objectUrl);
+    });
+
+    const updatedPhotos = [...selectedUnit.photos, ...newPhotoUrls];
+
+    // Update selected unit and units list
+    setSelectedUnit({
+      ...selectedUnit,
+      photos: updatedPhotos
+    });
+
+    setUnits(prev => prev.map(u => 
+      u.id === selectedUnit.id ? { ...u, photos: updatedPhotos } : u
+    ));
+
+    showSuccess(`Uploaded ${files.length} photo${files.length > 1 ? 's' : ''} for ${selectedUnit.name}.`);
+  };
+
+  const handleDeletePhoto = (indexToDelete: number) => {
+    if (!selectedUnit) return;
+
+    const updatedPhotos = selectedUnit.photos.filter((_, idx) => idx !== indexToDelete);
+
+    setSelectedUnit({
+      ...selectedUnit,
+      photos: updatedPhotos
+    });
+
+    setUnits(prev => prev.map(u => 
+      u.id === selectedUnit.id ? { ...u, photos: updatedPhotos } : u
+    ));
+
+    showSuccess("Photo removed from unit gallery.");
   };
 
   const handleForceSync = () => {
@@ -197,7 +260,9 @@ const UnitStatus = () => {
   const handleToggleMaintenance = () => {
     if (!selectedUnit) return;
     const nextStatus = selectedUnit.status === 'Maintenance' ? 'Available' : 'Maintenance';
-    setSelectedUnit({...selectedUnit, status: nextStatus});
+    const updated = { ...selectedUnit, status: nextStatus };
+    setSelectedUnit(updated);
+    setUnits(prev => prev.map(u => u.id === selectedUnit.id ? updated : u));
     showSuccess(`Unit status updated to ${nextStatus}.`);
   };
 
@@ -211,7 +276,7 @@ const UnitStatus = () => {
             <Activity className="h-4 w-4 text-primary" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">124</div>
+            <div className="text-2xl font-bold">{units.length}</div>
             <p className="text-xs text-muted-foreground">Across 12 prime locations</p>
           </CardContent>
         </Card>
@@ -246,7 +311,7 @@ const UnitStatus = () => {
             <div>
               <CardTitle>Unit Status & Pricing Catalog</CardTitle>
               <CardDescription>
-                Click on any unit row below to open the comprehensive detailed view, specs, current guest, and PMS actions.
+                Click on any unit row below to open the comprehensive detailed view, photos, specs, current guest, and PMS actions.
               </CardDescription>
             </div>
             <Badge variant="outline" className="text-xs font-mono bg-primary/5 text-primary border-primary/20">
@@ -263,6 +328,7 @@ const UnitStatus = () => {
                 <TableHead>Name</TableHead>
                 <TableHead>Location</TableHead>
                 <TableHead>Type</TableHead>
+                <TableHead>Photos</TableHead>
                 <TableHead>Daily Price</TableHead>
                 <TableHead>PMS Source</TableHead>
                 <TableHead>Status</TableHead>
@@ -270,7 +336,7 @@ const UnitStatus = () => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {mockUnits.map((unit) => (
+              {units.map((unit) => (
                 <TableRow 
                   key={unit.id}
                   className="cursor-pointer hover:bg-muted/50 transition-colors group"
@@ -287,6 +353,12 @@ const UnitStatus = () => {
                     </div>
                   </TableCell>
                   <TableCell className="text-xs font-medium">{unit.type}</TableCell>
+                  <TableCell>
+                    <div className="flex items-center gap-1">
+                      <ImageIcon className="w-3.5 h-3.5 text-primary" />
+                      <span className="text-xs font-semibold">{unit.photos.length}</span>
+                    </div>
+                  </TableCell>
                   <TableCell className="font-bold text-xs text-primary">AED {unit.price}</TableCell>
                   <TableCell>
                     <Badge variant="outline" className="text-[10px] font-mono">{unit.pms}</Badge>
@@ -322,7 +394,7 @@ const UnitStatus = () => {
 
       {/* Unit Detailed View Modal */}
       <Dialog open={isDetailOpen} onOpenChange={setIsDetailOpen}>
-        <DialogContent className="sm:max-w-[650px] max-h-[90vh] flex flex-col p-0 overflow-hidden">
+        <DialogContent className="sm:max-w-[700px] max-h-[92vh] flex flex-col p-0 overflow-hidden">
           {selectedUnit && (
             <>
               {/* Modal Header */}
@@ -355,7 +427,67 @@ const UnitStatus = () => {
               </DialogHeader>
 
               {/* Modal Body Content */}
-              <div className="p-5 overflow-y-auto space-y-6 max-h-[580px] text-xs">
+              <div className="p-5 overflow-y-auto space-y-6 max-h-[620px] text-xs">
+                
+                {/* PHOTO GALLERY & UPLOAD SECTION */}
+                <div className="space-y-3 border-b pb-5">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <ImageIcon className="w-4 h-4 text-primary" />
+                      <h4 className="font-bold text-xs uppercase tracking-wider text-foreground">
+                        Unit Photo Gallery ({selectedUnit.photos.length})
+                      </h4>
+                    </div>
+
+                    <Label htmlFor="upload-unit-photos" className="cursor-pointer">
+                      <div className="bg-primary text-primary-foreground hover:bg-primary/90 transition-colors px-3 py-1.5 rounded-md text-xs font-semibold flex items-center gap-1.5 shadow-xs">
+                        <Upload className="w-3.5 h-3.5" />
+                        <span>Upload Pictures</span>
+                      </div>
+                      <Input 
+                        id="upload-unit-photos"
+                        type="file"
+                        accept="image/*"
+                        multiple
+                        className="hidden"
+                        onChange={handlePhotoUpload}
+                      />
+                    </Label>
+                  </div>
+
+                  {/* Photos Grid */}
+                  <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
+                    {selectedUnit.photos.map((photoUrl, idx) => (
+                      <div 
+                        key={idx} 
+                        className="relative group rounded-lg overflow-hidden border bg-muted aspect-4/3 shadow-2xs"
+                      >
+                        <img 
+                          src={photoUrl} 
+                          alt={`${selectedUnit.name} photo ${idx + 1}`}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
+                        />
+                        <button
+                          onClick={() => handleDeletePhoto(idx)}
+                          className="absolute top-1.5 right-1.5 bg-black/70 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity hover:bg-destructive"
+                          title="Delete photo"
+                        >
+                          <X className="w-3 h-3" />
+                        </button>
+                      </div>
+                    ))}
+
+                    {/* Dropzone Placeholder Card */}
+                    <Label 
+                      htmlFor="upload-unit-photos"
+                      className="border-2 border-dashed border-primary/30 hover:border-primary bg-primary/5 hover:bg-primary/10 transition-colors rounded-lg flex flex-col items-center justify-center text-center p-3 cursor-pointer aspect-4/3 text-primary"
+                    >
+                      <Plus className="w-5 h-5 mb-1" />
+                      <span className="text-[10px] font-bold">Add Photo</span>
+                    </Label>
+                  </div>
+                </div>
+
                 {/* Specs Grid */}
                 <div className="grid grid-cols-4 gap-3 bg-muted/20 p-3 rounded-xl border text-center">
                   <div className="space-y-1">
