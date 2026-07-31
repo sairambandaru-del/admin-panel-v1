@@ -338,7 +338,7 @@ const Communications = () => {
       <div className="h-[calc(100vh-210px)] flex border rounded-2xl bg-card overflow-hidden shadow-xs">
         
         {/* PANEL 1: LEFT INBOX & FOLDER SIDEBAR */}
-        <div className="w-48 border-r bg-muted/20 flex flex-col shrink-0 select-none">
+        <div className="w-44 border-r bg-muted/20 flex flex-col shrink-0 select-none">
           <div className="p-3 border-b flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Inbox className="w-4 h-4 text-primary" />
@@ -491,7 +491,7 @@ const Communications = () => {
         </div>
 
         {/* PANEL 2: MIDDLE CONVERSATION LIST */}
-        <div className="w-72 border-r flex flex-col shrink-0 bg-background select-none">
+        <div className="w-64 border-r flex flex-col shrink-0 bg-background select-none">
           <div className="p-3 border-b space-y-2">
             <div className="flex items-center justify-between">
               <div className="flex gap-2">
@@ -631,17 +631,18 @@ const Communications = () => {
         {/* PANEL 3: MAIN CHAT CANVAS */}
         <div className="flex-1 flex flex-col bg-card min-w-0">
           {/* Header */}
-          <div className="p-3 border-b flex items-center justify-between gap-3 shrink-0 bg-background overflow-hidden">
-            <div className="flex items-center gap-2.5 min-w-0 flex-1">
+          <div className="p-3 border-b flex items-center justify-between gap-2 shrink-0 bg-background overflow-hidden min-w-0">
+            {/* Left: Avatar & Guest Info */}
+            <div className="flex items-center gap-2 min-w-0 flex-1 overflow-hidden">
               <Avatar className="w-8 h-8 border shrink-0">
                 <AvatarFallback className={cn("text-white font-bold text-xs", activeConv.avatarBg)}>
                   {activeConv.avatar}
                 </AvatarFallback>
               </Avatar>
 
-              <div className="min-w-0 flex-1">
-                <div className="flex items-center gap-2 min-w-0">
-                  <h3 className="font-bold text-xs text-foreground truncate shrink-0 max-w-[120px] sm:max-w-[180px]">{activeConv.guestName}</h3>
+              <div className="min-w-0 flex-1 overflow-hidden">
+                <div className="flex items-center gap-1.5 min-w-0">
+                  <h3 className="font-bold text-xs text-foreground truncate min-w-0">{activeConv.guestName}</h3>
                   <Badge variant="outline" className="text-[9px] px-1.5 py-0 bg-primary/5 text-primary border-primary/20 shrink-0 whitespace-nowrap">
                     {activeConv.status}
                   </Badge>
@@ -652,9 +653,10 @@ const Communications = () => {
               </div>
             </div>
 
-            <div className="flex items-center gap-1.5 shrink-0">
+            {/* Right: Controls & Actions */}
+            <div className="flex items-center gap-1 shrink-0">
               <Select value={activeConv.assignee} onValueChange={handleAssigneeChange}>
-                <SelectTrigger className="h-7 text-xs font-semibold w-28 bg-muted/30 shrink-0">
+                <SelectTrigger className="h-7 text-[11px] font-semibold w-24 sm:w-28 bg-muted/30 shrink-0">
                   <SelectValue placeholder="Assignee" />
                 </SelectTrigger>
                 <SelectContent>
@@ -908,7 +910,7 @@ const Communications = () => {
 
         {/* PANEL 4: FAR-RIGHT DRAWER */}
         {showDrawer && (
-          <div className="w-60 border-l bg-muted/10 p-3.5 space-y-5 flex flex-col shrink-0 overflow-y-auto select-none">
+          <div className="w-56 border-l bg-muted/10 p-3.5 space-y-5 flex flex-col shrink-0 overflow-y-auto select-none">
             <div className="text-center space-y-1.5 border-b pb-3">
               <Avatar className="w-14 h-14 mx-auto border-2 border-primary/20 shadow-xs">
                 <AvatarFallback className={cn("text-white font-bold text-base", activeConv.avatarBg)}>
@@ -917,7 +919,7 @@ const Communications = () => {
               </Avatar>
 
               <div>
-                <h4 className="font-bold text-xs text-foreground">{activeConv.guestName}</h4>
+                <h4 className="font-bold text-xs text-foreground truncate">{activeConv.guestName}</h4>
                 <Badge variant="outline" className="mt-0.5 text-[9px] bg-primary/5 text-primary border-primary/20 shrink-0 whitespace-nowrap">
                   {activeConv.status}
                 </Badge>
