@@ -16,10 +16,8 @@ import {
   DialogDescription, 
   DialogFooter, 
   DialogHeader, 
-  DialogTitle, 
-  DialogTrigger 
+  DialogTitle 
 } from "@/components/ui/dialog";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
   Building2, 
   User, 
@@ -40,22 +38,16 @@ import {
   Link as LinkIcon,
   Copy,
   Kanban,
-  List,
-  Sparkles,
   Search,
-  FileCheck,
-  AlertCircle,
   Plus,
   Globe,
   Calendar,
   Code2,
   DollarSign,
-  FileCode,
-  Edit2,
-  ExternalLink,
-  Laptop
+  Edit2
 } from 'lucide-react';
 import { showSuccess, showError } from '@/utils/toast';
+import { cn } from "@/lib/utils";
 
 export type CRMStage = 
   | 'New Lead'
@@ -540,7 +532,7 @@ const VendorOnboarding = () => {
           <h3 className="text-lg font-semibold">Vendor CRM & Onboarding Pipeline</h3>
           <p className="text-sm text-muted-foreground">Manage prospective vendor leads, track 23 key CRM parameters, auto-trigger onboarding email links on Contract Signed, and review submissions.</p>
         </div>
-        <div className="flex bg-muted p-1 rounded-lg border">
+        <div className="flex bg-muted p-1 rounded-lg border shrink-0">
           <Button 
             variant={activeTab === 'crm' ? 'secondary' : 'ghost'} 
             size="sm" 
@@ -606,17 +598,17 @@ const VendorOnboarding = () => {
 
             <CardContent className="p-0">
               <div className="rounded-md border-t overflow-x-auto">
-                <Table>
+                <Table className="min-w-[1100px]">
                   <TableHeader>
                     <TableRow className="bg-muted/30 text-[11px]">
-                      <TableHead>Vendor & Category</TableHead>
-                      <TableHead>Account Owner & Source</TableHead>
-                      <TableHead>Status Stage</TableHead>
-                      <TableHead>Integration Type & Software</TableHead>
-                      <TableHead>Target Dates (Signing / APIs)</TableHead>
-                      <TableHead>Commercial Model</TableHead>
-                      <TableHead>Legal Docs</TableHead>
-                      <TableHead className="text-right">Actions</TableHead>
+                      <TableHead className="min-w-[210px]">Vendor & Category</TableHead>
+                      <TableHead className="min-w-[150px]">Account Owner & Source</TableHead>
+                      <TableHead className="min-w-[180px]">Status Stage</TableHead>
+                      <TableHead className="min-w-[160px]">Integration Type & Software</TableHead>
+                      <TableHead className="min-w-[150px]">Target Dates (Signing / APIs)</TableHead>
+                      <TableHead className="min-w-[170px]">Commercial Model</TableHead>
+                      <TableHead className="min-w-[160px]">Legal Docs</TableHead>
+                      <TableHead className="text-right min-w-[110px]">Actions</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -629,39 +621,40 @@ const VendorOnboarding = () => {
                           className="hover:bg-muted/40 transition-colors cursor-pointer"
                           onClick={() => handleOpenInspector(lead)}
                         >
-                          <TableCell>
-                            <div>
-                              <p className="font-bold text-xs text-foreground flex items-center gap-1.5">
-                                {lead.companyName}
-                                <span className="text-[10px] font-mono text-muted-foreground">({lead.id})</span>
-                              </p>
-                              <div className="flex items-center gap-2 mt-0.5">
-                                <Badge variant="outline" className="text-[9px] bg-primary/5 text-primary border-primary/20 capitalize py-0">
+                          <TableCell className="align-top py-3">
+                            <div className="space-y-1">
+                              <div className="flex items-center gap-1.5 flex-wrap">
+                                <span className="font-bold text-xs text-foreground">{lead.companyName}</span>
+                                <span className="text-[10px] font-mono text-muted-foreground whitespace-nowrap">({lead.id})</span>
+                              </div>
+                              <div className="flex items-center gap-2 flex-wrap">
+                                <Badge variant="outline" className="text-[10px] rounded-md bg-primary/5 text-primary border-primary/20 px-1.5 py-0 capitalize whitespace-nowrap">
                                   {lead.category}
                                 </Badge>
-                                <span className="text-[10px] text-muted-foreground">{lead.contactPerson}</span>
+                                <span className="text-[10px] text-muted-foreground whitespace-nowrap">{lead.contactPerson}</span>
                               </div>
                             </div>
                           </TableCell>
 
-                          <TableCell>
-                            <div className="text-xs">
-                              <p className="font-semibold">{lead.accountOwner}</p>
-                              <p className="text-[10px] text-muted-foreground">Source: {lead.source}</p>
+                          <TableCell className="align-top py-3">
+                            <div className="text-xs space-y-0.5">
+                              <p className="font-semibold text-foreground">{lead.accountOwner}</p>
+                              <p className="text-[10px] text-muted-foreground whitespace-nowrap">Source: {lead.source}</p>
                             </div>
                           </TableCell>
 
-                          <TableCell onClick={e => e.stopPropagation()}>
-                            <div className="space-y-1">
+                          <TableCell className="align-top py-3" onClick={e => e.stopPropagation()}>
+                            <div className="space-y-1.5 max-w-[170px]">
                               <Select 
                                 value={lead.stage} 
                                 onValueChange={(val: CRMStage) => handleStageChange(lead.id, val)}
                               >
-                                <SelectTrigger className={`h-7 text-xs font-bold w-[160px] ${
+                                <SelectTrigger className={cn(
+                                  "h-8 text-xs font-bold w-full rounded-md",
                                   lead.stage === 'Contract Signed' ? 'border-emerald-500 bg-emerald-50 text-emerald-900' :
                                   lead.stage === 'Onboarding Completed' ? 'border-blue-500 bg-blue-50 text-blue-900' :
                                   'bg-background'
-                                }`}>
+                                )}>
                                   <SelectValue />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -676,55 +669,59 @@ const VendorOnboarding = () => {
                               </Select>
 
                               {lead.stage === 'Contract Signed' && (
-                                <span className="block text-[9px] text-emerald-600 font-bold flex items-center gap-1">
-                                  <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+                                <span className="block text-[9px] text-emerald-600 font-bold flex items-center gap-1 whitespace-nowrap">
+                                  <CheckCircle2 className="w-3 h-3 text-emerald-600 shrink-0" />
                                   Onboarding Email Sent
                                 </span>
                               )}
                             </div>
                           </TableCell>
 
-                          <TableCell>
-                            <div className="text-xs space-y-0.5">
-                              <Badge variant="outline" className="text-[9px] py-0 font-mono">
-                                <Code2 className="w-2.5 h-2.5 mr-1 text-primary" /> {lead.integrationType}
+                          <TableCell className="align-top py-3">
+                            <div className="text-xs space-y-1">
+                              <Badge variant="outline" className="text-[9px] rounded-md py-0.5 px-1.5 font-mono whitespace-nowrap">
+                                <Code2 className="w-2.5 h-2.5 mr-1 text-primary shrink-0 inline-block" />
+                                {lead.integrationType}
                               </Badge>
-                              <p className="text-[10px] text-muted-foreground truncate max-w-[140px]">
+                              <p className="text-[10px] text-muted-foreground truncate max-w-[150px]" title={lead.softwareUsed}>
                                 {lead.softwareUsed || 'Software TBD'}
                               </p>
                             </div>
                           </TableCell>
 
-                          <TableCell>
-                            <div className="text-[10px] font-mono space-y-0.5">
-                              <p className="text-foreground">Signing: <span className="font-bold">{lead.expectedSigningDate || 'TBD'}</span></p>
-                              <p className="text-muted-foreground">APIs: {lead.expectedDateOfAPIs || 'TBD'}</p>
+                          <TableCell className="align-top py-3">
+                            <div className="text-[10px] font-mono space-y-0.5 whitespace-nowrap">
+                              <p className="text-foreground"><span className="text-muted-foreground font-normal">Signing:</span> <span className="font-bold">{lead.expectedSigningDate || 'TBD'}</span></p>
+                              <p className="text-muted-foreground"><span>APIs:</span> {lead.expectedDateOfAPIs || 'TBD'}</p>
                             </div>
                           </TableCell>
 
-                          <TableCell>
-                            <p className="text-xs font-semibold text-primary truncate max-w-[150px]">
+                          <TableCell className="align-top py-3">
+                            <p className="text-xs font-semibold text-primary">
                               {lead.commercialModel}
                             </p>
                           </TableCell>
 
-                          <TableCell>
-                            <div className="flex items-center gap-1">
-                              <Badge 
-                                variant={lead.signedContract === 'Uploaded' ? 'default' : 'outline'}
-                                className={`text-[9px] px-1 py-0 ${lead.signedContract === 'Uploaded' ? 'bg-emerald-600' : ''}`}
-                              >
-                                Signed Contract: {lead.signedContract}
-                              </Badge>
-                            </div>
+                          <TableCell className="align-top py-3">
+                            <Badge 
+                              variant={lead.signedContract === 'Uploaded' ? 'default' : 'outline'}
+                              className={cn(
+                                "text-[10px] rounded-md px-2 py-0.5 font-medium whitespace-nowrap border",
+                                lead.signedContract === 'Uploaded' 
+                                  ? "bg-emerald-600 hover:bg-emerald-700 text-white border-emerald-600" 
+                                  : "bg-muted/40 text-muted-foreground border-muted-foreground/30"
+                              )}
+                            >
+                              Contract: {lead.signedContract}
+                            </Badge>
                           </TableCell>
 
-                          <TableCell className="text-right" onClick={e => e.stopPropagation()}>
+                          <TableCell className="text-right align-top py-3" onClick={e => e.stopPropagation()}>
                             <div className="flex justify-end gap-1">
                               <Button 
                                 variant="ghost" 
                                 size="sm" 
-                                className="h-7 text-xs text-primary hover:text-primary gap-1"
+                                className="h-7 text-xs text-primary hover:text-primary gap-1 px-2 whitespace-nowrap"
                                 onClick={() => handleOpenInspector(lead)}
                               >
                                 <Eye className="w-3.5 h-3.5" /> 360° View
@@ -888,35 +885,35 @@ const VendorOnboarding = () => {
                   <div className="grid grid-cols-5 gap-2 text-center">
                     <div className="border rounded-lg p-2.5 bg-card">
                       <span className="text-[9px] text-muted-foreground uppercase font-bold block mb-1">Concept Doc</span>
-                      <Badge variant={selectedLead.conceptDocument === 'Uploaded' ? 'default' : 'outline'} className="text-[9px]">
+                      <Badge variant={selectedLead.conceptDocument === 'Uploaded' ? 'default' : 'outline'} className="text-[9px] rounded-md">
                         {selectedLead.conceptDocument}
                       </Badge>
                     </div>
 
                     <div className="border rounded-lg p-2.5 bg-card">
                       <span className="text-[9px] text-muted-foreground uppercase font-bold block mb-1">Pitch Deck</span>
-                      <Badge variant={selectedLead.pitchDeck === 'Uploaded' ? 'default' : 'outline'} className="text-[9px]">
+                      <Badge variant={selectedLead.pitchDeck === 'Uploaded' ? 'default' : 'outline'} className="text-[9px] rounded-md">
                         {selectedLead.pitchDeck}
                       </Badge>
                     </div>
 
                     <div className="border rounded-lg p-2.5 bg-card">
                       <span className="text-[9px] text-muted-foreground uppercase font-bold block mb-1">Draft T&C</span>
-                      <Badge variant={selectedLead.draftTermsAndConditions === 'Uploaded' ? 'default' : 'outline'} className="text-[9px]">
+                      <Badge variant={selectedLead.draftTermsAndConditions === 'Uploaded' ? 'default' : 'outline'} className="text-[9px] rounded-md">
                         {selectedLead.draftTermsAndConditions}
                       </Badge>
                     </div>
 
                     <div className="border rounded-lg p-2.5 bg-card">
                       <span className="text-[9px] text-muted-foreground uppercase font-bold block mb-1">Contract</span>
-                      <Badge variant={selectedLead.contract === 'Uploaded' ? 'default' : 'outline'} className="text-[9px]">
+                      <Badge variant={selectedLead.contract === 'Uploaded' ? 'default' : 'outline'} className="text-[9px] rounded-md">
                         {selectedLead.contract}
                       </Badge>
                     </div>
 
                     <div className="border rounded-lg p-2.5 bg-emerald-50 border-emerald-200">
                       <span className="text-[9px] text-emerald-900 uppercase font-bold block mb-1">Signed Contract</span>
-                      <Badge className={`text-[9px] ${selectedLead.signedContract === 'Uploaded' ? 'bg-emerald-600' : 'bg-secondary'}`}>
+                      <Badge className={cn("text-[9px] rounded-md", selectedLead.signedContract === 'Uploaded' ? 'bg-emerald-600' : 'bg-secondary')}>
                         {selectedLead.signedContract}
                       </Badge>
                     </div>
