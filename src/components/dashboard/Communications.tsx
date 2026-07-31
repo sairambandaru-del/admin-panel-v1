@@ -9,6 +9,12 @@ import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { 
+  DropdownMenu, 
+  DropdownMenuContent, 
+  DropdownMenuItem, 
+  DropdownMenuTrigger 
+} from "@/components/ui/dropdown-menu";
 import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from "@/components/ui/tooltip";
 import { 
   Inbox, 
@@ -311,6 +317,13 @@ const Communications = () => {
       c.id === activeConv.id ? { ...c, assignee: newAssignee, assigneeAvatar: newAssignee.slice(0, 2).toUpperCase() } : c
     ));
     showSuccess(`Conversation reassigned to ${newAssignee}.`);
+  };
+
+  const handleStatusChange = (newStatus: ChatConversation['status']) => {
+    setConversations(prev => prev.map(c => 
+      c.id === activeConv.id ? { ...c, status: newStatus } : c
+    ));
+    showSuccess(`Lifecycle status updated to "${newStatus}".`);
   };
 
   const handleCloseConversation = () => {
@@ -896,9 +909,27 @@ const Communications = () => {
 
               <div>
                 <h4 className="font-bold text-xs text-foreground truncate">{activeConv.guestName}</h4>
-                <Badge variant="outline" className="mt-0.5 text-[9px] bg-primary/5 text-primary border-primary/20 shrink-0 whitespace-nowrap">
-                  {activeConv.status}
-                </Badge>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <button className="mt-1 inline-flex items-center gap-1 cursor-pointer hover:opacity-80 transition-opacity focus:outline-none">
+                      <Badge variant="outline" className="text-[9px] bg-primary/5 text-primary border-primary/20 shrink-0 whitespace-nowrap gap-1">
+                        {activeConv.status}
+                        <ChevronDown className="w-2.5 h-2.5 opacity-60" />
+                      </Badge>
+                    </button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="center" className="text-xs min-w-[140px]">
+                    {(['New Lead', 'Hot Lead', 'In House Guest', 'VIP Client', 'Closed - Won'] as ChatConversation['status'][]).map((st) => (
+                      <DropdownMenuItem 
+                        key={st} 
+                        onClick={() => handleStatusChange(st)}
+                        className={cn("text-xs font-medium cursor-pointer", activeConv.status === st && "bg-accent font-bold text-primary")}
+                      >
+                        {st}
+                      </DropdownMenuItem>
+                    ))}
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </div>
             </div>
 
