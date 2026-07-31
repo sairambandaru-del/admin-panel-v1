@@ -450,7 +450,7 @@ const Communications = () => {
                       )}
                     >
                       <div className="flex items-center gap-1.5 truncate">
-                        <Badge variant="outline" className="text-[8px] px-1 py-0 bg-blue-50 text-blue-700 border-blue-200">NEW</Badge>
+                        <Badge variant="outline" className="text-[8px] px-1 py-0 bg-blue-50 text-blue-700 border-blue-200 shrink-0 whitespace-nowrap">NEW</Badge>
                         <span className="truncate">New Lead</span>
                       </div>
                       <span className="font-mono text-[10px]">2</span>
@@ -594,7 +594,7 @@ const Communications = () => {
                           <Badge 
                             variant="outline" 
                             className={cn(
-                              "text-[9px] px-1.5 py-0 rounded-md font-medium",
+                              "text-[9px] px-1.5 py-0 rounded-md font-medium shrink-0 whitespace-nowrap",
                               conv.status === 'New Lead' ? "bg-blue-50 text-blue-800 border-blue-200" :
                               conv.status === 'In House Guest' ? "bg-emerald-50 text-emerald-800 border-emerald-200" :
                               conv.status === 'Hot Lead' ? "bg-amber-50 text-amber-800 border-amber-200" :
@@ -609,13 +609,13 @@ const Communications = () => {
                               <span className="w-2 h-2 rounded-full bg-primary shrink-0" />
                             )}
                             {conv.assigneeAvatar ? (
-                              <Avatar className="w-4 h-4 border">
+                              <Avatar className="w-4 h-4 border shrink-0">
                                 <AvatarFallback className="text-[8px] bg-muted font-bold text-foreground">
                                   {conv.assigneeAvatar}
                                 </AvatarFallback>
                               </Avatar>
                             ) : (
-                              <User className="w-3 h-3 text-muted-foreground" />
+                              <User className="w-3 h-3 text-muted-foreground shrink-0" />
                             )}
                           </div>
                         </div>
@@ -629,20 +629,20 @@ const Communications = () => {
         </div>
 
         {/* PANEL 3: MAIN CHAT CANVAS */}
-        <div className="flex-1 flex flex-col bg-card min-w-[300px]">
+        <div className="flex-1 flex flex-col bg-card min-w-0">
           {/* Header */}
-          <div className="p-3 border-b flex items-center justify-between gap-2 shrink-0 bg-background">
-            <div className="flex items-center gap-2.5 min-w-0">
-              <Avatar className="w-8 h-8 border">
+          <div className="p-3 border-b flex items-center justify-between gap-3 shrink-0 bg-background overflow-hidden">
+            <div className="flex items-center gap-2.5 min-w-0 flex-1">
+              <Avatar className="w-8 h-8 border shrink-0">
                 <AvatarFallback className={cn("text-white font-bold text-xs", activeConv.avatarBg)}>
                   {activeConv.avatar}
                 </AvatarFallback>
               </Avatar>
 
-              <div className="min-w-0">
-                <div className="flex items-center gap-2">
-                  <h3 className="font-bold text-xs text-foreground truncate">{activeConv.guestName}</h3>
-                  <Badge variant="outline" className="text-[9px] px-1.5 py-0 bg-primary/5 text-primary border-primary/20">
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center gap-2 min-w-0">
+                  <h3 className="font-bold text-xs text-foreground truncate shrink-0 max-w-[120px] sm:max-w-[180px]">{activeConv.guestName}</h3>
+                  <Badge variant="outline" className="text-[9px] px-1.5 py-0 bg-primary/5 text-primary border-primary/20 shrink-0 whitespace-nowrap">
                     {activeConv.status}
                   </Badge>
                 </div>
@@ -654,7 +654,7 @@ const Communications = () => {
 
             <div className="flex items-center gap-1.5 shrink-0">
               <Select value={activeConv.assignee} onValueChange={handleAssigneeChange}>
-                <SelectTrigger className="h-7 text-xs font-semibold w-28 bg-muted/30">
+                <SelectTrigger className="h-7 text-xs font-semibold w-28 bg-muted/30 shrink-0">
                   <SelectValue placeholder="Assignee" />
                 </SelectTrigger>
                 <SelectContent>
@@ -671,7 +671,7 @@ const Communications = () => {
                   <Button 
                     variant="ghost" 
                     size="icon" 
-                    className="h-7 w-7 text-muted-foreground hover:text-foreground"
+                    className="h-7 w-7 text-muted-foreground hover:text-foreground shrink-0"
                     onClick={() => setShowChatSearch(!showChatSearch)}
                   >
                     <Search className="w-3.5 h-3.5" />
@@ -685,7 +685,7 @@ const Communications = () => {
                   <Button 
                     variant="ghost" 
                     size="icon" 
-                    className="h-7 w-7 text-muted-foreground hover:text-primary"
+                    className="h-7 w-7 text-muted-foreground hover:text-primary shrink-0"
                     onClick={() => showSuccess(`Initiating call to ${activeConv.phone}...`)}
                   >
                     <PhoneCall className="w-3.5 h-3.5" />
@@ -697,17 +697,17 @@ const Communications = () => {
               <Button 
                 variant="outline" 
                 size="sm" 
-                className="h-7 text-xs gap-1 border-emerald-300 bg-emerald-50 text-emerald-900 hover:bg-emerald-100 font-bold px-2"
+                className="h-7 text-xs gap-1 border-emerald-300 bg-emerald-50 text-emerald-900 hover:bg-emerald-100 font-bold px-2 shrink-0 whitespace-nowrap"
                 onClick={handleCloseConversation}
               >
-                <Check className="w-3.5 h-3.5 text-emerald-600" />
+                <Check className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
                 Close
               </Button>
 
               <Button 
                 variant="ghost" 
                 size="icon" 
-                className={cn("h-7 w-7", showDrawer ? "text-primary" : "text-muted-foreground")}
+                className={cn("h-7 w-7 shrink-0", showDrawer ? "text-primary" : "text-muted-foreground")}
                 onClick={() => setShowDrawer(!showDrawer)}
               >
                 <SlidersHorizontal className="w-3.5 h-3.5" />
@@ -716,15 +716,15 @@ const Communications = () => {
           </div>
 
           {showChatSearch && (
-            <div className="p-2 border-b bg-muted/20 flex items-center gap-2">
-              <Search className="w-3.5 h-3.5 text-muted-foreground" />
+            <div className="p-2 border-b bg-muted/20 flex items-center gap-2 shrink-0">
+              <Search className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
               <Input 
                 placeholder="Search messages..."
                 value={chatSearchQuery}
                 onChange={e => setChatSearchQuery(e.target.value)}
                 className="h-7 text-xs bg-background"
               />
-              <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setShowChatSearch(false)}>
+              <Button variant="ghost" size="icon" className="h-7 w-7 shrink-0" onClick={() => setShowChatSearch(false)}>
                 <X className="w-3.5 h-3.5" />
               </Button>
             </div>
@@ -793,7 +793,7 @@ const Communications = () => {
           </ScrollArea>
 
           {/* RESPOND.IO COMPOSER */}
-          <div className="border-t p-2.5 bg-background space-y-2">
+          <div className="border-t p-2.5 bg-background space-y-2 shrink-0">
             <div className="flex items-center justify-between gap-2 border-b pb-1.5">
               <div className="flex items-center gap-2">
                 <div className="flex bg-muted p-0.5 rounded-lg border">
@@ -837,20 +837,20 @@ const Communications = () => {
                 <Button 
                   variant="outline" 
                   size="sm" 
-                  className="h-6 text-[10px] gap-1 border-primary/30 bg-primary/5 text-primary hover:bg-primary/10 font-bold px-2"
+                  className="h-6 text-[10px] gap-1 border-primary/30 bg-primary/5 text-primary hover:bg-primary/10 font-bold px-2 shrink-0 whitespace-nowrap"
                   onClick={handleAiAssist}
                 >
-                  <Wand2 className="w-3 h-3" />
+                  <Wand2 className="w-3 h-3 shrink-0" />
                   AI Assist
                 </Button>
 
                 <Button 
                   variant="ghost" 
                   size="sm" 
-                  className="h-6 text-[10px] gap-1 text-muted-foreground hover:text-foreground px-1.5"
+                  className="h-6 text-[10px] gap-1 text-muted-foreground hover:text-foreground px-1.5 shrink-0 whitespace-nowrap"
                   onClick={handleAiSummarize}
                 >
-                  <Sparkles className="w-3 h-3 text-amber-500" />
+                  <Sparkles className="w-3 h-3 text-amber-500 shrink-0" />
                   Summarize
                 </Button>
               </div>
@@ -893,13 +893,13 @@ const Communications = () => {
                 <Button 
                   size="sm" 
                   className={cn(
-                    "h-7 px-3 gap-1.5 font-bold text-xs",
+                    "h-7 px-3 gap-1.5 font-bold text-xs shrink-0 whitespace-nowrap",
                     messageMode === 'note' ? "bg-amber-600 hover:bg-amber-700 text-white" : "bg-primary text-primary-foreground"
                   )}
                   onClick={() => handleSendMessage()}
                 >
                   <span>{messageMode === 'note' ? 'Save Note' : 'Send'}</span>
-                  <Send className="w-3 h-3" />
+                  <Send className="w-3 h-3 shrink-0" />
                 </Button>
               </div>
             </div>
@@ -918,7 +918,7 @@ const Communications = () => {
 
               <div>
                 <h4 className="font-bold text-xs text-foreground">{activeConv.guestName}</h4>
-                <Badge variant="outline" className="mt-0.5 text-[9px] bg-primary/5 text-primary border-primary/20">
+                <Badge variant="outline" className="mt-0.5 text-[9px] bg-primary/5 text-primary border-primary/20 shrink-0 whitespace-nowrap">
                   {activeConv.status}
                 </Badge>
               </div>
@@ -928,10 +928,10 @@ const Communications = () => {
               <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block">Quick Actions</span>
               <div className="grid grid-cols-2 gap-1.5 text-xs">
                 <Button variant="outline" size="sm" className="h-7 text-[10px] gap-1" onClick={() => showSuccess(`Calling ${activeConv.phone}...`)}>
-                  <Phone className="w-3 h-3 text-primary" /> Call
+                  <Phone className="w-3 h-3 text-primary shrink-0" /> Call
                 </Button>
                 <Button variant="outline" size="sm" className="h-7 text-[10px] gap-1" onClick={() => showSuccess(`Creating support ticket for ${activeConv.guestName}...`)}>
-                  <Tag className="w-3 h-3 text-primary" /> Ticket
+                  <Tag className="w-3 h-3 text-primary shrink-0" /> Ticket
                 </Button>
               </div>
             </div>
