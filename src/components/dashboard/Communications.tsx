@@ -1,15 +1,13 @@
 "use client";
 
 import React, { useState } from 'react';
-import { Card } from "@/components/ui/card";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from "@/components/ui/tooltip";
 import { 
@@ -19,40 +17,27 @@ import {
   Phone, 
   PhoneIncoming, 
   MessageSquare, 
-  Clock, 
-  Tag, 
   Search, 
-  CheckCircle2, 
-  MoreHorizontal, 
   Sparkles, 
   Paperclip, 
   Smile, 
   Send, 
-  Mic, 
   Bot, 
   Zap, 
   ChevronDown, 
-  ChevronRight, 
   ArrowUpRight, 
   ArrowDownLeft, 
   Check, 
   CheckCheck, 
   Flame, 
   Building, 
-  Calendar, 
-  Hash, 
   SlidersHorizontal, 
-  AtSign, 
   Wand2, 
   X, 
-  Folder, 
-  ShieldCheck, 
   Lock, 
-  ExternalLink,
-  PhoneCall,
-  Volume2
+  PhoneCall
 } from 'lucide-react';
-import { showSuccess, showError } from '@/utils/toast';
+import { showSuccess } from '@/utils/toast';
 import { cn } from "@/lib/utils";
 
 interface ChatConversation {
@@ -202,15 +187,13 @@ const Communications = () => {
   const [openSections, setCollapsibleSections] = useState({
     aiAgents: true,
     lifecycle: true,
-    teamInbox: true,
-    customInbox: true
+    teamInbox: true
   });
 
   // Middle List State
   const [middleTab, setMiddleTab] = useState<'chats' | 'calls'>('chats');
   const [searchListQuery, setSearchListQuery] = useState('');
   const [onlyUnreplied, setOnlyUnreplied] = useState(false);
-  const [sortOrder, setSortOrder] = useState<'newest' | 'oldest'>('newest');
 
   // Active Chat State
   const [chatSearchQuery, setChatSearchQuery] = useState('');
@@ -228,7 +211,6 @@ const Communications = () => {
 
   // Filter Conversations based on Folder + Search + Unreplied
   const filteredConversations = conversations.filter(conv => {
-    // Folder filter
     if (selectedFolder === 'mine' && conv.assignee === 'Unassigned') return false;
     if (selectedFolder === 'unassigned' && conv.assignee !== 'Unassigned') return false;
     if (selectedFolder === 'new-lead' && conv.status !== 'New Lead') return false;
@@ -236,10 +218,8 @@ const Communications = () => {
     if (selectedFolder === 'in-house' && conv.status !== 'In House Guest') return false;
     if (selectedFolder === 'vip' && conv.status !== 'VIP Client') return false;
 
-    // Unreplied filter
     if (onlyUnreplied && !conv.unread && conv.direction !== 'inbound') return false;
 
-    // Search query
     if (searchListQuery) {
       const q = searchListQuery.toLowerCase();
       return (
@@ -288,7 +268,6 @@ const Communications = () => {
     setInputText('');
     showSuccess(isNote ? "Internal note added." : "Message sent!");
 
-    // Simulate Guest Reply if sending chat message
     if (!isNote) {
       setTimeout(() => {
         setConversations(prev => prev.map(c => {
@@ -317,7 +296,7 @@ const Communications = () => {
   };
 
   const handleAiAssist = () => {
-    const aiSuggestion = `Hello ${activeConv.guestName.split(' ')[0]}! I can certainly assist you with booking details and amenities for ${activeConv.unit || 'our suites'}. Would you like me to send an instant reservation link?`;
+    const aiSuggestion = `Hello ${activeConv.guestName.split(' ')[0]}! I can certainly assist you with booking details for ${activeConv.unit || 'our suites'}. Would you like me to send a quote?`;
     setInputText(aiSuggestion);
     showSuccess("AI Draft generated!");
   };
@@ -337,71 +316,65 @@ const Communications = () => {
     setConversations(prev => prev.map(c => 
       c.id === activeConv.id ? { ...c, status: 'Closed - Won' } : c
     ));
-    showSuccess(`Conversation with ${activeConv.guestName} marked as Resolved & Closed.`);
+    showSuccess(`Conversation with ${activeConv.guestName} marked as Closed.`);
   };
 
   const getChannelBadge = (channel: ChatConversation['channel']) => {
     switch (channel) {
       case 'WhatsApp':
-        return <div className="w-4 h-4 rounded-full bg-emerald-500 text-white flex items-center justify-center text-[9px] font-bold">W</div>;
+        return <div className="w-3.5 h-3.5 rounded-full bg-emerald-500 text-white flex items-center justify-center text-[8px] font-bold">W</div>;
       case 'In-App':
-        return <div className="w-4 h-4 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-[9px] font-bold">A</div>;
+        return <div className="w-3.5 h-3.5 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-[8px] font-bold">A</div>;
       case 'SMS':
-        return <div className="w-4 h-4 rounded-full bg-amber-500 text-white flex items-center justify-center text-[9px] font-bold">S</div>;
+        return <div className="w-3.5 h-3.5 rounded-full bg-amber-500 text-white flex items-center justify-center text-[8px] font-bold">S</div>;
       case 'Email':
-        return <div className="w-4 h-4 rounded-full bg-purple-500 text-white flex items-center justify-center text-[9px] font-bold">E</div>;
+        return <div className="w-3.5 h-3.5 rounded-full bg-purple-500 text-white flex items-center justify-center text-[8px] font-bold">E</div>;
     }
   };
 
   return (
     <TooltipProvider>
-      <div className="h-[calc(100vh-140px)] flex border rounded-2xl bg-card overflow-hidden shadow-xs">
+      <div className="h-[calc(100vh-210px)] flex border rounded-2xl bg-card overflow-hidden shadow-xs">
         
-        {/* ========================================================================= */}
-        {/* PANEL 1: LEFT INBOX & FOLDER SIDEBAR (Scallable like respond.io) */}
-        {/* ========================================================================= */}
-        <div className="w-56 border-r bg-muted/20 flex flex-col shrink-0 select-none">
-          {/* Header */}
+        {/* PANEL 1: LEFT INBOX & FOLDER SIDEBAR */}
+        <div className="w-48 border-r bg-muted/20 flex flex-col shrink-0 select-none">
           <div className="p-3 border-b flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Inbox className="w-4 h-4 text-primary" />
-              <span className="font-bold text-sm text-foreground">Inbox</span>
+              <span className="font-bold text-xs text-foreground">Inbox</span>
             </div>
             <Badge variant="secondary" className="text-[10px] font-mono px-1.5 py-0">
               {conversations.length}
             </Badge>
           </div>
 
-          {/* Nav Links & Collapsible Folders */}
-          <ScrollArea className="flex-1 px-2 py-3">
-            <div className="space-y-4 text-xs">
-              
-              {/* Quick Root Filters */}
+          <ScrollArea className="flex-1 px-2 py-2">
+            <div className="space-y-3 text-xs">
               <div className="space-y-0.5">
                 <button
                   onClick={() => setSelectedFolder('all')}
                   className={cn(
-                    "w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg transition-colors font-medium text-[11px]",
+                    "w-full flex items-center justify-between px-2 py-1.5 rounded-lg transition-colors font-medium text-[11px]",
                     selectedFolder === 'all' ? "bg-primary text-primary-foreground font-bold" : "hover:bg-muted text-foreground"
                   )}
                 >
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-1.5">
                     <Inbox className="w-3.5 h-3.5" />
-                    <span>All Conversations</span>
+                    <span className="truncate">All Conversations</span>
                   </div>
-                  <span className="font-mono text-[10px] opacity-80">80</span>
+                  <span className="font-mono text-[10px] opacity-80">{conversations.length}</span>
                 </button>
 
                 <button
                   onClick={() => setSelectedFolder('mine')}
                   className={cn(
-                    "w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg transition-colors font-medium text-[11px]",
+                    "w-full flex items-center justify-between px-2 py-1.5 rounded-lg transition-colors font-medium text-[11px]",
                     selectedFolder === 'mine' ? "bg-primary text-primary-foreground font-bold" : "hover:bg-muted text-muted-foreground hover:text-foreground"
                   )}
                 >
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-1.5">
                     <User className="w-3.5 h-3.5" />
-                    <span>Assigned to Me</span>
+                    <span className="truncate">Assigned to Me</span>
                   </div>
                   <span className="font-mono text-[10px] opacity-80">3</span>
                 </button>
@@ -409,13 +382,13 @@ const Communications = () => {
                 <button
                   onClick={() => setSelectedFolder('unassigned')}
                   className={cn(
-                    "w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg transition-colors font-medium text-[11px]",
+                    "w-full flex items-center justify-between px-2 py-1.5 rounded-lg transition-colors font-medium text-[11px]",
                     selectedFolder === 'unassigned' ? "bg-primary text-primary-foreground font-bold" : "hover:bg-muted text-muted-foreground hover:text-foreground"
                   )}
                 >
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-1.5">
                     <Users className="w-3.5 h-3.5" />
-                    <span>Unassigned</span>
+                    <span className="truncate">Unassigned</span>
                   </div>
                   <span className="font-mono text-[10px] opacity-80">2</span>
                 </button>
@@ -423,13 +396,13 @@ const Communications = () => {
                 <button
                   onClick={() => setSelectedFolder('calls')}
                   className={cn(
-                    "w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg transition-colors font-medium text-[11px]",
+                    "w-full flex items-center justify-between px-2 py-1.5 rounded-lg transition-colors font-medium text-[11px]",
                     selectedFolder === 'calls' ? "bg-primary text-primary-foreground font-bold" : "hover:bg-muted text-muted-foreground hover:text-foreground"
                   )}
                 >
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-1.5">
                     <PhoneIncoming className="w-3.5 h-3.5" />
-                    <span>Incoming Calls</span>
+                    <span className="truncate">Calls</span>
                   </div>
                   <span className="font-mono text-[10px] opacity-80">0</span>
                 </button>
@@ -445,11 +418,11 @@ const Communications = () => {
                   <ChevronDown className={cn("w-3 h-3 transition-transform", !openSections.aiAgents && "-rotate-90")} />
                 </button>
                 {openSections.aiAgents && (
-                  <div className="space-y-0.5 pl-1 mt-1">
+                  <div className="space-y-0.5 pl-1">
                     <div className="flex items-center justify-between px-2 py-1 rounded-md text-[11px] text-muted-foreground hover:bg-muted cursor-pointer">
-                      <div className="flex items-center gap-2">
-                        <Bot className="w-3.5 h-3.5 text-primary" />
-                        <span>AI Sales Concierge</span>
+                      <div className="flex items-center gap-1.5 truncate">
+                        <Bot className="w-3.5 h-3.5 text-primary shrink-0" />
+                        <span className="truncate">AI Sales Bot</span>
                       </div>
                       <span className="font-mono text-[10px]">50</span>
                     </div>
@@ -467,7 +440,7 @@ const Communications = () => {
                   <ChevronDown className={cn("w-3 h-3 transition-transform", !openSections.lifecycle && "-rotate-90")} />
                 </button>
                 {openSections.lifecycle && (
-                  <div className="space-y-0.5 pl-1 mt-1">
+                  <div className="space-y-0.5 pl-1">
                     <button
                       onClick={() => setSelectedFolder('new-lead')}
                       className={cn(
@@ -475,11 +448,11 @@ const Communications = () => {
                         selectedFolder === 'new-lead' ? "bg-primary/10 text-primary font-bold" : "text-muted-foreground hover:bg-muted"
                       )}
                     >
-                      <div className="flex items-center gap-2">
-                        <Badge variant="outline" className="text-[9px] px-1 py-0 bg-blue-50 text-blue-700 border-blue-200">NEW</Badge>
-                        <span>New Lead</span>
+                      <div className="flex items-center gap-1.5 truncate">
+                        <Badge variant="outline" className="text-[8px] px-1 py-0 bg-blue-50 text-blue-700 border-blue-200">NEW</Badge>
+                        <span className="truncate">New Lead</span>
                       </div>
-                      <span className="font-mono text-[10px]">13</span>
+                      <span className="font-mono text-[10px]">2</span>
                     </button>
 
                     <button
@@ -489,11 +462,11 @@ const Communications = () => {
                         selectedFolder === 'hot-lead' ? "bg-primary/10 text-primary font-bold" : "text-muted-foreground hover:bg-muted"
                       )}
                     >
-                      <div className="flex items-center gap-2">
-                        <Flame className="w-3.5 h-3.5 text-amber-500" />
-                        <span>Hot Lead</span>
+                      <div className="flex items-center gap-1.5 truncate">
+                        <Flame className="w-3.5 h-3.5 text-amber-500 shrink-0" />
+                        <span className="truncate">Hot Lead</span>
                       </div>
-                      <span className="font-mono text-[10px]">4</span>
+                      <span className="font-mono text-[10px]">1</span>
                     </button>
 
                     <button
@@ -503,100 +476,52 @@ const Communications = () => {
                         selectedFolder === 'in-house' ? "bg-primary/10 text-primary font-bold" : "text-muted-foreground hover:bg-muted"
                       )}
                     >
-                      <div className="flex items-center gap-2">
-                        <Building className="w-3.5 h-3.5 text-emerald-500" />
-                        <span>In House Guest</span>
+                      <div className="flex items-center gap-1.5 truncate">
+                        <Building className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+                        <span className="truncate">In House</span>
                       </div>
-                      <span className="font-mono text-[10px]">8</span>
-                    </button>
-
-                    <button
-                      onClick={() => setSelectedFolder('vip')}
-                      className={cn(
-                        "w-full flex items-center justify-between px-2 py-1 rounded-md text-[11px] transition-colors",
-                        selectedFolder === 'vip' ? "bg-primary/10 text-primary font-bold" : "text-muted-foreground hover:bg-muted"
-                      )}
-                    >
-                      <div className="flex items-center gap-2">
-                        <Badge className="text-[8px] bg-purple-600 text-white px-1 py-0">VIP</Badge>
-                        <span>VIP Clients</span>
-                      </div>
-                      <span className="font-mono text-[10px]">2</span>
+                      <span className="font-mono text-[10px]">1</span>
                     </button>
                   </div>
                 )}
               </div>
-
-              {/* Collapsible: Team Inboxes */}
-              <div className="pt-2 border-t">
-                <button 
-                  onClick={() => toggleSection('teamInbox')}
-                  className="w-full flex items-center justify-between text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-1 px-1 hover:text-foreground"
-                >
-                  <span>Team Inbox</span>
-                  <ChevronDown className={cn("w-3 h-3 transition-transform", !openSections.teamInbox && "-rotate-90")} />
-                </button>
-                {openSections.teamInbox && (
-                  <div className="space-y-0.5 pl-1 mt-1 text-muted-foreground">
-                    <div className="flex items-center justify-between px-2 py-1 rounded-md text-[11px] hover:bg-muted cursor-pointer">
-                      <span>Sales & Reservations</span>
-                      <span className="font-mono text-[10px]">5</span>
-                    </div>
-                    <div className="flex items-center justify-between px-2 py-1 rounded-md text-[11px] hover:bg-muted cursor-pointer">
-                      <span>Front Desk & Concierge</span>
-                      <span className="font-mono text-[10px]">3</span>
-                    </div>
-                    <div className="flex items-center justify-between px-2 py-1 rounded-md text-[11px] hover:bg-muted cursor-pointer">
-                      <span>Vendor Dispatch</span>
-                      <span className="font-mono text-[10px]">6</span>
-                    </div>
-                  </div>
-                )}
-              </div>
-
             </div>
           </ScrollArea>
         </div>
 
-        {/* ========================================================================= */}
-        {/* PANEL 2: MIDDLE CONVERSATION LIST PANE */}
-        {/* ========================================================================= */}
-        <div className="w-80 border-r flex flex-col shrink-0 bg-background select-none">
-          {/* Header Tabs (Chats / Calls) */}
+        {/* PANEL 2: MIDDLE CONVERSATION LIST */}
+        <div className="w-72 border-r flex flex-col shrink-0 bg-background select-none">
           <div className="p-3 border-b space-y-2">
             <div className="flex items-center justify-between">
               <div className="flex gap-2">
                 <button 
                   onClick={() => setMiddleTab('chats')} 
-                  className={cn("text-xs font-bold pb-1 border-b-2 transition-colors", middleTab === 'chats' ? "border-primary text-primary" : "border-transparent text-muted-foreground")}
+                  className={cn("text-xs font-bold pb-0.5 border-b-2 transition-colors", middleTab === 'chats' ? "border-primary text-primary" : "border-transparent text-muted-foreground")}
                 >
                   Chats
                 </button>
                 <button 
                   onClick={() => setMiddleTab('calls')} 
-                  className={cn("text-xs font-bold pb-1 border-b-2 transition-colors", middleTab === 'calls' ? "border-primary text-primary" : "border-transparent text-muted-foreground")}
+                  className={cn("text-xs font-bold pb-0.5 border-b-2 transition-colors", middleTab === 'calls' ? "border-primary text-primary" : "border-transparent text-muted-foreground")}
                 >
                   Calls
                 </button>
               </div>
 
-              <div className="flex items-center gap-1 text-muted-foreground">
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <button className="p-1 hover:text-foreground rounded" onClick={() => showSuccess("Sorting menu opened")}>
-                      <SlidersHorizontal className="w-3.5 h-3.5" />
-                    </button>
-                  </TooltipTrigger>
-                  <TooltipContent>Sort & Filter</TooltipContent>
-                </Tooltip>
-              </div>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button className="p-1 hover:text-foreground text-muted-foreground rounded" onClick={() => showSuccess("Sorting menu opened")}>
+                    <SlidersHorizontal className="w-3.5 h-3.5" />
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent>Sort & Filter</TooltipContent>
+              </Tooltip>
             </div>
 
-            {/* Filter Toggle Bar */}
             <div className="flex items-center justify-between text-[11px]">
               <span className="text-muted-foreground font-medium">All, Newest</span>
-              <div className="flex items-center gap-1.5">
-                <span className="text-muted-foreground">Unreplied</span>
+              <div className="flex items-center gap-1">
+                <span className="text-muted-foreground text-[10px]">Unreplied</span>
                 <Switch 
                   checked={onlyUnreplied} 
                   onCheckedChange={setOnlyUnreplied} 
@@ -605,11 +530,10 @@ const Communications = () => {
               </div>
             </div>
 
-            {/* Search Input */}
             <div className="relative">
               <Search className="absolute left-2.5 top-2 h-3.5 w-3.5 text-muted-foreground" />
               <Input
-                placeholder="Search conversations..."
+                placeholder="Search chats..."
                 value={searchListQuery}
                 onChange={e => setSearchListQuery(e.target.value)}
                 className="pl-8 h-7 text-xs bg-muted/30"
@@ -617,12 +541,11 @@ const Communications = () => {
             </div>
           </div>
 
-          {/* Chat List Items */}
           <ScrollArea className="flex-1">
             <div className="divide-y">
               {filteredConversations.length === 0 ? (
-                <div className="p-8 text-center text-xs text-muted-foreground">
-                  No conversations match filters.
+                <div className="p-6 text-center text-xs text-muted-foreground">
+                  No conversations match.
                 </div>
               ) : (
                 filteredConversations.map(conv => {
@@ -633,34 +556,30 @@ const Communications = () => {
                       key={conv.id}
                       onClick={() => {
                         setActiveConversationId(conv.id);
-                        // Mark read
                         setConversations(prev => prev.map(c => c.id === conv.id ? { ...c, unread: false, unreadCount: 0 } : c));
                       }}
                       className={cn(
-                        "w-full p-3 text-left transition-colors flex items-start gap-3 relative group",
+                        "w-full p-3 text-left transition-colors flex items-start gap-2.5 relative group",
                         isSelected ? "bg-accent/80 border-l-4 border-l-primary" : "hover:bg-muted/50"
                       )}
                     >
-                      {/* Avatar with Channel Badge Overlay */}
-                      <div className="relative shrink-0">
-                        <Avatar className="w-10 h-10 border">
+                      <div className="relative shrink-0 mt-0.5">
+                        <Avatar className="w-9 h-9 border">
                           <AvatarFallback className={cn("text-white font-bold text-xs", conv.avatarBg)}>
                             {conv.avatar}
                           </AvatarFallback>
                         </Avatar>
-                        <div className="absolute -bottom-1 -right-1 ring-2 ring-background rounded-full">
+                        <div className="absolute -bottom-1 -right-1 ring-1 ring-background rounded-full">
                           {getChannelBadge(conv.channel)}
                         </div>
                       </div>
 
-                      {/* Content */}
                       <div className="flex-1 min-w-0">
                         <div className="flex justify-between items-baseline gap-1">
                           <p className="font-bold text-xs text-foreground truncate">{conv.guestName}</p>
                           <span className="text-[10px] text-muted-foreground shrink-0 font-mono">{conv.time}</span>
                         </div>
 
-                        {/* Last Message Preview */}
                         <div className="flex items-center gap-1 mt-0.5 text-xs text-muted-foreground truncate">
                           {conv.direction === 'outbound' ? (
                             <ArrowUpRight className="w-3 h-3 text-blue-500 shrink-0" />
@@ -670,7 +589,6 @@ const Communications = () => {
                           <span className="truncate text-[11px]">{conv.lastMessage}</span>
                         </div>
 
-                        {/* Tags & Assignee Mini Avatar */}
                         <div className="mt-1.5 flex items-center justify-between gap-1">
                           <Badge 
                             variant="outline" 
@@ -709,15 +627,12 @@ const Communications = () => {
           </ScrollArea>
         </div>
 
-        {/* ========================================================================= */}
-        {/* PANEL 3: MAIN CONVERSATION CANVAS & RESPOND.IO COMPOSER */}
-        {/* ========================================================================= */}
-        <div className="flex-1 flex flex-col bg-card min-w-0">
-          
-          {/* Active Chat Top Header */}
+        {/* PANEL 3: MAIN CHAT CANVAS */}
+        <div className="flex-1 flex flex-col bg-card min-w-[300px]">
+          {/* Header */}
           <div className="p-3 border-b flex items-center justify-between gap-2 shrink-0 bg-background">
-            <div className="flex items-center gap-3 min-w-0">
-              <Avatar className="w-9 h-9 border">
+            <div className="flex items-center gap-2.5 min-w-0">
+              <Avatar className="w-8 h-8 border">
                 <AvatarFallback className={cn("text-white font-bold text-xs", activeConv.avatarBg)}>
                   {activeConv.avatar}
                 </AvatarFallback>
@@ -725,8 +640,8 @@ const Communications = () => {
 
               <div className="min-w-0">
                 <div className="flex items-center gap-2">
-                  <h3 className="font-bold text-sm text-foreground truncate">{activeConv.guestName}</h3>
-                  <Badge variant="outline" className="text-[10px] bg-primary/5 text-primary border-primary/20">
+                  <h3 className="font-bold text-xs text-foreground truncate">{activeConv.guestName}</h3>
+                  <Badge variant="outline" className="text-[9px] px-1.5 py-0 bg-primary/5 text-primary border-primary/20">
                     {activeConv.status}
                   </Badge>
                 </div>
@@ -736,11 +651,9 @@ const Communications = () => {
               </div>
             </div>
 
-            {/* Header Right Actions */}
-            <div className="flex items-center gap-2 shrink-0">
-              {/* Assignee Selector */}
+            <div className="flex items-center gap-1.5 shrink-0">
               <Select value={activeConv.assignee} onValueChange={handleAssigneeChange}>
-                <SelectTrigger className="h-8 text-xs font-semibold w-32 bg-muted/30">
+                <SelectTrigger className="h-7 text-xs font-semibold w-28 bg-muted/30">
                   <SelectValue placeholder="Assignee" />
                 </SelectTrigger>
                 <SelectContent>
@@ -752,60 +665,55 @@ const Communications = () => {
                 </SelectContent>
               </Select>
 
-              {/* Chat Search Toggle */}
               <Tooltip>
                 <TooltipTrigger asChild>
                   <Button 
                     variant="ghost" 
                     size="icon" 
-                    className="h-8 w-8 text-muted-foreground hover:text-foreground"
+                    className="h-7 w-7 text-muted-foreground hover:text-foreground"
                     onClick={() => setShowChatSearch(!showChatSearch)}
                   >
-                    <Search className="w-4 h-4" />
+                    <Search className="w-3.5 h-3.5" />
                   </Button>
                 </TooltipTrigger>
-                <TooltipContent>Search in conversation</TooltipContent>
+                <TooltipContent>Search chat</TooltipContent>
               </Tooltip>
 
-              {/* Call Guest */}
               <Tooltip>
                 <TooltipTrigger asChild>
                   <Button 
                     variant="ghost" 
                     size="icon" 
-                    className="h-8 w-8 text-muted-foreground hover:text-primary"
+                    className="h-7 w-7 text-muted-foreground hover:text-primary"
                     onClick={() => showSuccess(`Initiating call to ${activeConv.phone}...`)}
                   >
-                    <PhoneCall className="w-4 h-4" />
+                    <PhoneCall className="w-3.5 h-3.5" />
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>Call Guest</TooltipContent>
               </Tooltip>
 
-              {/* Resolve / Close Ticket Button */}
               <Button 
                 variant="outline" 
                 size="sm" 
-                className="h-8 text-xs gap-1 border-emerald-300 bg-emerald-50 text-emerald-900 hover:bg-emerald-100 font-bold"
+                className="h-7 text-xs gap-1 border-emerald-300 bg-emerald-50 text-emerald-900 hover:bg-emerald-100 font-bold px-2"
                 onClick={handleCloseConversation}
               >
                 <Check className="w-3.5 h-3.5 text-emerald-600" />
                 Close
               </Button>
 
-              {/* Toggle Info Drawer */}
               <Button 
                 variant="ghost" 
                 size="icon" 
-                className={cn("h-8 w-8", showDrawer ? "text-primary" : "text-muted-foreground")}
+                className={cn("h-7 w-7", showDrawer ? "text-primary" : "text-muted-foreground")}
                 onClick={() => setShowDrawer(!showDrawer)}
               >
-                <SlidersHorizontal className="w-4 h-4" />
+                <SlidersHorizontal className="w-3.5 h-3.5" />
               </Button>
             </div>
           </div>
 
-          {/* Search bar overlay if toggled */}
           {showChatSearch && (
             <div className="p-2 border-b bg-muted/20 flex items-center gap-2">
               <Search className="w-3.5 h-3.5 text-muted-foreground" />
@@ -822,14 +730,13 @@ const Communications = () => {
           )}
 
           {/* Messages Stream */}
-          <ScrollArea className="flex-1 p-4 bg-muted/10">
-            <div className="space-y-4 max-w-2xl mx-auto">
-              
+          <ScrollArea className="flex-1 p-3 bg-muted/10">
+            <div className="space-y-3 max-w-2xl mx-auto">
               {activeConv.messages.map((msg) => {
                 if (msg.sender === 'system') {
                   return (
                     <div key={msg.id} className="flex justify-center my-2">
-                      <div className="px-3 py-1 bg-muted/80 rounded-full text-[10px] font-medium text-muted-foreground shadow-2xs border">
+                      <div className="px-3 py-0.5 bg-muted/80 rounded-full text-[10px] font-medium text-muted-foreground shadow-2xs border">
                         {msg.text}
                       </div>
                     </div>
@@ -838,8 +745,8 @@ const Communications = () => {
 
                 if (msg.sender === 'note') {
                   return (
-                    <div key={msg.id} className="p-3 bg-amber-50 border-2 border-amber-300 rounded-xl space-y-1 text-xs text-amber-900 shadow-2xs">
-                      <div className="flex items-center justify-between font-bold text-[10px] text-amber-800 border-b border-amber-200 pb-1">
+                    <div key={msg.id} className="p-2.5 bg-amber-50 border-2 border-amber-300 rounded-xl space-y-1 text-xs text-amber-900 shadow-2xs">
+                      <div className="flex items-center justify-between font-bold text-[10px] text-amber-800 border-b border-amber-200 pb-0.5">
                         <span>🔒 Internal Comment by {msg.senderName}</span>
                         <span>{msg.time}</span>
                       </div>
@@ -858,14 +765,14 @@ const Communications = () => {
                       isAgent ? "ml-auto items-end" : "mr-auto items-start"
                     )}
                   >
-                    <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground px-1 mb-1">
+                    <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground px-1 mb-0.5">
                       <span className="font-bold text-foreground">{isAgent ? (msg.senderName || 'Staff Agent') : activeConv.guestName}</span>
                       <span>•</span>
                       <span>{msg.time}</span>
                     </div>
 
                     <div className={cn(
-                      "p-3 rounded-2xl text-xs space-y-1 shadow-2xs relative",
+                      "p-2.5 rounded-2xl text-xs space-y-1 shadow-2xs relative",
                       isAgent 
                         ? "bg-primary text-primary-foreground rounded-tr-none" 
                         : "bg-background border text-foreground rounded-tl-none"
@@ -881,22 +788,18 @@ const Communications = () => {
                   </div>
                 );
               })}
-
             </div>
           </ScrollArea>
 
-          {/* RESPOND.IO RICH COMPOSER */}
-          <div className="border-t p-3 bg-background space-y-2">
-            
-            {/* Top Toolbar: Message Mode & Channel Selector */}
-            <div className="flex items-center justify-between gap-2 border-b pb-2">
+          {/* RESPOND.IO COMPOSER */}
+          <div className="border-t p-2.5 bg-background space-y-2">
+            <div className="flex items-center justify-between gap-2 border-b pb-1.5">
               <div className="flex items-center gap-2">
-                {/* Mode Selector (Chat vs Internal Comment) */}
                 <div className="flex bg-muted p-0.5 rounded-lg border">
                   <button 
                     onClick={() => setMessageMode('chat')}
                     className={cn(
-                      "px-2.5 py-1 text-xs font-semibold rounded-md transition-all",
+                      "px-2 py-0.5 text-xs font-semibold rounded-md transition-all",
                       messageMode === 'chat' ? "bg-background text-foreground shadow-2xs" : "text-muted-foreground hover:text-foreground"
                     )}
                   >
@@ -905,7 +808,7 @@ const Communications = () => {
                   <button 
                     onClick={() => setMessageMode('note')}
                     className={cn(
-                      "px-2.5 py-1 text-xs font-semibold rounded-md transition-all flex items-center gap-1",
+                      "px-2 py-0.5 text-xs font-semibold rounded-md transition-all flex items-center gap-1",
                       messageMode === 'note' ? "bg-amber-100 text-amber-900 shadow-2xs font-bold" : "text-muted-foreground hover:text-foreground"
                     )}
                   >
@@ -914,10 +817,9 @@ const Communications = () => {
                   </button>
                 </div>
 
-                {/* Channel Selector */}
                 {messageMode === 'chat' && (
                   <Select value={selectedChannel} onValueChange={(v: any) => setSelectedChannel(v)}>
-                    <SelectTrigger className="h-7 text-xs font-bold w-28 bg-muted/30">
+                    <SelectTrigger className="h-6 text-[11px] font-bold w-26 bg-muted/30">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -930,12 +832,11 @@ const Communications = () => {
                 )}
               </div>
 
-              {/* AI Draft Assist & Summarize */}
-              <div className="flex items-center gap-1.5">
+              <div className="flex items-center gap-1">
                 <Button 
                   variant="outline" 
                   size="sm" 
-                  className="h-7 text-[11px] gap-1 border-primary/30 bg-primary/5 text-primary hover:bg-primary/10 font-bold"
+                  className="h-6 text-[10px] gap-1 border-primary/30 bg-primary/5 text-primary hover:bg-primary/10 font-bold px-2"
                   onClick={handleAiAssist}
                 >
                   <Wand2 className="w-3 h-3" />
@@ -945,7 +846,7 @@ const Communications = () => {
                 <Button 
                   variant="ghost" 
                   size="sm" 
-                  className="h-7 text-[11px] gap-1 text-muted-foreground hover:text-foreground"
+                  className="h-6 text-[10px] gap-1 text-muted-foreground hover:text-foreground px-1.5"
                   onClick={handleAiSummarize}
                 >
                   <Sparkles className="w-3 h-3 text-amber-500" />
@@ -954,13 +855,12 @@ const Communications = () => {
               </div>
             </div>
 
-            {/* Input Textarea Area */}
             <div className="relative">
               <Textarea
                 placeholder={
                   messageMode === 'note' 
                     ? "Add internal note for staff members (invisible to guest)..." 
-                    : "Use '/' for snippets, '$' for variables, ':' for emoji..."
+                    : "Use '/' for snippets, '$' for variables..."
                 }
                 value={inputText}
                 onChange={e => setInputText(e.target.value)}
@@ -971,132 +871,101 @@ const Communications = () => {
                   }
                 }}
                 className={cn(
-                  "min-h-[70px] text-xs resize-none p-2.5 border-none focus-visible:ring-0",
+                  "min-h-[50px] text-xs resize-none p-2 border-none focus-visible:ring-0",
                   messageMode === 'note' ? "bg-amber-50/50 text-amber-900 placeholder:text-amber-700/50" : "bg-transparent"
                 )}
               />
 
-              {/* Bottom Composer Toolbar Icons & Send Button */}
-              <div className="flex justify-between items-center pt-2 border-t mt-1">
-                <div className="flex items-center gap-2 text-muted-foreground">
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <button className="p-1 hover:text-foreground rounded" onClick={() => showSuccess("Attachment dialog opened")}>
-                        <Paperclip className="w-4 h-4" />
-                      </button>
-                    </TooltipTrigger>
-                    <TooltipContent>Attach file</TooltipContent>
-                  </Tooltip>
-
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <button className="p-1 hover:text-foreground rounded" onClick={() => setInputText(prev => prev + " 😊")}>
-                        <Smile className="w-4 h-4" />
-                      </button>
-                    </TooltipTrigger>
-                    <TooltipContent>Add Emoji</TooltipContent>
-                  </Tooltip>
-
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <button className="p-1 hover:text-foreground rounded" onClick={() => setInputText(prev => prev + " /welcome_greeting")}>
-                        <Zap className="w-4 h-4 text-amber-500" />
-                      </button>
-                    </TooltipTrigger>
-                    <TooltipContent>Quick Snippets ('/')</TooltipContent>
-                  </Tooltip>
+              <div className="flex justify-between items-center pt-1.5 border-t mt-1">
+                <div className="flex items-center gap-1.5 text-muted-foreground">
+                  <button className="p-1 hover:text-foreground rounded" onClick={() => showSuccess("Attachment dialog opened")}>
+                    <Paperclip className="w-3.5 h-3.5" />
+                  </button>
+                  <button className="p-1 hover:text-foreground rounded" onClick={() => setInputText(prev => prev + " 😊")}>
+                    <Smile className="w-3.5 h-3.5" />
+                  </button>
+                  <button className="p-1 hover:text-foreground rounded" onClick={() => setInputText(prev => prev + " /welcome_greeting")}>
+                    <Zap className="w-3.5 h-3.5 text-amber-500" />
+                  </button>
                 </div>
 
                 <Button 
                   size="sm" 
                   className={cn(
-                    "h-8 px-4 gap-1.5 font-bold text-xs",
+                    "h-7 px-3 gap-1.5 font-bold text-xs",
                     messageMode === 'note' ? "bg-amber-600 hover:bg-amber-700 text-white" : "bg-primary text-primary-foreground"
                   )}
                   onClick={() => handleSendMessage()}
                 >
                   <span>{messageMode === 'note' ? 'Save Note' : 'Send'}</span>
-                  <Send className="w-3.5 h-3.5" />
+                  <Send className="w-3 h-3" />
                 </Button>
               </div>
             </div>
-
           </div>
         </div>
 
-        {/* ========================================================================= */}
-        {/* PANEL 4: FAR-RIGHT CONTACT & STAY DETAILS DRAWER */}
-        {/* ========================================================================= */}
+        {/* PANEL 4: FAR-RIGHT DRAWER */}
         {showDrawer && (
-          <div className="w-64 border-l bg-muted/10 p-4 space-y-6 flex flex-col shrink-0 overflow-y-auto select-none">
-            
-            {/* Guest Profile Card */}
-            <div className="text-center space-y-2 border-b pb-4">
-              <Avatar className="w-16 h-16 mx-auto border-2 border-primary/20 shadow-xs">
-                <AvatarFallback className={cn("text-white font-bold text-lg", activeConv.avatarBg)}>
+          <div className="w-60 border-l bg-muted/10 p-3.5 space-y-5 flex flex-col shrink-0 overflow-y-auto select-none">
+            <div className="text-center space-y-1.5 border-b pb-3">
+              <Avatar className="w-14 h-14 mx-auto border-2 border-primary/20 shadow-xs">
+                <AvatarFallback className={cn("text-white font-bold text-base", activeConv.avatarBg)}>
                   {activeConv.avatar}
                 </AvatarFallback>
               </Avatar>
 
               <div>
-                <h4 className="font-bold text-sm text-foreground">{activeConv.guestName}</h4>
-                <Badge variant="outline" className="mt-1 text-[10px] bg-primary/5 text-primary border-primary/20">
+                <h4 className="font-bold text-xs text-foreground">{activeConv.guestName}</h4>
+                <Badge variant="outline" className="mt-0.5 text-[9px] bg-primary/5 text-primary border-primary/20">
                   {activeConv.status}
                 </Badge>
               </div>
             </div>
 
-            {/* Quick Action Tools */}
-            <div className="space-y-2">
+            <div className="space-y-1.5">
               <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block">Quick Actions</span>
-              <div className="grid grid-cols-2 gap-2 text-xs">
-                <Button variant="outline" size="sm" className="h-8 text-[11px] gap-1" onClick={() => showSuccess(`Calling ${activeConv.phone}...`)}>
+              <div className="grid grid-cols-2 gap-1.5 text-xs">
+                <Button variant="outline" size="sm" className="h-7 text-[10px] gap-1" onClick={() => showSuccess(`Calling ${activeConv.phone}...`)}>
                   <Phone className="w-3 h-3 text-primary" /> Call
                 </Button>
-                <Button variant="outline" size="sm" className="h-8 text-[11px] gap-1" onClick={() => showSuccess(`Creating support ticket for ${activeConv.guestName}...`)}>
+                <Button variant="outline" size="sm" className="h-7 text-[10px] gap-1" onClick={() => showSuccess(`Creating support ticket for ${activeConv.guestName}...`)}>
                   <Tag className="w-3 h-3 text-primary" /> Ticket
                 </Button>
               </div>
             </div>
 
-            {/* Stay / Unit Info */}
-            <div className="space-y-2 border-t pt-4 text-xs">
+            <div className="space-y-2 border-t pt-3 text-xs">
               <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block">Reservation & Unit</span>
-              <div className="space-y-2 border rounded-xl p-3 bg-card">
+              <div className="space-y-2 border rounded-xl p-2.5 bg-card text-[11px]">
                 <div>
-                  <span className="text-[10px] text-muted-foreground block font-bold">Assigned Unit</span>
+                  <span className="text-[9px] text-muted-foreground block font-bold">Assigned Unit</span>
                   <span className="font-bold text-foreground text-xs">{activeConv.unit || 'Pending Unit Assignment'}</span>
                 </div>
                 <div>
-                  <span className="text-[10px] text-muted-foreground block font-bold">Phone Number</span>
-                  <span className="font-mono text-[11px] text-foreground">{activeConv.phone}</span>
+                  <span className="text-[9px] text-muted-foreground block font-bold">Phone Number</span>
+                  <span className="font-mono text-[10px] text-foreground">{activeConv.phone}</span>
                 </div>
                 <div>
-                  <span className="text-[10px] text-muted-foreground block font-bold">Email Address</span>
-                  <span className="font-mono text-[11px] text-foreground truncate block">{activeConv.email}</span>
+                  <span className="text-[9px] text-muted-foreground block font-bold">Email Address</span>
+                  <span className="font-mono text-[10px] text-foreground truncate block">{activeConv.email}</span>
                 </div>
               </div>
             </div>
 
-            {/* CRM Lifecycle Attributes */}
-            <div className="space-y-2 border-t pt-4 text-xs">
+            <div className="space-y-1.5 border-t pt-3 text-xs">
               <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block">CRM Attributes</span>
-              <div className="space-y-2">
-                <div className="flex justify-between items-center text-[11px]">
+              <div className="space-y-1 text-[11px]">
+                <div className="flex justify-between items-center">
                   <span className="text-muted-foreground">Source:</span>
                   <span className="font-medium text-foreground">Inbound Chat</span>
                 </div>
-                <div className="flex justify-between items-center text-[11px]">
-                  <span className="text-muted-foreground">Preferred Lang:</span>
-                  <span className="font-medium text-foreground">English (US)</span>
-                </div>
-                <div className="flex justify-between items-center text-[11px]">
+                <div className="flex justify-between items-center">
                   <span className="text-muted-foreground">Lead Score:</span>
                   <span className="font-bold text-emerald-600">88/100</span>
                 </div>
               </div>
             </div>
-
           </div>
         )}
 
