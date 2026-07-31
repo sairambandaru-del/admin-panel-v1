@@ -149,11 +149,11 @@ const GuestCommunicationModal: React.FC<GuestCommunicationModalProps> = ({
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[750px] max-h-[90vh] flex flex-col p-0 overflow-hidden">
-        {/* Modal Header with Customer Quick Info */}
-        <DialogHeader className="p-4 bg-muted/40 border-b shrink-0">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+        {/* Modal Header with Customer Quick Info & Clear Right Margin for Close Button */}
+        <DialogHeader className="p-4 pr-12 bg-muted/40 border-b shrink-0">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 flex-wrap">
                 <DialogTitle className="text-base font-bold">Order #{booking.id}</DialogTitle>
                 <Badge variant="outline" className="text-[10px] bg-primary/10 text-primary border-primary/30">
                   {booking.serviceCategory}
@@ -162,7 +162,7 @@ const GuestCommunicationModal: React.FC<GuestCommunicationModalProps> = ({
                   {booking.status}
                 </Badge>
               </div>
-              <DialogDescription className="text-xs mt-0.5 flex items-center gap-3">
+              <DialogDescription className="text-xs mt-1 flex items-center gap-3 flex-wrap">
                 <span className="font-semibold text-foreground flex items-center gap-1">
                   <User className="w-3.5 h-3.5 text-primary" /> {booking.guestName}
                 </span>
@@ -172,8 +172,8 @@ const GuestCommunicationModal: React.FC<GuestCommunicationModalProps> = ({
               </DialogDescription>
             </div>
 
-            {/* Price Badge */}
-            <div className="text-right sm:border-l sm:pl-4">
+            {/* Price Badge - Positioned cleanly away from Close Button */}
+            <div className="text-left sm:text-right sm:border-l sm:pl-4 shrink-0">
               <span className="text-[10px] text-muted-foreground uppercase font-bold block">Total Amount</span>
               <span className="text-base font-extrabold text-primary">AED {finalCalculatedTotal.toFixed(2)}</span>
             </div>
