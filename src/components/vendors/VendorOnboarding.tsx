@@ -19,6 +19,7 @@ import {
   DialogTitle, 
   DialogTrigger 
 } from "@/components/ui/dialog";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
   Building2, 
   User, 
@@ -44,7 +45,15 @@ import {
   Search,
   FileCheck,
   AlertCircle,
-  Plus
+  Plus,
+  Globe,
+  Calendar,
+  Code2,
+  DollarSign,
+  FileCode,
+  Edit2,
+  ExternalLink,
+  Laptop
 } from 'lucide-react';
 import { showSuccess, showError } from '@/utils/toast';
 
@@ -56,13 +65,46 @@ export type CRMStage =
   | 'Onboarding Completed';
 
 export interface VendorCRMLead {
+  // 1. Vendor name & 2. Vendor category & 3. Status
   id: string;
   companyName: string;
   category: string;
-  contactPerson: string;
-  email: string;
-  phone: string;
   stage: CRMStage;
+
+  // 4. Expected date of closure & 5. Expected date of API's
+  expectedDateOfClosure: string;
+  expectedDateOfAPIs: string;
+
+  // 6. Source & 7. Account owner & 8. Mobile number & 9. Email id & 10. Website
+  source: string;
+  accountOwner: string;
+  phone: string;
+  email: string;
+  website: string;
+
+  // 11. Commercial model & 12. Concept document & 13. Pitch deck & 14. Agreed pricing model
+  commercialModel: string;
+  conceptDocument: 'Uploaded' | 'Pending' | 'N/A';
+  pitchDeck: 'Uploaded' | 'Pending' | 'N/A';
+  agreedPricingModel: string;
+
+  // 15. Draft terms and conditions & 16. Contract & 17. Signed contract
+  draftTermsAndConditions: 'Uploaded' | 'Pending' | 'N/A';
+  contract: 'Uploaded' | 'Pending' | 'N/A';
+  signedContract: 'Uploaded' | 'Pending' | 'N/A';
+
+  // 18. Lead start date & 19. Expected date of signing the contract & 20. Closing date
+  leadStartDate: string;
+  expectedSigningDate: string;
+  closingDate: string;
+
+  // 21. Name of softwares used & 22. API documentation & 23. Type of integration
+  softwareUsed: string;
+  apiDocumentation: 'Uploaded' | 'Pending' | 'N/A';
+  integrationType: 'API' | 'Admin Panel' | 'API & Admin Panel';
+
+  // System helpers
+  contactPerson: string;
   onboardingToken?: string;
   emailSentDate?: string;
   notes?: string;
@@ -84,10 +126,33 @@ const initialCRMLeads: VendorCRMLead[] = [
     id: 'LEAD-101',
     companyName: 'Apex Luxury Fleet',
     category: 'Car rental',
+    stage: 'Contract Signed',
     contactPerson: 'James Bond',
     email: 'james@apexfleet.com',
     phone: '+971 50 123 4567',
-    stage: 'Contract Signed',
+    website: 'https://apexfleet.ae',
+    source: 'Inbound Referral',
+    accountOwner: 'Sarah Jenkins',
+    
+    expectedDateOfClosure: '2024-05-30',
+    expectedDateOfAPIs: '2024-06-05',
+    leadStartDate: '2024-04-10',
+    expectedSigningDate: '2024-05-20',
+    closingDate: '2024-05-20',
+
+    commercialModel: '15% Commission per booking',
+    agreedPricingModel: 'Tiered daily rates with AED 2000 security deposit',
+    
+    conceptDocument: 'Uploaded',
+    pitchDeck: 'Uploaded',
+    draftTermsAndConditions: 'Uploaded',
+    contract: 'Uploaded',
+    signedContract: 'Uploaded',
+
+    softwareUsed: 'FleetManager Pro & Odoo',
+    apiDocumentation: 'Uploaded',
+    integrationType: 'API & Admin Panel',
+
     onboardingToken: 'TOK-APEX-8821',
     emailSentDate: '2024-05-20 14:30',
     notes: 'Premium fleet supplier. Contract signed for 15% platform commission.'
@@ -96,33 +161,67 @@ const initialCRMLeads: VendorCRMLead[] = [
     id: 'LEAD-102',
     companyName: 'Gourmet Chef Collective',
     category: 'Chef on call',
+    stage: 'Contract Sent',
     contactPerson: 'Chef Auguste',
     email: 'auguste@gourmetchef.ae',
     phone: '+971 52 987 6543',
-    stage: 'Contract Sent',
+    website: 'https://gourmetchef.ae',
+    source: 'Direct Outreach',
+    accountOwner: 'Michael Chen',
+
+    expectedDateOfClosure: '2024-06-15',
+    expectedDateOfAPIs: '2024-06-20',
+    leadStartDate: '2024-05-01',
+    expectedSigningDate: '2024-05-28',
+    closingDate: 'Pending',
+
+    commercialModel: '12% Revenue Share',
+    agreedPricingModel: 'Per-menu pricing with min AED 1200 order value',
+
+    conceptDocument: 'Uploaded',
+    pitchDeck: 'Uploaded',
+    draftTermsAndConditions: 'Uploaded',
+    contract: 'Uploaded',
+    signedContract: 'Pending',
+
+    softwareUsed: 'Custom Chef Portal',
+    apiDocumentation: 'Pending',
+    integrationType: 'Admin Panel',
+
     notes: 'Awaiting signature from legal team.'
   },
   {
     id: 'LEAD-103',
     companyName: 'Desert Oasis Yachting',
     category: 'Leisure activities',
+    stage: 'In Discussion',
     contactPerson: 'Capt. Jack Sparrow',
     email: 'jack@oasisyachts.com',
     phone: '+971 55 444 3322',
-    stage: 'In Discussion',
+    website: 'https://oasisyachts.com',
+    source: 'Trade Show Expo',
+    accountOwner: 'David Miller',
+
+    expectedDateOfClosure: '2024-07-01',
+    expectedDateOfAPIs: '2024-07-10',
+    leadStartDate: '2024-05-10',
+    expectedSigningDate: '2024-06-15',
+    closingDate: 'Pending',
+
+    commercialModel: '10% Commission',
+    agreedPricingModel: 'Hourly charter rate plus fuel surcharge',
+
+    conceptDocument: 'Uploaded',
+    pitchDeck: 'Pending',
+    draftTermsAndConditions: 'Pending',
+    contract: 'Pending',
+    signedContract: 'Pending',
+
+    softwareUsed: 'YachtMaster OS',
+    apiDocumentation: 'Pending',
+    integrationType: 'API',
+
     notes: 'Reviewing category pricing structure.'
-  },
-  {
-    id: 'LEAD-104',
-    companyName: 'Sparkle Cleaners Dubai',
-    category: 'House keeping',
-    contactPerson: 'Sarah Connor',
-    email: 'sarah@sparkleclean.ae',
-    phone: '+971 50 888 9900',
-    stage: 'Onboarding Completed',
-    onboardingToken: 'TOK-SPARKLE-9912',
-    emailSentDate: '2024-05-18 09:15',
-    notes: 'Form filled out and approved into vendor registry.'
   }
 ];
 
@@ -154,15 +253,39 @@ const VendorOnboarding = () => {
   const [crmLeads, setCrmLeads] = useState<VendorCRMLead[]>(initialCRMLeads);
   const [applications, setApplications] = useState<OnboardingApplication[]>(initialApplications);
   const [crmSearch, setCrmSearch] = useState('');
+
+  // Selected Lead for 360° Inspector Modal / Drawer
+  const [selectedLead, setSelectedLead] = useState<VendorCRMLead | null>(null);
+  const [isInspectorOpen, setIsInspectorOpen] = useState(false);
   
   // New Lead Dialog
   const [isNewLeadOpen, setIsNewLeadOpen] = useState(false);
-  const [newLeadForm, setNewLeadForm] = useState({
+  const [leadForm, setLeadForm] = useState<VendorCRMLead>({
+    id: '',
     companyName: '',
     category: 'Car rental',
+    stage: 'New Lead',
     contactPerson: '',
     email: '',
     phone: '',
+    website: '',
+    source: 'Direct Outreach',
+    accountOwner: 'Sarah Jenkins',
+    expectedDateOfClosure: '',
+    expectedDateOfAPIs: '',
+    leadStartDate: new Date().toISOString().split('T')[0],
+    expectedSigningDate: '',
+    closingDate: 'Pending',
+    commercialModel: '15% Commission',
+    agreedPricingModel: '',
+    conceptDocument: 'Pending',
+    pitchDeck: 'Pending',
+    draftTermsAndConditions: 'Pending',
+    contract: 'Pending',
+    signedContract: 'Pending',
+    softwareUsed: '',
+    apiDocumentation: 'Pending',
+    integrationType: 'API & Admin Panel',
     notes: ''
   });
 
@@ -198,6 +321,8 @@ const VendorOnboarding = () => {
         const updatedLead: VendorCRMLead = {
           ...lead,
           stage: newStage,
+          signedContract: isContractSigned ? 'Uploaded' : lead.signedContract,
+          closingDate: isContractSigned ? new Date().toISOString().split('T')[0] : lead.closingDate,
           onboardingToken: token,
           emailSentDate: isContractSigned ? dateStr : lead.emailSentDate
         };
@@ -210,34 +335,74 @@ const VendorOnboarding = () => {
           showSuccess(`Lead "${lead.companyName}" stage updated to ${newStage}.`);
         }
 
+        if (selectedLead?.id === leadId) {
+          setSelectedLead(updatedLead);
+        }
+
         return updatedLead;
       }
       return lead;
     }));
   };
 
-  const handleCreateLead = (e: React.FormEvent) => {
+  const handleOpenAddLead = () => {
+    setLeadForm({
+      id: `LEAD-${100 + crmLeads.length + 1}`,
+      companyName: '',
+      category: 'Car rental',
+      stage: 'New Lead',
+      contactPerson: '',
+      email: '',
+      phone: '',
+      website: 'https://',
+      source: 'Direct Outreach',
+      accountOwner: 'Sarah Jenkins',
+      expectedDateOfClosure: '',
+      expectedDateOfAPIs: '',
+      leadStartDate: new Date().toISOString().split('T')[0],
+      expectedSigningDate: '',
+      closingDate: 'Pending',
+      commercialModel: '15% Commission per booking',
+      agreedPricingModel: '',
+      conceptDocument: 'Pending',
+      pitchDeck: 'Pending',
+      draftTermsAndConditions: 'Pending',
+      contract: 'Pending',
+      signedContract: 'Pending',
+      softwareUsed: '',
+      apiDocumentation: 'Pending',
+      integrationType: 'API & Admin Panel',
+      notes: ''
+    });
+    setIsNewLeadOpen(true);
+  };
+
+  const handleSaveLead = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newLeadForm.companyName || !newLeadForm.email || !newLeadForm.contactPerson) {
+    if (!leadForm.companyName || !leadForm.email || !leadForm.contactPerson) {
       showError("Please fill in company name, contact person, and email.");
       return;
     }
 
-    const newLead: VendorCRMLead = {
-      id: `LEAD-${100 + crmLeads.length + 1}`,
-      companyName: newLeadForm.companyName,
-      category: newLeadForm.category,
-      contactPerson: newLeadForm.contactPerson,
-      email: newLeadForm.email,
-      phone: newLeadForm.phone,
-      stage: 'New Lead',
-      notes: newLeadForm.notes
-    };
+    // Check if updating existing or adding new
+    const exists = crmLeads.some(l => l.id === leadForm.id);
+    if (exists) {
+      setCrmLeads(prev => prev.map(l => l.id === leadForm.id ? leadForm : l));
+      showSuccess(`Lead "${leadForm.companyName}" updated.`);
+    } else {
+      setCrmLeads([leadForm, ...crmLeads]);
+      showSuccess(`Vendor CRM Lead "${leadForm.companyName}" created.`);
+    }
 
-    setCrmLeads([newLead, ...crmLeads]);
     setIsNewLeadOpen(false);
-    setNewLeadForm({ companyName: '', category: 'Car rental', contactPerson: '', email: '', phone: '', notes: '' });
-    showSuccess(`Vendor CRM Lead "${newLead.companyName}" created.`);
+    if (selectedLead?.id === leadForm.id) {
+      setSelectedLead(leadForm);
+    }
+  };
+
+  const handleOpenInspector = (lead: VendorCRMLead) => {
+    setSelectedLead(lead);
+    setIsInspectorOpen(true);
   };
 
   const handleCopyOnboardingLink = (token?: string) => {
@@ -363,6 +528,7 @@ const VendorOnboarding = () => {
     l.companyName.toLowerCase().includes(crmSearch.toLowerCase()) ||
     l.contactPerson.toLowerCase().includes(crmSearch.toLowerCase()) ||
     l.email.toLowerCase().includes(crmSearch.toLowerCase()) ||
+    l.accountOwner.toLowerCase().includes(crmSearch.toLowerCase()) ||
     l.id.toLowerCase().includes(crmSearch.toLowerCase())
   );
 
@@ -372,7 +538,7 @@ const VendorOnboarding = () => {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h3 className="text-lg font-semibold">Vendor CRM & Onboarding Pipeline</h3>
-          <p className="text-sm text-muted-foreground">Manage prospective vendor leads, auto-trigger onboarding email links on Contract Signed, and review submissions.</p>
+          <p className="text-sm text-muted-foreground">Manage prospective vendor leads, track 23 key CRM parameters, auto-trigger onboarding email links on Contract Signed, and review submissions.</p>
         </div>
         <div className="flex bg-muted p-1 rounded-lg border">
           <Button 
@@ -414,9 +580,9 @@ const VendorOnboarding = () => {
             <CardHeader className="pb-3">
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <div>
-                  <CardTitle className="text-base">Prospective Vendor CRM Leads</CardTitle>
+                  <CardTitle className="text-base">Prospective Vendor CRM Directory (23 Tracking Attributes)</CardTitle>
                   <CardDescription className="text-xs">
-                    Marking a vendor lead's stage as <span className="font-bold text-emerald-600 font-mono">"Contract Signed"</span> automatically triggers an invitation email with a unique Onboarding Form link.
+                    Click any row to inspect all 23 details including technical integration, dates, commercial models, and contract documents.
                   </CardDescription>
                 </div>
 
@@ -424,115 +590,16 @@ const VendorOnboarding = () => {
                   <div className="relative w-full sm:w-56">
                     <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                     <Input
-                      placeholder="Search lead or email..."
+                      placeholder="Search lead, owner, or email..."
                       value={crmSearch}
                       onChange={e => setCrmSearch(e.target.value)}
                       className="pl-8 h-9 text-xs"
                     />
                   </div>
 
-                  <Dialog open={isNewLeadOpen} onOpenChange={setIsNewLeadOpen}>
-                    <DialogTrigger asChild>
-                      <Button className="gap-1.5 h-9 text-xs shrink-0">
-                        <Plus className="w-3.5 h-3.5" /> Add CRM Lead
-                      </Button>
-                    </DialogTrigger>
-                    <DialogContent className="sm:max-w-[450px]">
-                      <form onSubmit={handleCreateLead}>
-                        <DialogHeader>
-                          <DialogTitle>Add Prospective Vendor Lead</DialogTitle>
-                          <DialogDescription>
-                            Enter vendor details. You can track discussions and trigger automated onboarding links when contract is signed.
-                          </DialogDescription>
-                        </DialogHeader>
-
-                        <div className="grid gap-3 py-4 text-xs">
-                          <div className="space-y-1">
-                            <Label htmlFor="lead-company">Company Name *</Label>
-                            <Input 
-                              id="lead-company" 
-                              placeholder="e.g. Apex Luxury Fleet" 
-                              value={newLeadForm.companyName}
-                              onChange={e => setNewLeadForm({...newLeadForm, companyName: e.target.value})}
-                              required
-                            />
-                          </div>
-
-                          <div className="grid grid-cols-2 gap-2">
-                            <div className="space-y-1">
-                              <Label htmlFor="lead-cat">Category</Label>
-                              <Select 
-                                value={newLeadForm.category} 
-                                onValueChange={v => setNewLeadForm({...newLeadForm, category: v})}
-                              >
-                                <SelectTrigger id="lead-cat"><SelectValue /></SelectTrigger>
-                                <SelectContent>
-                                  <SelectItem value="Car rental">Car rental</SelectItem>
-                                  <SelectItem value="Transportation">Transportation</SelectItem>
-                                  <SelectItem value="House keeping">House keeping</SelectItem>
-                                  <SelectItem value="Laundry">Laundry</SelectItem>
-                                  <SelectItem value="Chef on call">Chef on call</SelectItem>
-                                  <SelectItem value="In-house catering">In-house catering</SelectItem>
-                                  <SelectItem value="Wellness">Wellness</SelectItem>
-                                  <SelectItem value="Leisure activities">Leisure activities</SelectItem>
-                                </SelectContent>
-                              </Select>
-                            </div>
-
-                            <div className="space-y-1">
-                              <Label htmlFor="lead-contact">Contact Person *</Label>
-                              <Input 
-                                id="lead-contact" 
-                                placeholder="e.g. James Bond" 
-                                value={newLeadForm.contactPerson}
-                                onChange={e => setNewLeadForm({...newLeadForm, contactPerson: e.target.value})}
-                                required
-                              />
-                            </div>
-                          </div>
-
-                          <div className="grid grid-cols-2 gap-2">
-                            <div className="space-y-1">
-                              <Label htmlFor="lead-email">Email Address *</Label>
-                              <Input 
-                                id="lead-email" 
-                                type="email" 
-                                placeholder="contact@company.com" 
-                                value={newLeadForm.email}
-                                onChange={e => setNewLeadForm({...newLeadForm, email: e.target.value})}
-                                required
-                              />
-                            </div>
-
-                            <div className="space-y-1">
-                              <Label htmlFor="lead-phone">Phone Number</Label>
-                              <Input 
-                                id="lead-phone" 
-                                placeholder="+971 50 123 4567" 
-                                value={newLeadForm.phone}
-                                onChange={e => setNewLeadForm({...newLeadForm, phone: e.target.value})}
-                              />
-                            </div>
-                          </div>
-
-                          <div className="space-y-1">
-                            <Label htmlFor="lead-notes">Notes / Deal Terms</Label>
-                            <Textarea 
-                              id="lead-notes" 
-                              placeholder="Initial deal terms, commission rates..." 
-                              value={newLeadForm.notes}
-                              onChange={e => setNewLeadForm({...newLeadForm, notes: e.target.value})}
-                              className="min-h-[60px]"
-                            />
-                          </div>
-                        </div>
-
-                        <DialogFooter>
-                          <Button type="submit" className="w-full">Create Lead</Button>
-                        </DialogFooter>
-                      </form>
-                    </DialogContent>
-                  </Dialog>
+                  <Button onClick={handleOpenAddLead} className="gap-1.5 h-9 text-xs shrink-0">
+                    <Plus className="w-3.5 h-3.5" /> Add CRM Lead
+                  </Button>
                 </div>
               </div>
             </CardHeader>
@@ -541,12 +608,14 @@ const VendorOnboarding = () => {
               <div className="rounded-md border-t overflow-x-auto">
                 <Table>
                   <TableHeader>
-                    <TableRow className="bg-muted/30">
-                      <TableHead>Lead ID</TableHead>
-                      <TableHead>Company & Category</TableHead>
-                      <TableHead>Primary Contact</TableHead>
-                      <TableHead>CRM Stage Pipeline</TableHead>
-                      <TableHead>Automated Onboarding Email Link</TableHead>
+                    <TableRow className="bg-muted/30 text-[11px]">
+                      <TableHead>Vendor & Category</TableHead>
+                      <TableHead>Account Owner & Source</TableHead>
+                      <TableHead>Status Stage</TableHead>
+                      <TableHead>Integration Type & Software</TableHead>
+                      <TableHead>Target Dates (Signing / APIs)</TableHead>
+                      <TableHead>Commercial Model</TableHead>
+                      <TableHead>Legal Docs</TableHead>
                       <TableHead className="text-right">Actions</TableHead>
                     </TableRow>
                   </TableHeader>
@@ -555,29 +624,40 @@ const VendorOnboarding = () => {
                       const isSigned = lead.stage === 'Contract Signed' || lead.stage === 'Onboarding Completed';
 
                       return (
-                        <TableRow key={lead.id} className="hover:bg-muted/30 transition-colors">
-                          <TableCell className="font-mono text-xs font-bold">{lead.id}</TableCell>
+                        <TableRow 
+                          key={lead.id} 
+                          className="hover:bg-muted/40 transition-colors cursor-pointer"
+                          onClick={() => handleOpenInspector(lead)}
+                        >
                           <TableCell>
                             <div>
-                              <p className="font-bold text-xs text-foreground">{lead.companyName}</p>
-                              <Badge variant="outline" className="text-[9px] bg-primary/5 text-primary border-primary/20 capitalize mt-0.5">
-                                {lead.category}
-                              </Badge>
+                              <p className="font-bold text-xs text-foreground flex items-center gap-1.5">
+                                {lead.companyName}
+                                <span className="text-[10px] font-mono text-muted-foreground">({lead.id})</span>
+                              </p>
+                              <div className="flex items-center gap-2 mt-0.5">
+                                <Badge variant="outline" className="text-[9px] bg-primary/5 text-primary border-primary/20 capitalize py-0">
+                                  {lead.category}
+                                </Badge>
+                                <span className="text-[10px] text-muted-foreground">{lead.contactPerson}</span>
+                              </div>
                             </div>
                           </TableCell>
+
                           <TableCell>
                             <div className="text-xs">
-                              <p className="font-semibold">{lead.contactPerson}</p>
-                              <p className="text-[10px] text-muted-foreground">{lead.email}</p>
+                              <p className="font-semibold">{lead.accountOwner}</p>
+                              <p className="text-[10px] text-muted-foreground">Source: {lead.source}</p>
                             </div>
                           </TableCell>
-                          <TableCell>
+
+                          <TableCell onClick={e => e.stopPropagation()}>
                             <div className="space-y-1">
                               <Select 
                                 value={lead.stage} 
                                 onValueChange={(val: CRMStage) => handleStageChange(lead.id, val)}
                               >
-                                <SelectTrigger className={`h-8 text-xs font-bold w-[180px] ${
+                                <SelectTrigger className={`h-7 text-xs font-bold w-[160px] ${
                                   lead.stage === 'Contract Signed' ? 'border-emerald-500 bg-emerald-50 text-emerald-900' :
                                   lead.stage === 'Onboarding Completed' ? 'border-blue-500 bg-blue-50 text-blue-900' :
                                   'bg-background'
@@ -598,54 +678,58 @@ const VendorOnboarding = () => {
                               {lead.stage === 'Contract Signed' && (
                                 <span className="block text-[9px] text-emerald-600 font-bold flex items-center gap-1">
                                   <CheckCircle2 className="w-3 h-3 text-emerald-600" />
-                                  Onboarding Email Dispatched
+                                  Onboarding Email Sent
                                 </span>
                               )}
                             </div>
                           </TableCell>
+
                           <TableCell>
-                            {isSigned ? (
-                              <div className="space-y-1">
-                                <div className="flex items-center gap-1.5">
-                                  <Badge variant="outline" className="bg-emerald-50 text-emerald-800 border-emerald-300 font-mono text-[10px]">
-                                    <Send className="w-2.5 h-2.5 mr-1 text-emerald-600" /> Link Sent
-                                  </Badge>
-                                  <span className="text-[10px] text-muted-foreground font-mono">{lead.emailSentDate || 'Just now'}</span>
-                                </div>
-                                <div className="flex items-center gap-1">
-                                  <Button 
-                                    variant="ghost" 
-                                    size="sm" 
-                                    className="h-6 text-[10px] px-2 text-primary hover:bg-primary/10 gap-1"
-                                    onClick={() => handleCopyOnboardingLink(lead.onboardingToken)}
-                                  >
-                                    <Copy className="w-3 h-3" /> Copy Link
-                                  </Button>
-                                  <Button 
-                                    variant="ghost" 
-                                    size="sm" 
-                                    className="h-6 text-[10px] px-2 text-emerald-600 hover:bg-emerald-50 gap-1"
-                                    onClick={() => handleLaunchOnboardingForLead(lead)}
-                                  >
-                                    <LinkIcon className="w-3 h-3" /> Open Form
-                                  </Button>
-                                </div>
-                              </div>
-                            ) : (
-                              <span className="text-[11px] text-muted-foreground italic">
-                                Update stage to "Contract Signed" to send link
-                              </span>
-                            )}
+                            <div className="text-xs space-y-0.5">
+                              <Badge variant="outline" className="text-[9px] py-0 font-mono">
+                                <Code2 className="w-2.5 h-2.5 mr-1 text-primary" /> {lead.integrationType}
+                              </Badge>
+                              <p className="text-[10px] text-muted-foreground truncate max-w-[140px]">
+                                {lead.softwareUsed || 'Software TBD'}
+                              </p>
+                            </div>
                           </TableCell>
-                          <TableCell className="text-right">
-                            <Button 
-                              variant="outline" 
-                              size="sm" 
-                              className="h-8 text-xs gap-1"
-                              onClick={() => handleLaunchOnboardingForLead(lead)}
-                            >
-                              <FileText className="w-3.5 h-3.5" /> Fill Form
-                            </Button>
+
+                          <TableCell>
+                            <div className="text-[10px] font-mono space-y-0.5">
+                              <p className="text-foreground">Signing: <span className="font-bold">{lead.expectedSigningDate || 'TBD'}</span></p>
+                              <p className="text-muted-foreground">APIs: {lead.expectedDateOfAPIs || 'TBD'}</p>
+                            </div>
+                          </TableCell>
+
+                          <TableCell>
+                            <p className="text-xs font-semibold text-primary truncate max-w-[150px]">
+                              {lead.commercialModel}
+                            </p>
+                          </TableCell>
+
+                          <TableCell>
+                            <div className="flex items-center gap-1">
+                              <Badge 
+                                variant={lead.signedContract === 'Uploaded' ? 'default' : 'outline'}
+                                className={`text-[9px] px-1 py-0 ${lead.signedContract === 'Uploaded' ? 'bg-emerald-600' : ''}`}
+                              >
+                                Signed Contract: {lead.signedContract}
+                              </Badge>
+                            </div>
+                          </TableCell>
+
+                          <TableCell className="text-right" onClick={e => e.stopPropagation()}>
+                            <div className="flex justify-end gap-1">
+                              <Button 
+                                variant="ghost" 
+                                size="sm" 
+                                className="h-7 text-xs text-primary hover:text-primary gap-1"
+                                onClick={() => handleOpenInspector(lead)}
+                              >
+                                <Eye className="w-3.5 h-3.5" /> 360° View
+                              </Button>
+                            </div>
                           </TableCell>
                         </TableRow>
                       );
@@ -657,6 +741,564 @@ const VendorOnboarding = () => {
           </Card>
         </div>
       )}
+
+      {/* 360° LEAD INSPECTOR MODAL (Viewing & Editing all 23 details) */}
+      <Dialog open={isInspectorOpen} onOpenChange={setIsInspectorOpen}>
+        <DialogContent className="sm:max-w-[750px] max-h-[92vh] flex flex-col p-0 overflow-hidden">
+          {selectedLead && (
+            <>
+              <DialogHeader className="p-5 pr-12 bg-muted/30 border-b shrink-0">
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <DialogTitle className="text-lg font-bold">{selectedLead.companyName}</DialogTitle>
+                      <Badge variant="outline" className="text-[10px] font-mono font-bold bg-primary/5 text-primary border-primary/20">
+                        {selectedLead.id}
+                      </Badge>
+                      <Badge variant={selectedLead.stage === 'Contract Signed' ? 'default' : 'secondary'}>
+                        {selectedLead.stage}
+                      </Badge>
+                    </div>
+                    <DialogDescription className="text-xs mt-1.5 flex items-center gap-3 text-muted-foreground flex-wrap">
+                      <span className="flex items-center gap-1 font-semibold text-foreground">
+                        <User className="w-3.5 h-3.5 text-primary" /> {selectedLead.contactPerson} ({selectedLead.email})
+                      </span>
+                      <span className="flex items-center gap-1">
+                        <Phone className="w-3.5 h-3.5 text-muted-foreground" /> {selectedLead.phone}
+                      </span>
+                      <span className="flex items-center gap-1">
+                        <Globe className="w-3.5 h-3.5 text-muted-foreground" /> {selectedLead.website}
+                      </span>
+                    </DialogDescription>
+                  </div>
+
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="gap-1 text-xs shrink-0"
+                    onClick={() => {
+                      setLeadForm(selectedLead);
+                      setIsInspectorOpen(false);
+                      setIsNewLeadOpen(true);
+                    }}
+                  >
+                    <Edit2 className="w-3.5 h-3.5" /> Edit Parameters
+                  </Button>
+                </div>
+              </DialogHeader>
+
+              <div className="p-5 overflow-y-auto space-y-6 max-h-[620px] text-xs">
+                {/* Section 1: General & Account Info */}
+                <div className="space-y-2">
+                  <h4 className="font-bold text-xs uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
+                    <Building2 className="w-4 h-4 text-primary" /> General & Account Details
+                  </h4>
+                  <div className="grid grid-cols-3 gap-3 bg-muted/20 p-3 rounded-xl border">
+                    <div>
+                      <span className="text-[10px] text-muted-foreground font-bold uppercase block">Vendor Category</span>
+                      <span className="font-bold text-foreground text-xs">{selectedLead.category}</span>
+                    </div>
+                    <div>
+                      <span className="text-[10px] text-muted-foreground font-bold uppercase block">Account Owner</span>
+                      <span className="font-bold text-foreground text-xs">{selectedLead.accountOwner}</span>
+                    </div>
+                    <div>
+                      <span className="text-[10px] text-muted-foreground font-bold uppercase block">Lead Source</span>
+                      <span className="font-semibold text-foreground text-xs">{selectedLead.source}</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Section 2: Key Milestones & Dates (5 Tracking Dates) */}
+                <div className="space-y-2">
+                  <h4 className="font-bold text-xs uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
+                    <Calendar className="w-4 h-4 text-primary" /> Timeline & Milestone Dates
+                  </h4>
+                  <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 border rounded-xl p-3 bg-card font-mono text-[11px]">
+                    <div className="space-y-0.5 border-r pr-2">
+                      <span className="text-[9px] text-muted-foreground uppercase block font-bold">Lead Start Date</span>
+                      <span className="font-bold text-foreground">{selectedLead.leadStartDate || 'N/A'}</span>
+                    </div>
+                    <div className="space-y-0.5 border-r pr-2">
+                      <span className="text-[9px] text-muted-foreground uppercase block font-bold">Expected Signing</span>
+                      <span className="font-bold text-primary">{selectedLead.expectedSigningDate || 'Pending'}</span>
+                    </div>
+                    <div className="space-y-0.5 border-r pr-2">
+                      <span className="text-[9px] text-muted-foreground uppercase block font-bold">Expected Closure</span>
+                      <span className="font-bold text-foreground">{selectedLead.expectedDateOfClosure || 'Pending'}</span>
+                    </div>
+                    <div className="space-y-0.5 border-r pr-2">
+                      <span className="text-[9px] text-muted-foreground uppercase block font-bold">Expected APIs</span>
+                      <span className="font-bold text-foreground">{selectedLead.expectedDateOfAPIs || 'Pending'}</span>
+                    </div>
+                    <div className="space-y-0.5">
+                      <span className="text-[9px] text-muted-foreground uppercase block font-bold">Closing Date</span>
+                      <span className="font-bold text-emerald-600">{selectedLead.closingDate || 'Pending'}</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Section 3: Technical & Software Architecture */}
+                <div className="space-y-2">
+                  <h4 className="font-bold text-xs uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
+                    <Code2 className="w-4 h-4 text-primary" /> Software & Integration Specs
+                  </h4>
+                  <div className="grid grid-cols-3 gap-3 border rounded-xl p-3 bg-card">
+                    <div>
+                      <span className="text-[10px] text-muted-foreground font-bold uppercase block">Type of Integration</span>
+                      <Badge variant="outline" className="text-[10px] bg-primary/5 text-primary border-primary/20 mt-1">
+                        {selectedLead.integrationType}
+                      </Badge>
+                    </div>
+                    <div>
+                      <span className="text-[10px] text-muted-foreground font-bold uppercase block">Name of Software Used</span>
+                      <span className="font-bold text-foreground text-xs mt-1 block">{selectedLead.softwareUsed || 'Not specified'}</span>
+                    </div>
+                    <div>
+                      <span className="text-[10px] text-muted-foreground font-bold uppercase block">API Documentation Status</span>
+                      <Badge variant={selectedLead.apiDocumentation === 'Uploaded' ? 'default' : 'secondary'} className="text-[10px] mt-1">
+                        {selectedLead.apiDocumentation}
+                      </Badge>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Section 4: Commercials & Pricing Models */}
+                <div className="space-y-2">
+                  <h4 className="font-bold text-xs uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
+                    <DollarSign className="w-4 h-4 text-primary" /> Commercial & Pricing Structure
+                  </h4>
+                  <div className="grid grid-cols-2 gap-3 border rounded-xl p-3 bg-primary/5 border-primary/20">
+                    <div>
+                      <span className="text-[10px] font-bold text-muted-foreground uppercase block">Commercial Model</span>
+                      <p className="font-bold text-primary text-xs mt-0.5">{selectedLead.commercialModel}</p>
+                    </div>
+                    <div>
+                      <span className="text-[10px] font-bold text-muted-foreground uppercase block">Agreed Pricing Model</span>
+                      <p className="font-semibold text-foreground text-xs mt-0.5">{selectedLead.agreedPricingModel || 'Standard rate card agreed'}</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Section 5: Legal & Pitch Documentation Checklist */}
+                <div className="space-y-2">
+                  <h4 className="font-bold text-xs uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
+                    <ShieldCheck className="w-4 h-4 text-primary" /> Legal & Proposal Documentation
+                  </h4>
+                  <div className="grid grid-cols-5 gap-2 text-center">
+                    <div className="border rounded-lg p-2.5 bg-card">
+                      <span className="text-[9px] text-muted-foreground uppercase font-bold block mb-1">Concept Doc</span>
+                      <Badge variant={selectedLead.conceptDocument === 'Uploaded' ? 'default' : 'outline'} className="text-[9px]">
+                        {selectedLead.conceptDocument}
+                      </Badge>
+                    </div>
+
+                    <div className="border rounded-lg p-2.5 bg-card">
+                      <span className="text-[9px] text-muted-foreground uppercase font-bold block mb-1">Pitch Deck</span>
+                      <Badge variant={selectedLead.pitchDeck === 'Uploaded' ? 'default' : 'outline'} className="text-[9px]">
+                        {selectedLead.pitchDeck}
+                      </Badge>
+                    </div>
+
+                    <div className="border rounded-lg p-2.5 bg-card">
+                      <span className="text-[9px] text-muted-foreground uppercase font-bold block mb-1">Draft T&C</span>
+                      <Badge variant={selectedLead.draftTermsAndConditions === 'Uploaded' ? 'default' : 'outline'} className="text-[9px]">
+                        {selectedLead.draftTermsAndConditions}
+                      </Badge>
+                    </div>
+
+                    <div className="border rounded-lg p-2.5 bg-card">
+                      <span className="text-[9px] text-muted-foreground uppercase font-bold block mb-1">Contract</span>
+                      <Badge variant={selectedLead.contract === 'Uploaded' ? 'default' : 'outline'} className="text-[9px]">
+                        {selectedLead.contract}
+                      </Badge>
+                    </div>
+
+                    <div className="border rounded-lg p-2.5 bg-emerald-50 border-emerald-200">
+                      <span className="text-[9px] text-emerald-900 uppercase font-bold block mb-1">Signed Contract</span>
+                      <Badge className={`text-[9px] ${selectedLead.signedContract === 'Uploaded' ? 'bg-emerald-600' : 'bg-secondary'}`}>
+                        {selectedLead.signedContract}
+                      </Badge>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Section 6: Notes */}
+                {selectedLead.notes && (
+                  <div className="p-3 bg-muted/30 rounded-xl border">
+                    <span className="text-[10px] font-bold text-muted-foreground uppercase block mb-1">Account Manager Notes</span>
+                    <p className="text-xs text-foreground italic">{selectedLead.notes}</p>
+                  </div>
+                )}
+              </div>
+
+              <DialogFooter className="p-4 border-t bg-muted/20 gap-2 shrink-0 sm:gap-0">
+                <Button variant="outline" size="sm" onClick={() => setIsInspectorOpen(false)}>
+                  Close
+                </Button>
+                {selectedLead.stage === 'Contract Signed' && (
+                  <Button 
+                    size="sm" 
+                    className="gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold"
+                    onClick={() => handleLaunchOnboardingForLead(selectedLead)}
+                  >
+                    <LinkIcon className="w-3.5 h-3.5" /> Launch Onboarding Form
+                  </Button>
+                )}
+              </DialogFooter>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* CREATE / EDIT VENDOR LEAD MODAL (FULL 23 PARAMETERS) */}
+      <Dialog open={isNewLeadOpen} onOpenChange={setIsNewLeadOpen}>
+        <DialogContent className="sm:max-w-[650px] max-h-[92vh] flex flex-col p-0 overflow-hidden">
+          <form onSubmit={handleSaveLead} className="flex flex-col h-full overflow-hidden">
+            <DialogHeader className="p-5 bg-muted/30 border-b shrink-0">
+              <DialogTitle className="text-base font-bold">
+                {leadForm.id ? `Edit Vendor Lead (${leadForm.id})` : 'Add Prospective Vendor CRM Lead'}
+              </DialogTitle>
+              <DialogDescription className="text-xs">
+                Configure all 23 parameters including contacts, milestone dates, software integration, commercial models, and contract documents.
+              </DialogDescription>
+            </DialogHeader>
+
+            <div className="p-5 overflow-y-auto space-y-4 max-h-[580px] text-xs">
+              {/* Row 1: Vendor Name, Category, Status */}
+              <div className="grid grid-cols-3 gap-3">
+                <div className="space-y-1">
+                  <Label htmlFor="c-name">Vendor Name *</Label>
+                  <Input 
+                    id="c-name" 
+                    placeholder="e.g. Apex Luxury Fleet" 
+                    value={leadForm.companyName}
+                    onChange={e => setLeadForm({...leadForm, companyName: e.target.value})}
+                    required
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <Label htmlFor="c-cat">Vendor Category</Label>
+                  <Select value={leadForm.category} onValueChange={v => setLeadForm({...leadForm, category: v})}>
+                    <SelectTrigger id="c-cat"><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Car rental">Car rental</SelectItem>
+                      <SelectItem value="Transportation">Transportation</SelectItem>
+                      <SelectItem value="House keeping">House keeping</SelectItem>
+                      <SelectItem value="Laundry">Laundry</SelectItem>
+                      <SelectItem value="Chef on call">Chef on call</SelectItem>
+                      <SelectItem value="In-house catering">In-house catering</SelectItem>
+                      <SelectItem value="Doctor on call">Doctor on call</SelectItem>
+                      <SelectItem value="Wellness">Wellness</SelectItem>
+                      <SelectItem value="Leisure activities">Leisure activities</SelectItem>
+                      <SelectItem value="Dining">Dining</SelectItem>
+                      <SelectItem value="Co-working">Co-working</SelectItem>
+                      <SelectItem value="Grocery">Grocery</SelectItem>
+                      <SelectItem value="Food delivery">Food delivery</SelectItem>
+                      <SelectItem value="Short term rental">Short term rental</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-1">
+                  <Label htmlFor="c-stage">Status (CRM Stage)</Label>
+                  <Select value={leadForm.stage} onValueChange={(v: CRMStage) => setLeadForm({...leadForm, stage: v})}>
+                    <SelectTrigger id="c-stage"><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="New Lead">New Lead</SelectItem>
+                      <SelectItem value="In Discussion">In Discussion</SelectItem>
+                      <SelectItem value="Contract Sent">Contract Sent</SelectItem>
+                      <SelectItem value="Contract Signed">Contract Signed</SelectItem>
+                      <SelectItem value="Onboarding Completed">Onboarding Completed</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              {/* Row 2: Account Owner, Source, Contact Person */}
+              <div className="grid grid-cols-3 gap-3">
+                <div className="space-y-1">
+                  <Label htmlFor="c-owner">Account Owner</Label>
+                  <Input 
+                    id="c-owner" 
+                    placeholder="e.g. Sarah Jenkins" 
+                    value={leadForm.accountOwner}
+                    onChange={e => setLeadForm({...leadForm, accountOwner: e.target.value})}
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <Label htmlFor="c-source">Lead Source</Label>
+                  <Input 
+                    id="c-source" 
+                    placeholder="e.g. Referral / Outreach" 
+                    value={leadForm.source}
+                    onChange={e => setLeadForm({...leadForm, source: e.target.value})}
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <Label htmlFor="c-contact">Mobile / Contact Person *</Label>
+                  <Input 
+                    id="c-contact" 
+                    placeholder="Contact Name" 
+                    value={leadForm.contactPerson}
+                    onChange={e => setLeadForm({...leadForm, contactPerson: e.target.value})}
+                    required
+                  />
+                </div>
+              </div>
+
+              {/* Row 3: Phone, Email, Website */}
+              <div className="grid grid-cols-3 gap-3">
+                <div className="space-y-1">
+                  <Label htmlFor="c-phone">Mobile Number</Label>
+                  <Input 
+                    id="c-phone" 
+                    placeholder="+971 50 123 4567" 
+                    value={leadForm.phone}
+                    onChange={e => setLeadForm({...leadForm, phone: e.target.value})}
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <Label htmlFor="c-email">Email ID *</Label>
+                  <Input 
+                    id="c-email" 
+                    type="email" 
+                    placeholder="contact@company.com" 
+                    value={leadForm.email}
+                    onChange={e => setLeadForm({...leadForm, email: e.target.value})}
+                    required
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <Label htmlFor="c-web">Website</Label>
+                  <Input 
+                    id="c-web" 
+                    placeholder="https://company.com" 
+                    value={leadForm.website}
+                    onChange={e => setLeadForm({...leadForm, website: e.target.value})}
+                  />
+                </div>
+              </div>
+
+              {/* Row 4: Commercial Model & Agreed Pricing Model */}
+              <div className="grid grid-cols-2 gap-3 bg-primary/5 p-3 rounded-xl border border-primary/20">
+                <div className="space-y-1">
+                  <Label htmlFor="c-comm">Commercial Model</Label>
+                  <Input 
+                    id="c-comm" 
+                    placeholder="e.g. 15% Commission per booking" 
+                    value={leadForm.commercialModel}
+                    onChange={e => setLeadForm({...leadForm, commercialModel: e.target.value})}
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <Label htmlFor="c-pricing">Agreed Pricing Model</Label>
+                  <Input 
+                    id="c-pricing" 
+                    placeholder="e.g. Tiered daily rate card with deposit" 
+                    value={leadForm.agreedPricingModel}
+                    onChange={e => setLeadForm({...leadForm, agreedPricingModel: e.target.value})}
+                  />
+                </div>
+              </div>
+
+              {/* Row 5: Technical & Integration Specs */}
+              <div className="grid grid-cols-3 gap-3 bg-muted/20 p-3 rounded-xl border">
+                <div className="space-y-1">
+                  <Label htmlFor="c-sw">Name of Softwares Used</Label>
+                  <Input 
+                    id="c-sw" 
+                    placeholder="e.g. FleetManager Pro / Odoo" 
+                    value={leadForm.softwareUsed}
+                    onChange={e => setLeadForm({...leadForm, softwareUsed: e.target.value})}
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <Label htmlFor="c-type">Type of Integration</Label>
+                  <Select 
+                    value={leadForm.integrationType} 
+                    onValueChange={(v: any) => setLeadForm({...leadForm, integrationType: v})}
+                  >
+                    <SelectTrigger id="c-type"><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="API">API Only</SelectItem>
+                      <SelectItem value="Admin Panel">Admin Panel Only</SelectItem>
+                      <SelectItem value="API & Admin Panel">API & Admin Panel</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-1">
+                  <Label htmlFor="c-apidoc">API Documentation</Label>
+                  <Select 
+                    value={leadForm.apiDocumentation} 
+                    onValueChange={(v: any) => setLeadForm({...leadForm, apiDocumentation: v})}
+                  >
+                    <SelectTrigger id="c-apidoc"><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Uploaded">Uploaded</SelectItem>
+                      <SelectItem value="Pending">Pending</SelectItem>
+                      <SelectItem value="N/A">N/A</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              {/* Row 6: Milestone Dates (5 Dates) */}
+              <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 border p-3 rounded-xl bg-card">
+                <div className="space-y-1">
+                  <Label htmlFor="d-start" className="text-[10px]">Lead Start Date</Label>
+                  <Input 
+                    id="d-start" 
+                    type="date" 
+                    className="h-8 text-[11px]" 
+                    value={leadForm.leadStartDate}
+                    onChange={e => setLeadForm({...leadForm, leadStartDate: e.target.value})}
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <Label htmlFor="d-sign" className="text-[10px]">Expected Signing</Label>
+                  <Input 
+                    id="d-sign" 
+                    type="date" 
+                    className="h-8 text-[11px]" 
+                    value={leadForm.expectedSigningDate}
+                    onChange={e => setLeadForm({...leadForm, expectedSigningDate: e.target.value})}
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <Label htmlFor="d-closure" className="text-[10px]">Expected Closure</Label>
+                  <Input 
+                    id="d-closure" 
+                    type="date" 
+                    className="h-8 text-[11px]" 
+                    value={leadForm.expectedDateOfClosure}
+                    onChange={e => setLeadForm({...leadForm, expectedDateOfClosure: e.target.value})}
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <Label htmlFor="d-api" className="text-[10px]">Expected Date APIs</Label>
+                  <Input 
+                    id="d-api" 
+                    type="date" 
+                    className="h-8 text-[11px]" 
+                    value={leadForm.expectedDateOfAPIs}
+                    onChange={e => setLeadForm({...leadForm, expectedDateOfAPIs: e.target.value})}
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <Label htmlFor="d-close" className="text-[10px]">Closing Date</Label>
+                  <Input 
+                    id="d-close" 
+                    placeholder="e.g. 2024-05-20" 
+                    className="h-8 text-[11px]" 
+                    value={leadForm.closingDate}
+                    onChange={e => setLeadForm({...leadForm, closingDate: e.target.value})}
+                  />
+                </div>
+              </div>
+
+              {/* Row 7: Legal Documents Status (5 Docs) */}
+              <div className="space-y-1">
+                <Label className="text-xs font-semibold">Legal & Pitch Document Statuses</Label>
+                <div className="grid grid-cols-5 gap-2 border p-3 rounded-xl bg-card">
+                  <div className="space-y-1">
+                    <span className="text-[10px] text-muted-foreground font-bold">Concept Doc</span>
+                    <Select value={leadForm.conceptDocument} onValueChange={(v: any) => setLeadForm({...leadForm, conceptDocument: v})}>
+                      <SelectTrigger className="h-7 text-[10px]"><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="Uploaded">Uploaded</SelectItem>
+                        <SelectItem value="Pending">Pending</SelectItem>
+                        <SelectItem value="N/A">N/A</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="space-y-1">
+                    <span className="text-[10px] text-muted-foreground font-bold">Pitch Deck</span>
+                    <Select value={leadForm.pitchDeck} onValueChange={(v: any) => setLeadForm({...leadForm, pitchDeck: v})}>
+                      <SelectTrigger className="h-7 text-[10px]"><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="Uploaded">Uploaded</SelectItem>
+                        <SelectItem value="Pending">Pending</SelectItem>
+                        <SelectItem value="N/A">N/A</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="space-y-1">
+                    <span className="text-[10px] text-muted-foreground font-bold">Draft T&C</span>
+                    <Select value={leadForm.draftTermsAndConditions} onValueChange={(v: any) => setLeadForm({...leadForm, draftTermsAndConditions: v})}>
+                      <SelectTrigger className="h-7 text-[10px]"><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="Uploaded">Uploaded</SelectItem>
+                        <SelectItem value="Pending">Pending</SelectItem>
+                        <SelectItem value="N/A">N/A</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="space-y-1">
+                    <span className="text-[10px] text-muted-foreground font-bold">Contract</span>
+                    <Select value={leadForm.contract} onValueChange={(v: any) => setLeadForm({...leadForm, contract: v})}>
+                      <SelectTrigger className="h-7 text-[10px]"><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="Uploaded">Uploaded</SelectItem>
+                        <SelectItem value="Pending">Pending</SelectItem>
+                        <SelectItem value="N/A">N/A</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="space-y-1">
+                    <span className="text-[10px] text-muted-foreground font-bold">Signed Contract</span>
+                    <Select value={leadForm.signedContract} onValueChange={(v: any) => setLeadForm({...leadForm, signedContract: v})}>
+                      <SelectTrigger className="h-7 text-[10px]"><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="Uploaded">Uploaded</SelectItem>
+                        <SelectItem value="Pending">Pending</SelectItem>
+                        <SelectItem value="N/A">N/A</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+              </div>
+
+              {/* Notes */}
+              <div className="space-y-1">
+                <Label htmlFor="c-notes">Notes / Deal Parameters</Label>
+                <Textarea 
+                  id="c-notes" 
+                  placeholder="Enter initial terms or deal notes..." 
+                  value={leadForm.notes}
+                  onChange={e => setLeadForm({...leadForm, notes: e.target.value})}
+                  className="min-h-[50px]"
+                />
+              </div>
+            </div>
+
+            <DialogFooter className="p-4 border-t bg-muted/20 gap-2 shrink-0 sm:gap-0">
+              <Button type="button" variant="outline" size="sm" onClick={() => setIsNewLeadOpen(false)}>
+                Cancel
+              </Button>
+              <Button type="submit" size="sm" className="bg-primary text-primary-foreground font-semibold">
+                Save Vendor CRM Lead
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
 
       {/* TAB 2: VENDOR ONBOARDING WIZARD FORM */}
       {activeTab === 'wizard' && (
