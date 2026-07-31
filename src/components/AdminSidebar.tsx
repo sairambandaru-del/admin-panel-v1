@@ -32,7 +32,8 @@ import {
   CreditCard,
   AlertCircle,
   Sparkles,
-  Boxes
+  Boxes,
+  TrendingUp
 } from 'lucide-react';
 import { cn } from "@/lib/utils";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -94,6 +95,7 @@ const navigation: NavItem[] = [
       { title: "Registry & KYC", href: "/vendors/registry", icon: UserCheck },
       { title: "Vendor Onboarding", href: "/vendors/onboarding", icon: UserPlus },
       { title: "Vendor Services", href: "/vendors/services", icon: Truck },
+      { title: "Service Markups", href: "/vendors/markup", icon: TrendingUp },
       { title: "Inventory Management", href: "/vendors/inventory", icon: Boxes },
       { title: "Performance", href: "/vendors/performance", icon: Star },
       { title: "Statement of Accounts", href: "/vendors/accounts", icon: Receipt },

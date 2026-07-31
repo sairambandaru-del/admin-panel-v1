@@ -21,6 +21,7 @@ import BookingQuotation from '@/components/inventory/BookingQuotation';
 import VendorRegistry from '@/components/vendors/VendorRegistry';
 import VendorOnboarding from '@/components/vendors/VendorOnboarding';
 import VendorServices from '@/components/vendors/VendorServices';
+import VendorMarkup from '@/components/vendors/VendorMarkup';
 import VendorInventory from '@/components/vendors/VendorInventory';
 import VendorPerformance from '@/components/vendors/VendorPerformance';
 import VendorSOA from '@/components/vendors/VendorSOA';
@@ -61,6 +62,7 @@ const AdminPage = () => {
     if (path === '/vendors/registry') return <VendorRegistry />;
     if (path === '/vendors/onboarding') return <VendorOnboarding />;
     if (path === '/vendors/services') return <VendorServices />;
+    if (path === '/vendors/markup') return <VendorMarkup />;
     if (path === '/vendors/inventory') return <VendorInventory />;
     if (path === '/vendors/performance') return <VendorPerformance />;
     if (path === '/vendors/accounts') return <VendorSOA />;
