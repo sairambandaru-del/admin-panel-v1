@@ -78,6 +78,7 @@ export interface GenericServiceItem {
   capacityOrStock: number;
   unitLabel: string; // e.g. "Per Trip", "Per Session", "Per Hour", "Per Item"
   badgeText?: string;
+  durationText?: string; // Time taken for the service, e.g. "45 mins", "2 hours"
   isActive: boolean;
 }
 
@@ -165,6 +166,7 @@ const initialGenericCatalog: GenericServiceItem[] = [
     capacityOrStock: 40,
     unitLabel: 'Per Trip',
     badgeText: 'Zen Pool Eligible',
+    durationText: '45 mins',
     isActive: true
   },
   {
@@ -178,6 +180,7 @@ const initialGenericCatalog: GenericServiceItem[] = [
     capacityOrStock: 30,
     unitLabel: 'Per Session',
     badgeText: 'Eco-certified',
+    durationText: '60 mins',
     isActive: true
   },
   {
@@ -191,6 +194,7 @@ const initialGenericCatalog: GenericServiceItem[] = [
     capacityOrStock: 100,
     unitLabel: 'Per Suit',
     badgeText: 'Same-day Express',
+    durationText: '24 hours',
     isActive: true
   },
   {
@@ -204,6 +208,7 @@ const initialGenericCatalog: GenericServiceItem[] = [
     capacityOrStock: 15,
     unitLabel: 'Per Visit',
     badgeText: 'DHA Licensed',
+    durationText: '45 mins',
     isActive: true
   },
   {
@@ -217,6 +222,7 @@ const initialGenericCatalog: GenericServiceItem[] = [
     capacityOrStock: 5,
     unitLabel: 'Per Hour',
     badgeText: 'VIP Experience',
+    durationText: '2 hours min',
     isActive: true
   },
   {
@@ -230,6 +236,7 @@ const initialGenericCatalog: GenericServiceItem[] = [
     capacityOrStock: 20,
     unitLabel: 'Per Guest',
     badgeText: 'Michelin Starred Chef',
+    durationText: '2 hours',
     isActive: true
   },
   {
@@ -243,6 +250,7 @@ const initialGenericCatalog: GenericServiceItem[] = [
     capacityOrStock: 25,
     unitLabel: 'Per Day',
     badgeText: '24/7 Access',
+    durationText: '1 Day',
     isActive: true
   },
   {
@@ -256,6 +264,7 @@ const initialGenericCatalog: GenericServiceItem[] = [
     capacityOrStock: 12,
     unitLabel: 'Per Session',
     badgeText: 'Organic Essential Oils',
+    durationText: '90 mins',
     isActive: true
   },
   {
@@ -269,6 +278,7 @@ const initialGenericCatalog: GenericServiceItem[] = [
     capacityOrStock: 8,
     unitLabel: 'Per Event',
     badgeText: 'Personalized Menu',
+    durationText: '3 hours',
     isActive: true
   },
   {
@@ -282,6 +292,7 @@ const initialGenericCatalog: GenericServiceItem[] = [
     capacityOrStock: 15,
     unitLabel: 'Per Platter',
     badgeText: 'Serves 10 Guests',
+    durationText: '2 hours',
     isActive: true
   },
   {
@@ -295,6 +306,7 @@ const initialGenericCatalog: GenericServiceItem[] = [
     capacityOrStock: 50,
     unitLabel: 'Per Basket',
     badgeText: 'Farm Fresh',
+    durationText: '30 mins delivery',
     isActive: true
   },
   {
@@ -308,6 +320,7 @@ const initialGenericCatalog: GenericServiceItem[] = [
     capacityOrStock: 80,
     unitLabel: 'Per Order',
     badgeText: '30-min Express',
+    durationText: '30 mins',
     isActive: true
   },
   {
@@ -321,6 +334,7 @@ const initialGenericCatalog: GenericServiceItem[] = [
     capacityOrStock: 2,
     unitLabel: 'Per Night',
     badgeText: 'Panoramic Sea View',
+    durationText: '24 hours',
     isActive: true
   }
 ];
@@ -360,14 +374,15 @@ const VendorInventory = () => {
   const [genericFormData, setGenericFormData] = useState<GenericServiceItem>({
     id: '',
     sku: '',
-    category: 'Transportation',
+    category: 'House keeping',
     title: '',
-    vendorName: 'Apex Luxury Fleet',
+    vendorName: 'Sparkle Cleaners',
     description: '',
-    unitPriceAED: 150,
+    unitPriceAED: 120,
     capacityOrStock: 20,
     unitLabel: 'Per Session',
-    badgeText: 'Verified Partner',
+    badgeText: 'Eco-certified',
+    durationText: '60 mins',
     isActive: true
   });
 
@@ -381,6 +396,7 @@ const VendorInventory = () => {
       ...prev,
       category,
       title: '',
+      durationText: category === 'House keeping' ? '60 mins' : '45 mins',
       sku: `SKU-${category.slice(0, 3).toUpperCase()}-${Math.floor(1000 + Math.random() * 9000)}`
     }));
   };
@@ -535,7 +551,7 @@ const VendorInventory = () => {
                 {selectedCategory} Inventory & Pricing Catalog
               </CardTitle>
               <CardDescription>
-                Manage service offerings, unit pricing, SKU codes, and stock availability for <span className="font-bold text-primary">{selectedCategory}</span>.
+                Manage service offerings, unit pricing, duration, SKU codes, and stock availability for <span className="font-bold text-primary">{selectedCategory}</span>.
               </CardDescription>
             </div>
 
@@ -554,7 +570,7 @@ const VendorInventory = () => {
                       Add New {selectedCategory} Offering
                     </DialogTitle>
                     <DialogDescription>
-                      Configure pricing, vendor partner details, and capacity for this {selectedCategory} item.
+                      Configure pricing, time taken for service, vendor partner details, and capacity for this {selectedCategory} item.
                     </DialogDescription>
                   </DialogHeader>
 
@@ -719,9 +735,10 @@ const VendorInventory = () => {
                           >
                             <SelectTrigger id="gen-vendor"><SelectValue /></SelectTrigger>
                             <SelectContent>
+                              <SelectItem value="Sparkle Cleaners">Sparkle Cleaners</SelectItem>
+                              <SelectItem value="Elite Housekeeping Co">Elite Housekeeping Co</SelectItem>
                               <SelectItem value="Apex Luxury Fleet">Apex Luxury Fleet</SelectItem>
                               <SelectItem value="Swift Airport Transfers">Swift Airport Transfers</SelectItem>
-                              <SelectItem value="Sparkle Cleaners">Sparkle Cleaners</SelectItem>
                               <SelectItem value="QuickWash Laundry">QuickWash Laundry</SelectItem>
                               <SelectItem value="CarePlus Mobile Health">CarePlus Mobile Health</SelectItem>
                               <SelectItem value="Gourmet Express">Gourmet Express</SelectItem>
@@ -732,15 +749,31 @@ const VendorInventory = () => {
                         </div>
                       </div>
 
-                      <div className="space-y-1.5">
-                        <Label htmlFor="gen-title">Service / Item Title</Label>
-                        <Input 
-                          id="gen-title" 
-                          placeholder={`e.g. Premium ${selectedCategory} Service`} 
-                          value={genericFormData.title}
-                          onChange={e => setGenericFormData({...genericFormData, title: e.target.value})}
-                          required
-                        />
+                      <div className="grid grid-cols-2 gap-3">
+                        <div className="space-y-1.5">
+                          <Label htmlFor="gen-title">Service / Item Title</Label>
+                          <Input 
+                            id="gen-title" 
+                            placeholder={`e.g. Premium ${selectedCategory} Service`} 
+                            value={genericFormData.title}
+                            onChange={e => setGenericFormData({...genericFormData, title: e.target.value})}
+                            required
+                          />
+                        </div>
+
+                        {/* TIME TAKEN / DURATION FIELD */}
+                        <div className="space-y-1.5">
+                          <Label htmlFor="gen-duration" className="flex items-center gap-1 font-bold text-primary">
+                            <Clock className="w-3.5 h-3.5 text-primary" />
+                            Time Taken for Service
+                          </Label>
+                          <Input 
+                            id="gen-duration" 
+                            placeholder="e.g. 60 mins, 2 hours, 45 mins" 
+                            value={genericFormData.durationText || ''}
+                            onChange={e => setGenericFormData({...genericFormData, durationText: e.target.value})}
+                          />
+                        </div>
                       </div>
 
                       <div className="space-y-1.5">
@@ -803,7 +836,7 @@ const VendorInventory = () => {
                         <Label htmlFor="gen-badge">Special Tag / Badge (Optional)</Label>
                         <Input 
                           id="gen-badge" 
-                          placeholder="e.g. Express Delivery, DHA Certified, 24/7 Available" 
+                          placeholder="e.g. Express Delivery, DHA Certified, Eco-certified" 
                           value={genericFormData.badgeText || ''}
                           onChange={e => setGenericFormData({...genericFormData, badgeText: e.target.value})}
                         />
@@ -969,6 +1002,7 @@ const VendorInventory = () => {
                   <TableRow className="bg-muted/30">
                     <TableHead>SKU</TableHead>
                     <TableHead>Offering Title & Vendor</TableHead>
+                    <TableHead>Time Taken</TableHead>
                     <TableHead>Description</TableHead>
                     <TableHead>Tag / Badge</TableHead>
                     <TableHead>Unit Price (AED)</TableHead>
@@ -979,7 +1013,7 @@ const VendorInventory = () => {
                 <TableBody>
                   {filteredGenericItems.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={7} className="text-center py-8">
+                      <TableCell colSpan={8} className="text-center py-8">
                         <Boxes className="w-8 h-8 text-muted-foreground mx-auto mb-2 opacity-50" />
                         <p className="font-bold text-xs">No items currently listed for {selectedCategory}</p>
                         <p className="text-[11px] text-muted-foreground mt-0.5">
@@ -996,6 +1030,16 @@ const VendorInventory = () => {
                             <p className="font-bold text-xs text-foreground">{item.title}</p>
                             <p className="text-[10px] text-muted-foreground">{item.vendorName}</p>
                           </div>
+                        </TableCell>
+                        <TableCell>
+                          {item.durationText ? (
+                            <Badge variant="secondary" className="text-[10px] gap-1 font-mono font-semibold">
+                              <Clock className="w-3 h-3 text-primary" />
+                              {item.durationText}
+                            </Badge>
+                          ) : (
+                            <span className="text-[10px] text-muted-foreground">-</span>
+                          )}
                         </TableCell>
                         <TableCell className="text-xs text-muted-foreground max-w-xs truncate">
                           {item.description || 'Standard service offering'}
@@ -1055,7 +1099,7 @@ const VendorInventory = () => {
                 <Edit2 className="w-4 h-4 text-primary" />
                 Edit {selectedCategory} Offering
               </DialogTitle>
-              <DialogDescription>Modify offering specs and price details.</DialogDescription>
+              <DialogDescription>Modify offering specs, duration, and price details.</DialogDescription>
             </DialogHeader>
 
             {selectedCategory === 'Car rental' ? (
@@ -1097,14 +1141,28 @@ const VendorInventory = () => {
               </div>
             ) : (
               <div className="grid gap-4 py-4 text-xs">
-                <div className="space-y-1.5">
-                  <Label>Service Title</Label>
-                  <Input 
-                    value={genericFormData.title}
-                    onChange={e => setGenericFormData({...genericFormData, title: e.target.value})}
-                    required
-                  />
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="space-y-1.5">
+                    <Label>Service Title</Label>
+                    <Input 
+                      value={genericFormData.title}
+                      onChange={e => setGenericFormData({...genericFormData, title: e.target.value})}
+                      required
+                    />
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <Label className="flex items-center gap-1 font-bold text-primary">
+                      <Clock className="w-3.5 h-3.5" /> Time Taken for Service
+                    </Label>
+                    <Input 
+                      placeholder="e.g. 60 mins, 2 hours"
+                      value={genericFormData.durationText || ''}
+                      onChange={e => setGenericFormData({...genericFormData, durationText: e.target.value})}
+                    />
+                  </div>
                 </div>
+
                 <div className="space-y-1.5">
                   <Label>Description</Label>
                   <Textarea 
@@ -1113,6 +1171,7 @@ const VendorInventory = () => {
                     onChange={e => setGenericFormData({...genericFormData, description: e.target.value})}
                   />
                 </div>
+
                 <div className="grid grid-cols-2 gap-3">
                   <div className="space-y-1.5">
                     <Label>Unit Price (AED)</Label>
