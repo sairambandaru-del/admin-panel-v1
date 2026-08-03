@@ -23,15 +23,9 @@ import {
   Boxes, 
   Plus, 
   Search, 
-  AlertTriangle, 
   CheckCircle2, 
-  PackageX, 
   Edit2, 
   Trash2, 
-  RefreshCw, 
-  Building2, 
-  DollarSign,
-  Shirt,
   Car,
   Utensils,
   Stethoscope,
@@ -45,77 +39,20 @@ import {
   ShoppingBasket,
   CarTaxiFront,
   Building,
-  Sparkles,
-  Zap,
   Tag,
-  Clock,
-  Plane,
-  Navigation,
-  Crown,
-  Leaf,
-  Wifi,
-  Radio,
-  Sliders,
-  ShieldCheck,
-  Briefcase,
+  Shirt,
   Fuel,
-  Users,
-  Shield
+  Shield,
+  Clock,
+  Sparkles
 } from 'lucide-react';
 import { showSuccess, showError } from '@/utils/toast';
 import { ServiceCategory } from './VendorServices';
 
-export interface LaundryServiceItem {
-  id: string;
-  sku: string;
-  itemName: string;
-  vendorName: string;
-  subCategory: 'Clothing' | 'Suits & Outerwear' | 'Bedding & Linens' | 'Bulk Wash & Fold' | 'Delicates';
-  serviceMethod: 'Wash & Iron' | 'Dry Cleaning' | 'Wash & Fold' | 'Pressing Only';
-  unitPriceAED: number;
-  expressPriceAED: number;
-  packagingStyle: 'Hanger' | 'Folded & Boxed' | 'Garment Bag';
-  dailyCapacity: number;
-  isActive: boolean;
-}
-
-export interface HousekeepingServiceItem {
-  id: string;
-  sku: string;
-  serviceTitle: string;
-  vendorName: string;
-  serviceType: 'Daily Service' | 'Deep Cleaning' | 'Targeted Service' | 'Amenity Refill' | 'Evening Service';
-  description: string;
-  durationFormatted: string;
-  durationMinutes: number;
-  priceAED: number;
-  isIncludedInStay: boolean;
-  dailyCapacity: number;
-  isActive: boolean;
-}
-
-export interface TransportationServiceItem {
-  id: string;
-  sku: string;
-  serviceTitle: string;
-  vendorName: string;
-  rideType: 'Airport Transfer' | 'Local Ride Hailing' | 'Premium Private Taxi' | 'Rent a Car';
-  description: string;
-  vehicleModel: string;
-  rideModeProfile: 'Business' | 'Relaxed' | 'VIP' | 'Green' | 'Focus';
-  zenPoolEligible: boolean;
-  aquaAccessEligible: boolean;
-  onboardExtras: string[];
-  priceAED: number;
-  pricingUnit: 'Per Trip' | 'Per Hour' | 'Per Day' | '3-Day Package';
-  dailyCapacity: number;
-  isActive: boolean;
-}
-
 export interface CarRentalItem {
   id: string;
   sku: string;
-  vehicleName: string; // e.g. "Range Rover Sport HSE 2024"
+  vehicleName: string;
   vendorName: string;
   categoryClass: 'Luxury SUV' | 'Electric & Hybrid' | 'Executive Sedan' | 'Sports Car' | 'Compact Economy';
   transmission: 'Automatic' | 'Manual';
@@ -126,9 +63,21 @@ export interface CarRentalItem {
   depositAED: number;
   insuranceIncluded: boolean;
   deliveryToUnit: boolean;
-  zenPoolEligible: boolean;
-  aquaAccessEligible: boolean;
   availableVehiclesCount: number;
+  isActive: boolean;
+}
+
+export interface GenericServiceItem {
+  id: string;
+  sku: string;
+  category: ServiceCategory;
+  title: string;
+  vendorName: string;
+  description: string;
+  unitPriceAED: number;
+  capacityOrStock: number;
+  unitLabel: string; // e.g. "Per Trip", "Per Session", "Per Hour", "Per Item"
+  badgeText?: string;
   isActive: boolean;
 }
 
@@ -149,7 +98,7 @@ export const EXACT_14_CATEGORIES: Array<{ id: ServiceCategory; label: string; ic
   { id: 'Food delivery', label: 'Food Delivery', icon: ShoppingBag }
 ];
 
-// Car Rental Catalog
+// Initial Catalogs
 const initialCarRentalCatalog: CarRentalItem[] = [
   {
     id: 'CAR-001',
@@ -165,8 +114,6 @@ const initialCarRentalCatalog: CarRentalItem[] = [
     depositAED: 2000.00,
     insuranceIncluded: true,
     deliveryToUnit: true,
-    zenPoolEligible: true,
-    aquaAccessEligible: true,
     availableVehiclesCount: 6,
     isActive: true
   },
@@ -184,8 +131,6 @@ const initialCarRentalCatalog: CarRentalItem[] = [
     depositAED: 1500.00,
     insuranceIncluded: true,
     deliveryToUnit: true,
-    zenPoolEligible: true,
-    aquaAccessEligible: true,
     availableVehiclesCount: 12,
     isActive: true
   },
@@ -203,103 +148,196 @@ const initialCarRentalCatalog: CarRentalItem[] = [
     depositAED: 2500.00,
     insuranceIncluded: true,
     deliveryToUnit: true,
-    zenPoolEligible: true,
-    aquaAccessEligible: true,
     availableVehiclesCount: 4,
-    isActive: true
-  },
-  {
-    id: 'CAR-004',
-    sku: 'SKU-CAR-PORSCHE-MACAN',
-    vehicleName: 'Porsche Macan GTS (Carmine Red)',
-    vendorName: 'Apex Luxury Fleet',
-    categoryClass: 'Sports Car',
-    transmission: 'Automatic',
-    fuelType: 'Petrol',
-    seats: 5,
-    dailyRateAED: 1100.00,
-    weeklyRateAED: 7000.00,
-    depositAED: 3000.00,
-    insuranceIncluded: true,
-    deliveryToUnit: true,
-    zenPoolEligible: true,
-    aquaAccessEligible: true,
-    availableVehiclesCount: 3,
     isActive: true
   }
 ];
 
-// Transportation Catalog
-const initialTransportationCatalog: TransportationServiceItem[] = [
+const initialGenericCatalog: GenericServiceItem[] = [
   {
     id: 'TRN-001',
     sku: 'SKU-TRN-AIRPORT-DXB',
-    serviceTitle: 'Airport Transfer (DXB & AUH)',
+    category: 'Transportation',
+    title: 'Airport Transfer (DXB & AUH)',
     vendorName: 'Swift Airport Transfers',
-    rideType: 'Airport Transfer',
-    description: 'Meet & greet, one-way or round-trip transfers for DXB & AUH airports',
-    vehicleModel: 'Mercedes S-Class Maybach (Black · DXB 9021)',
-    rideModeProfile: 'Business',
-    zenPoolEligible: true,
-    aquaAccessEligible: true,
-    onboardExtras: ['WiFi Hotspot', 'Phone Charger', 'Bottled Water', 'Bloomberg News Briefing'],
-    priceAED: 180.00,
-    pricingUnit: 'Per Trip',
-    dailyCapacity: 40,
+    description: 'Meet & greet transfers with chauffeur in Mercedes Maybach',
+    unitPriceAED: 180.00,
+    capacityOrStock: 40,
+    unitLabel: 'Per Trip',
+    badgeText: 'Zen Pool Eligible',
     isActive: true
-  }
-];
-
-// Housekeeping Catalog
-const initialHousekeepingCatalog: HousekeepingServiceItem[] = [
+  },
   {
     id: 'HKP-001',
     sku: 'SKU-HKP-DAILY',
-    serviceTitle: 'Daily Cleaning',
+    category: 'House keeping',
+    title: 'Daily Suite Sanitization & Linen Refresh',
     vendorName: 'Sparkle Cleaners',
-    serviceType: 'Daily Service',
-    description: 'Standard room cleaning, dusting, vacuuming, bathroom sanitization',
-    durationFormatted: '90 min',
-    durationMinutes: 90,
-    priceAED: 0,
-    isIncludedInStay: true,
-    dailyCapacity: 45,
+    description: 'Deep bathroom sanitization, bed making, dusting, and trash removal',
+    unitPriceAED: 120.00,
+    capacityOrStock: 30,
+    unitLabel: 'Per Session',
+    badgeText: 'Eco-certified',
     isActive: true
-  }
-];
-
-// Laundry catalog
-const initialLaundryCatalog: LaundryServiceItem[] = [
+  },
   {
-    id: 'LND-101',
-    sku: 'SKU-LND-SHIRT-WI',
-    itemName: "Men's Shirt (Formal / Casual)",
+    id: 'LND-001',
+    sku: 'SKU-LND-SUIT-DRY',
+    category: 'Laundry',
+    title: 'Men / Women 2-Piece Suit Dry Cleaning',
     vendorName: 'QuickWash Laundry',
-    subCategory: 'Clothing',
-    serviceMethod: 'Wash & Iron',
-    unitPriceAED: 18.00,
-    expressPriceAED: 28.00,
-    packagingStyle: 'Hanger',
-    dailyCapacity: 250,
+    description: 'Premium dry cleaning and hanger pressing with garment cover',
+    unitPriceAED: 45.00,
+    capacityOrStock: 100,
+    unitLabel: 'Per Suit',
+    badgeText: 'Same-day Express',
+    isActive: true
+  },
+  {
+    id: 'DOC-001',
+    sku: 'SKU-DOC-VISIT',
+    category: 'Doctor on call',
+    title: 'In-Suite General Practitioner Consultation',
+    vendorName: 'CarePlus Mobile Health',
+    description: '24/7 licensed GP consultation, vital checks, and immediate prescription',
+    unitPriceAED: 350.00,
+    capacityOrStock: 15,
+    unitLabel: 'Per Visit',
+    badgeText: 'DHA Licensed',
+    isActive: true
+  },
+  {
+    id: 'LEI-001',
+    sku: 'SKU-LEI-YACHT',
+    category: 'Leisure activities',
+    title: 'Private Yacht Charter (50ft Luxury Cruiser)',
+    vendorName: 'Ocean Breeze Marine',
+    description: 'Includes captain, crew, soft drinks, ice, and sound system',
+    unitPriceAED: 1200.00,
+    capacityOrStock: 5,
+    unitLabel: 'Per Hour',
+    badgeText: 'VIP Experience',
+    isActive: true
+  },
+  {
+    id: 'DIN-001',
+    sku: 'SKU-DIN-SEAFOOD',
+    category: 'Dining',
+    title: 'Signature Omakase Dining Voucher',
+    vendorName: 'Gourmet Express',
+    description: '7-course Japanese Omakase experience with priority seating',
+    unitPriceAED: 450.00,
+    capacityOrStock: 20,
+    unitLabel: 'Per Guest',
+    badgeText: 'Michelin Starred Chef',
+    isActive: true
+  },
+  {
+    id: 'CWK-001',
+    sku: 'SKU-CWK-DESK',
+    category: 'Co-working',
+    title: 'Dedicated Executive Desk Pass',
+    vendorName: 'Zenith Workspaces',
+    description: 'High-speed fiber internet, free espresso bar, print services, and meeting room access',
+    unitPriceAED: 85.00,
+    capacityOrStock: 25,
+    unitLabel: 'Per Day',
+    badgeText: '24/7 Access',
+    isActive: true
+  },
+  {
+    id: 'WEL-001',
+    sku: 'SKU-WEL-MASSAGE',
+    category: 'Wellness',
+    title: 'In-Suite Swedish Massage (90 Min)',
+    vendorName: 'Serenity Spa Mobile',
+    description: 'Professional therapist brings massage bed, aromatherapy oils, and calming music',
+    unitPriceAED: 290.00,
+    capacityOrStock: 12,
+    unitLabel: 'Per Session',
+    badgeText: 'Organic Essential Oils',
+    isActive: true
+  },
+  {
+    id: 'CHF-001',
+    sku: 'SKU-CHF-PRIVATE',
+    category: 'Chef on call',
+    title: 'Private Chef Dining Experience (3-Course)',
+    vendorName: 'Elite Culinary Group',
+    description: 'Custom menu creation, ingredient sourcing, cooking, and kitchen cleanup',
+    unitPriceAED: 650.00,
+    capacityOrStock: 8,
+    unitLabel: 'Per Event',
+    badgeText: 'Personalized Menu',
+    isActive: true
+  },
+  {
+    id: 'CAT-001',
+    sku: 'SKU-CAT-CANAPE',
+    category: 'In-house catering',
+    title: 'Gourmet Canapé & Mocktail Platter',
+    vendorName: 'Elite Culinary Group',
+    description: 'Selection of 24 handcrafted sweet and savory canapés with beverage service',
+    unitPriceAED: 520.00,
+    capacityOrStock: 15,
+    unitLabel: 'Per Platter',
+    badgeText: 'Serves 10 Guests',
+    isActive: true
+  },
+  {
+    id: 'GRO-001',
+    sku: 'SKU-GRO-BASKET',
+    category: 'Grocery',
+    title: 'Organic Breakfast Welcome Basket',
+    vendorName: 'Fresh Mart Essentials',
+    description: 'Artisanal bread, organic eggs, fresh berries, local honey, and premium coffee beans',
+    unitPriceAED: 145.00,
+    capacityOrStock: 50,
+    unitLabel: 'Per Basket',
+    badgeText: 'Farm Fresh',
+    isActive: true
+  },
+  {
+    id: 'FOD-001',
+    sku: 'SKU-FOD-BOWL',
+    category: 'Food delivery',
+    title: 'Artisanal Acai & Superfood Bowl',
+    vendorName: 'Gourmet Express',
+    description: 'Organic acai, guarana, fresh kiwi, strawberries, chia seeds, and almond butter',
+    unitPriceAED: 48.00,
+    capacityOrStock: 80,
+    unitLabel: 'Per Order',
+    badgeText: '30-min Express',
+    isActive: true
+  },
+  {
+    id: 'STR-001',
+    sku: 'SKU-STR-PENTHOUSE',
+    category: 'Short term rental',
+    title: 'Marina Horizon Luxury Penthouse Suite',
+    vendorName: 'Apex Luxury Fleet',
+    description: '3-bedroom penthouse with private plunge pool, skyline views, and butler service',
+    unitPriceAED: 2400.00,
+    capacityOrStock: 2,
+    unitLabel: 'Per Night',
+    badgeText: 'Panoramic Sea View',
     isActive: true
   }
 ];
 
 const VendorInventory = () => {
-  const [carRentalCatalog, setCarRentalCatalog] = useState<CarRentalItem[]>(initialCarRentalCatalog);
-  const [transportationCatalog, setTransportationCatalog] = useState<TransportationServiceItem[]>(initialTransportationCatalog);
-  const [housekeepingCatalog, setHousekeepingCatalog] = useState<HousekeepingServiceItem[]>(initialHousekeepingCatalog);
-  const [laundryCatalog, setLaundryCatalog] = useState<LaundryServiceItem[]>(initialLaundryCatalog);
-  
   const [selectedCategory, setSelectedCategory] = useState<ServiceCategory>('Car rental');
   const [searchTerm, setSearchTerm] = useState('');
-  const [carClassFilter, setCarClassFilter] = useState('all');
+  
+  // Catalogs state
+  const [carRentalCatalog, setCarRentalCatalog] = useState<CarRentalItem[]>(initialCarRentalCatalog);
+  const [genericCatalog, setGenericCatalog] = useState<GenericServiceItem[]>(initialGenericCatalog);
 
-  // Modals state for Car Rental
-  const [isAddCarOpen, setIsAddCarOpen] = useState(false);
-  const [isEditCarOpen, setIsEditCarOpen] = useState(false);
-  const [editingCarItem, setEditingCarItem] = useState<CarRentalItem | null>(null);
-
+  // Dialog state
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  
+  // Car form data
   const [carFormData, setCarFormData] = useState<CarRentalItem>({
     id: '',
     sku: '',
@@ -314,145 +352,214 @@ const VendorInventory = () => {
     depositAED: 2000,
     insuranceIncluded: true,
     deliveryToUnit: true,
-    zenPoolEligible: true,
-    aquaAccessEligible: true,
     availableVehiclesCount: 5,
     isActive: true
   });
 
-  const filteredCarItems = carRentalCatalog.filter(item => {
-    const matchesSearch = 
-      item.vehicleName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      item.sku.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      item.vendorName.toLowerCase().includes(searchTerm.toLowerCase());
-
-    const matchesClass = carClassFilter === 'all' || item.categoryClass === carClassFilter;
-
-    return matchesSearch && matchesClass;
+  // Generic form data
+  const [genericFormData, setGenericFormData] = useState<GenericServiceItem>({
+    id: '',
+    sku: '',
+    category: 'Transportation',
+    title: '',
+    vendorName: 'Apex Luxury Fleet',
+    description: '',
+    unitPriceAED: 150,
+    capacityOrStock: 20,
+    unitLabel: 'Per Session',
+    badgeText: 'Verified Partner',
+    isActive: true
   });
 
-  const handleAddCarItem = (e: React.FormEvent) => {
+  const [editingItemId, setEditingItemId] = useState<string | null>(null);
+
+  // Reset generic form when category changes
+  const handleCategoryChange = (category: ServiceCategory) => {
+    setSelectedCategory(category);
+    setSearchTerm('');
+    setGenericFormData(prev => ({
+      ...prev,
+      category,
+      title: '',
+      sku: `SKU-${category.slice(0, 3).toUpperCase()}-${Math.floor(1000 + Math.random() * 9000)}`
+    }));
+  };
+
+  // Filtering
+  const filteredCarItems = carRentalCatalog.filter(item => 
+    item.vehicleName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    item.sku.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    item.vendorName.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const filteredGenericItems = genericCatalog.filter(item => 
+    item.category === selectedCategory && (
+      item.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      item.sku.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      item.vendorName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      item.description.toLowerCase().includes(searchTerm.toLowerCase())
+    )
+  );
+
+  // Add Item Handler
+  const handleAddItem = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!carFormData.vehicleName || !carFormData.sku) {
-      showError("Please enter Vehicle Name and SKU.");
-      return;
+
+    if (selectedCategory === 'Car rental') {
+      if (!carFormData.vehicleName || !carFormData.sku) {
+        showError("Please fill in Vehicle Name and SKU.");
+        return;
+      }
+      const newItem: CarRentalItem = {
+        ...carFormData,
+        id: `CAR-${Date.now()}`
+      };
+      setCarRentalCatalog([newItem, ...carRentalCatalog]);
+      showSuccess(`Added "${newItem.vehicleName}" to Car Rental Catalog.`);
+    } else {
+      if (!genericFormData.title || !genericFormData.sku) {
+        showError("Please fill in Offering Title and SKU.");
+        return;
+      }
+      const newItem: GenericServiceItem = {
+        ...genericFormData,
+        category: selectedCategory,
+        id: `GEN-${Date.now()}`
+      };
+      setGenericCatalog([newItem, ...genericCatalog]);
+      showSuccess(`Added "${newItem.title}" to ${selectedCategory} Catalog.`);
     }
 
-    const newItem: CarRentalItem = {
-      ...carFormData,
-      id: `CAR-00${carRentalCatalog.length + 1}`
-    };
-
-    setCarRentalCatalog([...carRentalCatalog, newItem]);
-    setIsAddCarOpen(false);
-    showSuccess(`Added "${newItem.vehicleName}" to Car Rental Fleet Catalog.`);
+    setIsAddDialogOpen(false);
   };
 
-  const handleOpenEditCar = (item: CarRentalItem) => {
-    setEditingCarItem(item);
-    setCarFormData(item);
-    setIsEditCarOpen(true);
+  // Edit Item Handlers
+  const handleOpenEdit = (item: CarRentalItem | GenericServiceItem) => {
+    setEditingItemId(item.id);
+    if (selectedCategory === 'Car rental') {
+      setCarFormData(item as CarRentalItem);
+    } else {
+      setGenericFormData(item as GenericServiceItem);
+    }
+    setIsEditDialogOpen(true);
   };
 
-  const handleUpdateCarItem = (e: React.FormEvent) => {
+  const handleUpdateItem = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!editingCarItem) return;
+    if (!editingItemId) return;
 
-    setCarRentalCatalog(prev => prev.map(item => {
-      if (item.id === editingCarItem.id) {
-        return carFormData;
-      }
-      return item;
-    }));
+    if (selectedCategory === 'Car rental') {
+      setCarRentalCatalog(prev => prev.map(i => i.id === editingItemId ? carFormData : i));
+      showSuccess(`Updated "${carFormData.vehicleName}".`);
+    } else {
+      setGenericCatalog(prev => prev.map(i => i.id === editingItemId ? genericFormData : i));
+      showSuccess(`Updated "${genericFormData.title}".`);
+    }
 
-    setIsEditCarOpen(false);
-    setEditingCarItem(null);
-    showSuccess(`Updated Car Rental offering "${carFormData.vehicleName}".`);
+    setIsEditDialogOpen(false);
+    setEditingItemId(null);
   };
 
-  const handleDeleteCarItem = (id: string, name: string) => {
-    setCarRentalCatalog(prev => prev.filter(i => i.id !== id));
-    showSuccess(`Removed "${name}" from Car Rental Catalog.`);
+  const handleDeleteItem = (id: string, name: string) => {
+    if (selectedCategory === 'Car rental') {
+      setCarRentalCatalog(prev => prev.filter(i => i.id !== id));
+    } else {
+      setGenericCatalog(prev => prev.filter(i => i.id !== id));
+    }
+    showSuccess(`Removed "${name}" from ${selectedCategory} catalog.`);
   };
+
+  const activeCategoryObj = EXACT_14_CATEGORIES.find(c => c.id === selectedCategory);
+  const ActiveCategoryIcon = activeCategoryObj?.icon || Boxes;
 
   return (
     <div className="space-y-6">
-      {/* Top Header Metrics */}
+      {/* Metrics Banner */}
       <div className="grid gap-4 md:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-xs font-medium">Rental Fleet Vehicles</CardTitle>
-            <Car className="h-4 w-4 text-primary" />
+            <CardTitle className="text-xs font-medium">Active Category</CardTitle>
+            <ActiveCategoryIcon className="h-4 w-4 text-primary" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{carRentalCatalog.length} Models</div>
-            <p className="text-xs text-muted-foreground mt-1">Configured Rental Models</p>
+            <div className="text-2xl font-bold">{selectedCategory}</div>
+            <p className="text-xs text-muted-foreground mt-1">
+              {selectedCategory === 'Car rental' 
+                ? `${carRentalCatalog.length} Vehicles configured` 
+                : `${filteredGenericItems.length} Offerings cataloged`}
+            </p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-xs font-medium">Delivery to Suite / Unit</CardTitle>
+            <CardTitle className="text-xs font-medium">Service Delivery</CardTitle>
             <CheckCircle2 className="h-4 w-4 text-emerald-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-emerald-600">100% Free Delivery</div>
-            <p className="text-xs text-muted-foreground mt-1">Direct dropoff at property</p>
+            <div className="text-2xl font-bold text-emerald-600">100% On-Demand</div>
+            <p className="text-xs text-muted-foreground mt-1">In-suite & mobile dispatch</p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-xs font-medium">Avg. Daily Rate</CardTitle>
-            <Tag className="h-4 w-4 text-primary" />
+            <CardTitle className="text-xs font-medium">Total Inventory Categories</CardTitle>
+            <Boxes className="h-4 w-4 text-primary" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">AED 837.50</div>
-            <p className="text-xs text-muted-foreground mt-1">Self-drive rentals</p>
+            <div className="text-2xl font-bold">14 Categories</div>
+            <p className="text-xs text-muted-foreground mt-1">Integrated ecosystem</p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-xs font-medium">Total Fleet Available</CardTitle>
-            <Boxes className="h-4 w-4 text-emerald-500" />
+            <CardTitle className="text-xs font-medium">Active Vendor Network</CardTitle>
+            <Tag className="h-4 w-4 text-emerald-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-emerald-600">
-              {carRentalCatalog.reduce((sum, item) => sum + item.availableVehiclesCount, 0)} Cars
-            </div>
-            <p className="text-xs text-muted-foreground mt-1">Active vendor stock</p>
+            <div className="text-2xl font-bold text-emerald-600">Verified</div>
+            <p className="text-xs text-muted-foreground mt-1">SLA & Quality monitored</p>
           </CardContent>
         </Card>
       </div>
 
-      {/* Main Directory Card */}
+      {/* Main Directory & Action Area */}
       <Card>
         <CardHeader className="pb-3">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div>
-              <CardTitle className="text-lg">Category Inventory & Pricing Catalog</CardTitle>
+              <CardTitle className="text-lg flex items-center gap-2">
+                <ActiveCategoryIcon className="w-5 h-5 text-primary" />
+                {selectedCategory} Inventory & Pricing Catalog
+              </CardTitle>
               <CardDescription>
-                Tailored inventory structure per category. Selected category: <span className="font-bold text-primary">{selectedCategory}</span>
+                Manage service offerings, unit pricing, SKU codes, and stock availability for <span className="font-bold text-primary">{selectedCategory}</span>.
               </CardDescription>
             </div>
 
-            {selectedCategory === 'Car rental' && (
-              <Dialog open={isAddCarOpen} onOpenChange={setIsAddCarOpen}>
-                <DialogTrigger asChild>
-                  <Button className="gap-2 shrink-0">
-                    <Plus className="w-4 h-4" /> Add Car Rental Fleet Model
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className="sm:max-w-[550px]">
-                  <form onSubmit={handleAddCarItem}>
-                    <DialogHeader>
-                      <DialogTitle>Add Car Rental Vehicle Offering</DialogTitle>
-                      <DialogDescription>
-                        Configure vehicle specs, daily/weekly rates, security deposit, and suite delivery options.
-                      </DialogDescription>
-                    </DialogHeader>
+            {/* ADD BUTTON FOR ALL 14 CATEGORIES */}
+            <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
+              <DialogTrigger asChild>
+                <Button className="gap-2 shrink-0">
+                  <Plus className="w-4 h-4" /> Add {selectedCategory} Offering
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-[550px]">
+                <form onSubmit={handleAddItem}>
+                  <DialogHeader>
+                    <DialogTitle className="flex items-center gap-2">
+                      <ActiveCategoryIcon className="w-5 h-5 text-primary" />
+                      Add New {selectedCategory} Offering
+                    </DialogTitle>
+                    <DialogDescription>
+                      Configure pricing, vendor partner details, and capacity for this {selectedCategory} item.
+                    </DialogDescription>
+                  </DialogHeader>
 
+                  {selectedCategory === 'Car rental' ? (
+                    /* CAR RENTAL FORM FIELDS */
                     <div className="grid gap-4 py-4 text-xs">
                       <div className="grid grid-cols-2 gap-3">
                         <div className="space-y-1.5">
@@ -466,7 +573,7 @@ const VendorInventory = () => {
                           />
                         </div>
                         <div className="space-y-1.5">
-                          <Label htmlFor="car-vendor">Rental Vendor</Label>
+                          <Label htmlFor="car-vendor">Vendor Partner</Label>
                           <Select 
                             value={carFormData.vendorName}
                             onValueChange={v => setCarFormData({...carFormData, vendorName: v})}
@@ -493,12 +600,12 @@ const VendorInventory = () => {
 
                       <div className="grid grid-cols-3 gap-3">
                         <div className="space-y-1.5">
-                          <Label htmlFor="car-class">Category Class</Label>
+                          <Label>Category Class</Label>
                           <Select 
                             value={carFormData.categoryClass}
                             onValueChange={(v: any) => setCarFormData({...carFormData, categoryClass: v})}
                           >
-                            <SelectTrigger id="car-class"><SelectValue /></SelectTrigger>
+                            <SelectTrigger><SelectValue /></SelectTrigger>
                             <SelectContent>
                               <SelectItem value="Luxury SUV">Luxury SUV</SelectItem>
                               <SelectItem value="Electric & Hybrid">Electric & Hybrid</SelectItem>
@@ -510,12 +617,12 @@ const VendorInventory = () => {
                         </div>
 
                         <div className="space-y-1.5">
-                          <Label htmlFor="car-trans">Transmission</Label>
+                          <Label>Transmission</Label>
                           <Select 
                             value={carFormData.transmission}
                             onValueChange={(v: any) => setCarFormData({...carFormData, transmission: v})}
                           >
-                            <SelectTrigger id="car-trans"><SelectValue /></SelectTrigger>
+                            <SelectTrigger><SelectValue /></SelectTrigger>
                             <SelectContent>
                               <SelectItem value="Automatic">Automatic</SelectItem>
                               <SelectItem value="Manual">Manual</SelectItem>
@@ -524,12 +631,12 @@ const VendorInventory = () => {
                         </div>
 
                         <div className="space-y-1.5">
-                          <Label htmlFor="car-fuel">Fuel Type</Label>
+                          <Label>Fuel Type</Label>
                           <Select 
                             value={carFormData.fuelType}
                             onValueChange={(v: any) => setCarFormData({...carFormData, fuelType: v})}
                           >
-                            <SelectTrigger id="car-fuel"><SelectValue /></SelectTrigger>
+                            <SelectTrigger><SelectValue /></SelectTrigger>
                             <SelectContent>
                               <SelectItem value="Petrol">Petrol</SelectItem>
                               <SelectItem value="Electric">Electric</SelectItem>
@@ -541,33 +648,25 @@ const VendorInventory = () => {
 
                       <div className="grid grid-cols-3 gap-3">
                         <div className="space-y-1.5">
-                          <Label htmlFor="car-daily">Daily Rate (AED)</Label>
+                          <Label>Daily Rate (AED)</Label>
                           <Input 
-                            id="car-daily" 
                             type="number"
-                            step="10.00"
                             value={carFormData.dailyRateAED}
                             onChange={e => setCarFormData({...carFormData, dailyRateAED: Number(e.target.value)})}
                           />
                         </div>
-
                         <div className="space-y-1.5">
-                          <Label htmlFor="car-weekly">Weekly Rate (AED)</Label>
+                          <Label>Weekly Rate (AED)</Label>
                           <Input 
-                            id="car-weekly" 
                             type="number"
-                            step="50.00"
                             value={carFormData.weeklyRateAED}
                             onChange={e => setCarFormData({...carFormData, weeklyRateAED: Number(e.target.value)})}
                           />
                         </div>
-
                         <div className="space-y-1.5">
-                          <Label htmlFor="car-dep">Refundable Deposit (AED)</Label>
+                          <Label>Security Deposit (AED)</Label>
                           <Input 
-                            id="car-dep" 
                             type="number"
-                            step="100.00"
                             value={carFormData.depositAED}
                             onChange={e => setCarFormData({...carFormData, depositAED: Number(e.target.value)})}
                           />
@@ -598,17 +697,131 @@ const VendorInventory = () => {
                         </div>
                       </div>
                     </div>
+                  ) : (
+                    /* GENERIC FORM FIELDS FOR ALL OTHER 13 CATEGORIES */
+                    <div className="grid gap-4 py-4 text-xs">
+                      <div className="grid grid-cols-2 gap-3">
+                        <div className="space-y-1.5">
+                          <Label htmlFor="gen-sku">SKU Code</Label>
+                          <Input 
+                            id="gen-sku" 
+                            placeholder="e.g. SKU-SRV-101" 
+                            value={genericFormData.sku}
+                            onChange={e => setGenericFormData({...genericFormData, sku: e.target.value})}
+                            required
+                          />
+                        </div>
+                        <div className="space-y-1.5">
+                          <Label htmlFor="gen-vendor">Vendor Partner</Label>
+                          <Select 
+                            value={genericFormData.vendorName}
+                            onValueChange={v => setGenericFormData({...genericFormData, vendorName: v})}
+                          >
+                            <SelectTrigger id="gen-vendor"><SelectValue /></SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="Apex Luxury Fleet">Apex Luxury Fleet</SelectItem>
+                              <SelectItem value="Swift Airport Transfers">Swift Airport Transfers</SelectItem>
+                              <SelectItem value="Sparkle Cleaners">Sparkle Cleaners</SelectItem>
+                              <SelectItem value="QuickWash Laundry">QuickWash Laundry</SelectItem>
+                              <SelectItem value="CarePlus Mobile Health">CarePlus Mobile Health</SelectItem>
+                              <SelectItem value="Gourmet Express">Gourmet Express</SelectItem>
+                              <SelectItem value="Serenity Spa Mobile">Serenity Spa Mobile</SelectItem>
+                              <SelectItem value="Fresh Mart Essentials">Fresh Mart Essentials</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      </div>
 
-                    <DialogFooter>
-                      <Button type="submit" className="w-full">Save Car Model</Button>
-                    </DialogFooter>
-                  </form>
-                </DialogContent>
-              </Dialog>
-            )}
+                      <div className="space-y-1.5">
+                        <Label htmlFor="gen-title">Service / Item Title</Label>
+                        <Input 
+                          id="gen-title" 
+                          placeholder={`e.g. Premium ${selectedCategory} Service`} 
+                          value={genericFormData.title}
+                          onChange={e => setGenericFormData({...genericFormData, title: e.target.value})}
+                          required
+                        />
+                      </div>
+
+                      <div className="space-y-1.5">
+                        <Label htmlFor="gen-desc">Description & Inclusions</Label>
+                        <Textarea 
+                          id="gen-desc" 
+                          rows={2}
+                          placeholder="Brief description of inclusions, turnaround time, or service details..." 
+                          value={genericFormData.description}
+                          onChange={e => setGenericFormData({...genericFormData, description: e.target.value})}
+                        />
+                      </div>
+
+                      <div className="grid grid-cols-3 gap-3">
+                        <div className="space-y-1.5">
+                          <Label htmlFor="gen-price">Price (AED)</Label>
+                          <Input 
+                            id="gen-price" 
+                            type="number"
+                            step="5"
+                            value={genericFormData.unitPriceAED}
+                            onChange={e => setGenericFormData({...genericFormData, unitPriceAED: Number(e.target.value)})}
+                            required
+                          />
+                        </div>
+
+                        <div className="space-y-1.5">
+                          <Label htmlFor="gen-label">Pricing Unit</Label>
+                          <Select 
+                            value={genericFormData.unitLabel}
+                            onValueChange={v => setGenericFormData({...genericFormData, unitLabel: v})}
+                          >
+                            <SelectTrigger id="gen-label"><SelectValue /></SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="Per Session">Per Session</SelectItem>
+                              <SelectItem value="Per Trip">Per Trip</SelectItem>
+                              <SelectItem value="Per Item">Per Item</SelectItem>
+                              <SelectItem value="Per Hour">Per Hour</SelectItem>
+                              <SelectItem value="Per Day">Per Day</SelectItem>
+                              <SelectItem value="Per Visit">Per Visit</SelectItem>
+                              <SelectItem value="Per Guest">Per Guest</SelectItem>
+                              <SelectItem value="Per Order">Per Order</SelectItem>
+                              <SelectItem value="Per Night">Per Night</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+
+                        <div className="space-y-1.5">
+                          <Label htmlFor="gen-stock">Daily Capacity / Stock</Label>
+                          <Input 
+                            id="gen-stock" 
+                            type="number"
+                            value={genericFormData.capacityOrStock}
+                            onChange={e => setGenericFormData({...genericFormData, capacityOrStock: Number(e.target.value)})}
+                          />
+                        </div>
+                      </div>
+
+                      <div className="space-y-1.5">
+                        <Label htmlFor="gen-badge">Special Tag / Badge (Optional)</Label>
+                        <Input 
+                          id="gen-badge" 
+                          placeholder="e.g. Express Delivery, DHA Certified, 24/7 Available" 
+                          value={genericFormData.badgeText || ''}
+                          onChange={e => setGenericFormData({...genericFormData, badgeText: e.target.value})}
+                        />
+                      </div>
+                    </div>
+                  )}
+
+                  <DialogFooter>
+                    <Button type="submit" className="w-full">
+                      Save {selectedCategory} Offering
+                    </Button>
+                  </DialogFooter>
+                </form>
+              </DialogContent>
+            </Dialog>
           </div>
 
-          {/* Category Navigation Bar */}
+          {/* Category Bar Navigation */}
           <div className="pt-4 border-t mt-4 flex flex-col xl:flex-row items-start xl:items-center justify-between gap-3">
             <div className="w-full xl:w-auto overflow-x-auto pb-1">
               <div className="flex gap-1.5 bg-muted/80 p-1.5 rounded-lg border min-w-max">
@@ -619,7 +832,7 @@ const VendorInventory = () => {
                   return (
                     <button
                       key={tab.id}
-                      onClick={() => setSelectedCategory(tab.id)}
+                      onClick={() => handleCategoryChange(tab.id)}
                       className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-all ${
                         isActive 
                           ? 'bg-background text-foreground shadow-xs border font-bold' 
@@ -634,243 +847,247 @@ const VendorInventory = () => {
               </div>
             </div>
 
-            {/* Filter Controls */}
-            <div className="flex items-center gap-2 w-full xl:w-auto">
-              {selectedCategory === 'Car rental' && (
-                <Select value={carClassFilter} onValueChange={setCarClassFilter}>
-                  <SelectTrigger className="w-[180px] h-9 text-xs">
-                    <SelectValue placeholder="All Classes" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Vehicle Classes</SelectItem>
-                    <SelectItem value="Luxury SUV">Luxury SUV</SelectItem>
-                    <SelectItem value="Electric & Hybrid">Electric & Hybrid</SelectItem>
-                    <SelectItem value="Executive Sedan">Executive Sedan</SelectItem>
-                    <SelectItem value="Sports Car">Sports Car</SelectItem>
-                    <SelectItem value="Compact Economy">Compact Economy</SelectItem>
-                  </SelectContent>
-                </Select>
-              )}
-
-              <div className="relative w-full xl:w-60 shrink-0">
-                <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                <Input
-                  placeholder="Search car model or SKU..."
-                  value={searchTerm}
-                  onChange={e => setSearchTerm(e.target.value)}
-                  className="pl-8 h-9 text-xs"
-                />
-              </div>
+            {/* Search Input */}
+            <div className="relative w-full xl:w-64 shrink-0">
+              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder={`Search ${selectedCategory}...`}
+                value={searchTerm}
+                onChange={e => setSearchTerm(e.target.value)}
+                className="pl-8 h-9 text-xs"
+              />
             </div>
           </div>
         </CardHeader>
 
         <CardContent className="pt-2">
           {selectedCategory === 'Car rental' ? (
-            /* TAILORED CAR RENTAL FLEET CATALOG TABLE */
+            /* CAR RENTAL TABLE */
             <div className="rounded-md border overflow-x-auto">
               <Table>
                 <TableHeader>
                   <TableRow className="bg-muted/30">
                     <TableHead>SKU</TableHead>
-                    <TableHead>Vehicle Model Name</TableHead>
+                    <TableHead>Vehicle Model</TableHead>
                     <TableHead>Category Class</TableHead>
-                    <TableHead>Specs (Transmission / Fuel)</TableHead>
+                    <TableHead>Specs</TableHead>
                     <TableHead>Daily Rate (AED)</TableHead>
                     <TableHead>Weekly Rate (AED)</TableHead>
-                    <TableHead>Security Deposit</TableHead>
-                    <TableHead>Service Perks</TableHead>
+                    <TableHead>Deposit</TableHead>
+                    <TableHead>Perks</TableHead>
                     <TableHead className="text-center">Fleet Available</TableHead>
                     <TableHead className="text-right">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {filteredCarItems.map(item => (
-                    <TableRow key={item.id} className="hover:bg-muted/50 transition-colors">
-                      <TableCell className="font-mono text-xs font-bold">{item.sku}</TableCell>
-                      <TableCell>
-                        <div>
-                          <p className="font-bold text-xs text-foreground">{item.vehicleName}</p>
-                          <p className="text-[10px] text-muted-foreground">{item.vendorName}</p>
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <Badge variant="outline" className="text-[10px] bg-primary/5 text-primary border-primary/20">
-                          {item.categoryClass}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>
-                        <div className="space-y-0.5 text-[11px]">
-                          <p className="font-medium text-foreground">{item.transmission} • {item.seats} Seats</p>
-                          <p className="text-muted-foreground flex items-center gap-1">
-                            <Fuel className="w-3 h-3 text-primary" /> {item.fuelType}
-                          </p>
-                        </div>
-                      </TableCell>
-                      <TableCell className="text-xs font-bold text-foreground">
-                        AED {item.dailyRateAED.toFixed(2)}
-                      </TableCell>
-                      <TableCell className="text-xs font-bold text-emerald-600">
-                        AED {item.weeklyRateAED.toFixed(2)}
-                      </TableCell>
-                      <TableCell className="text-xs font-mono text-muted-foreground">
-                        AED {item.depositAED.toFixed(2)}
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex flex-col gap-1">
-                          {item.insuranceIncluded && (
-                            <Badge variant="outline" className="text-[9px] bg-emerald-50 text-emerald-800 border-emerald-300 w-fit py-0">
-                              <Shield className="w-2.5 h-2.5 mr-1 text-emerald-600" /> Full Insurance
-                            </Badge>
-                          )}
-                          {item.deliveryToUnit && (
-                            <Badge variant="outline" className="text-[9px] bg-blue-50 text-blue-800 border-blue-300 w-fit py-0">
-                              <CheckCircle2 className="w-2.5 h-2.5 mr-1 text-blue-600" /> Suite Delivery
-                            </Badge>
-                          )}
-                        </div>
-                      </TableCell>
-                      <TableCell className="text-center font-mono text-xs font-bold">
-                        {item.availableVehiclesCount} Cars
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <div className="flex justify-end items-center gap-1">
-                          <Button 
-                            variant="ghost" 
-                            size="icon" 
-                            className="h-7 w-7 text-muted-foreground hover:text-foreground"
-                            onClick={() => handleOpenEditCar(item)}
-                            title="Edit Vehicle Specs"
-                          >
-                            <Edit2 className="w-3.5 h-3.5" />
-                          </Button>
-                          <Button 
-                            variant="ghost" 
-                            size="icon" 
-                            className="h-7 w-7 text-destructive hover:text-destructive"
-                            onClick={() => handleDeleteCarItem(item.id, item.vehicleName)}
-                            title="Delete Car Model"
-                          >
-                            <Trash2 className="w-3.5 h-3.5" />
-                          </Button>
-                        </div>
+                  {filteredCarItems.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={10} className="text-center py-6 text-xs text-muted-foreground">
+                        No car rental models found matching search.
                       </TableCell>
                     </TableRow>
-                  ))}
+                  ) : (
+                    filteredCarItems.map(item => (
+                      <TableRow key={item.id} className="hover:bg-muted/50 transition-colors">
+                        <TableCell className="font-mono text-xs font-bold">{item.sku}</TableCell>
+                        <TableCell>
+                          <div>
+                            <p className="font-bold text-xs text-foreground">{item.vehicleName}</p>
+                            <p className="text-[10px] text-muted-foreground">{item.vendorName}</p>
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <Badge variant="outline" className="text-[10px] bg-primary/5 text-primary border-primary/20">
+                            {item.categoryClass}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>
+                          <div className="space-y-0.5 text-[11px]">
+                            <p className="font-medium text-foreground">{item.transmission} • {item.seats} Seats</p>
+                            <p className="text-muted-foreground flex items-center gap-1">
+                              <Fuel className="w-3 h-3 text-primary" /> {item.fuelType}
+                            </p>
+                          </div>
+                        </TableCell>
+                        <TableCell className="text-xs font-bold text-foreground">
+                          AED {item.dailyRateAED.toFixed(2)}
+                        </TableCell>
+                        <TableCell className="text-xs font-bold text-emerald-600">
+                          AED {item.weeklyRateAED.toFixed(2)}
+                        </TableCell>
+                        <TableCell className="text-xs font-mono text-muted-foreground">
+                          AED {item.depositAED.toFixed(2)}
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex flex-col gap-1">
+                            {item.insuranceIncluded && (
+                              <Badge variant="outline" className="text-[9px] bg-emerald-50 text-emerald-800 border-emerald-300 w-fit py-0">
+                                <Shield className="w-2.5 h-2.5 mr-1 text-emerald-600" /> Full Insurance
+                              </Badge>
+                            )}
+                            {item.deliveryToUnit && (
+                              <Badge variant="outline" className="text-[9px] bg-blue-50 text-blue-800 border-blue-300 w-fit py-0">
+                                <CheckCircle2 className="w-2.5 h-2.5 mr-1 text-blue-600" /> Suite Delivery
+                              </Badge>
+                            )}
+                          </div>
+                        </TableCell>
+                        <TableCell className="text-center font-mono text-xs font-bold">
+                          {item.availableVehiclesCount} Cars
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <div className="flex justify-end items-center gap-1">
+                            <Button 
+                              variant="ghost" 
+                              size="icon" 
+                              className="h-7 w-7 text-muted-foreground hover:text-foreground"
+                              onClick={() => handleOpenEdit(item)}
+                            >
+                              <Edit2 className="w-3.5 h-3.5" />
+                            </Button>
+                            <Button 
+                              variant="ghost" 
+                              size="icon" 
+                              className="h-7 w-7 text-destructive hover:text-destructive"
+                              onClick={() => handleDeleteItem(item.id, item.vehicleName)}
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  )}
                 </TableBody>
               </Table>
             </div>
-          ) : selectedCategory === 'Transportation' ? (
-            /* TAILORED TRANSPORTATION HUB CATALOG TABLE */
+          ) : (
+            /* GENERIC CATALOG TABLE FOR ALL OTHER 13 CATEGORIES */
             <div className="rounded-md border overflow-x-auto">
               <Table>
                 <TableHeader>
                   <TableRow className="bg-muted/30">
                     <TableHead>SKU</TableHead>
-                    <TableHead>Ride Service Title</TableHead>
-                    <TableHead>Ride Type</TableHead>
-                    <TableHead>Assigned Vehicle / Fleet ID</TableHead>
-                    <TableHead>Eligibility Badges</TableHead>
-                    <TableHead>Rate (AED)</TableHead>
-                    <TableHead className="text-center">Daily Capacity</TableHead>
+                    <TableHead>Offering Title & Vendor</TableHead>
+                    <TableHead>Description</TableHead>
+                    <TableHead>Tag / Badge</TableHead>
+                    <TableHead>Unit Price (AED)</TableHead>
+                    <TableHead className="text-center">Daily Capacity / Stock</TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {transportationCatalog.map(item => (
-                    <TableRow key={item.id}>
-                      <TableCell className="font-mono text-xs font-bold">{item.sku}</TableCell>
-                      <TableCell className="font-bold text-xs">{item.serviceTitle}</TableCell>
-                      <TableCell><Badge variant="outline" className="text-[10px]">{item.rideType}</Badge></TableCell>
-                      <TableCell className="text-xs">{item.vehicleModel}</TableCell>
-                      <TableCell><Badge className="bg-amber-100 text-amber-900 border-amber-300 text-[9px]">Zen Pool Eligible</Badge></TableCell>
-                      <TableCell className="text-xs font-bold">AED {item.priceAED.toFixed(2)}</TableCell>
-                      <TableCell className="text-center font-mono text-xs">{item.dailyCapacity} Trips/Day</TableCell>
+                  {filteredGenericItems.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={7} className="text-center py-8">
+                        <Boxes className="w-8 h-8 text-muted-foreground mx-auto mb-2 opacity-50" />
+                        <p className="font-bold text-xs">No items currently listed for {selectedCategory}</p>
+                        <p className="text-[11px] text-muted-foreground mt-0.5">
+                          Click "Add {selectedCategory} Offering" above to create an offering.
+                        </p>
+                      </TableCell>
                     </TableRow>
-                  ))}
+                  ) : (
+                    filteredGenericItems.map(item => (
+                      <TableRow key={item.id} className="hover:bg-muted/50 transition-colors">
+                        <TableCell className="font-mono text-xs font-bold">{item.sku}</TableCell>
+                        <TableCell>
+                          <div>
+                            <p className="font-bold text-xs text-foreground">{item.title}</p>
+                            <p className="text-[10px] text-muted-foreground">{item.vendorName}</p>
+                          </div>
+                        </TableCell>
+                        <TableCell className="text-xs text-muted-foreground max-w-xs truncate">
+                          {item.description || 'Standard service offering'}
+                        </TableCell>
+                        <TableCell>
+                          {item.badgeText ? (
+                            <Badge variant="outline" className="text-[9px] bg-primary/10 text-primary border-primary/20">
+                              <Sparkles className="w-2.5 h-2.5 mr-1" />
+                              {item.badgeText}
+                            </Badge>
+                          ) : (
+                            <span className="text-[10px] text-muted-foreground">-</span>
+                          )}
+                        </TableCell>
+                        <TableCell className="text-xs font-bold text-foreground">
+                          AED {item.unitPriceAED.toFixed(2)} <span className="text-[10px] font-normal text-muted-foreground">/ {item.unitLabel}</span>
+                        </TableCell>
+                        <TableCell className="text-center font-mono text-xs font-bold">
+                          {item.capacityOrStock} units/day
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <div className="flex justify-end items-center gap-1">
+                            <Button 
+                              variant="ghost" 
+                              size="icon" 
+                              className="h-7 w-7 text-muted-foreground hover:text-foreground"
+                              onClick={() => handleOpenEdit(item)}
+                            >
+                              <Edit2 className="w-3.5 h-3.5" />
+                            </Button>
+                            <Button 
+                              variant="ghost" 
+                              size="icon" 
+                              className="h-7 w-7 text-destructive hover:text-destructive"
+                              onClick={() => handleDeleteItem(item.id, item.title)}
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  )}
                 </TableBody>
               </Table>
-            </div>
-          ) : (
-            <div className="p-8 text-center border-2 border-dashed rounded-xl bg-muted/10">
-              <Boxes className="w-10 h-10 text-muted-foreground mx-auto mb-2 opacity-50" />
-              <h4 className="font-bold text-sm">Custom Inventory for {selectedCategory}</h4>
-              <p className="text-xs text-muted-foreground max-w-sm mx-auto mt-1">
-                Select the Car Rental or Transportation Hub tabs above to inspect synchronized fleet offerings and pricing catalogs.
-              </p>
             </div>
           )}
         </CardContent>
       </Card>
 
-      {/* Edit Car Rental Dialog */}
-      <Dialog open={isEditCarOpen} onOpenChange={setIsEditCarOpen}>
+      {/* Edit Offering Dialog */}
+      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
         <DialogContent className="sm:max-w-[550px]">
-          {editingCarItem && (
-            <form onSubmit={handleUpdateCarItem}>
-              <DialogHeader>
-                <DialogTitle>Edit Car Rental Model: {editingCarItem.vehicleName}</DialogTitle>
-                <DialogDescription>Modify rates, security deposit, and fleet availability.</DialogDescription>
-              </DialogHeader>
+          <form onSubmit={handleUpdateItem}>
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                <Edit2 className="w-4 h-4 text-primary" />
+                Edit {selectedCategory} Offering
+              </DialogTitle>
+              <DialogDescription>Modify offering specs and price details.</DialogDescription>
+            </DialogHeader>
 
+            {selectedCategory === 'Car rental' ? (
               <div className="grid gap-4 py-4 text-xs">
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="space-y-1.5">
-                    <Label htmlFor="edit-car-sku">SKU Code</Label>
-                    <Input 
-                      id="edit-car-sku" 
-                      value={carFormData.sku}
-                      onChange={e => setCarFormData({...carFormData, sku: e.target.value})}
-                      required
-                    />
-                  </div>
-                  <div className="space-y-1.5">
-                    <Label htmlFor="edit-car-vendor">Vendor</Label>
-                    <Select 
-                      value={carFormData.vendorName}
-                      onValueChange={v => setCarFormData({...carFormData, vendorName: v})}
-                    >
-                      <SelectTrigger id="edit-car-vendor"><SelectValue /></SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="Apex Luxury Fleet">Apex Luxury Fleet</SelectItem>
-                        <SelectItem value="Swift Airport Transfers">Swift Airport Transfers</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-
                 <div className="space-y-1.5">
-                  <Label htmlFor="edit-car-name">Vehicle Name</Label>
+                  <Label>Vehicle Name</Label>
                   <Input 
-                    id="edit-car-name" 
                     value={carFormData.vehicleName}
                     onChange={e => setCarFormData({...carFormData, vehicleName: e.target.value})}
                     required
                   />
                 </div>
-
                 <div className="grid grid-cols-3 gap-3">
                   <div className="space-y-1.5">
-                    <Label htmlFor="edit-car-daily">Daily Rate (AED)</Label>
+                    <Label>Daily Rate (AED)</Label>
                     <Input 
-                      id="edit-car-daily" 
                       type="number"
                       value={carFormData.dailyRateAED}
                       onChange={e => setCarFormData({...carFormData, dailyRateAED: Number(e.target.value)})}
                     />
                   </div>
                   <div className="space-y-1.5">
-                    <Label htmlFor="edit-car-weekly">Weekly Rate (AED)</Label>
+                    <Label>Weekly Rate (AED)</Label>
                     <Input 
-                      id="edit-car-weekly" 
                       type="number"
                       value={carFormData.weeklyRateAED}
                       onChange={e => setCarFormData({...carFormData, weeklyRateAED: Number(e.target.value)})}
                     />
                   </div>
                   <div className="space-y-1.5">
-                    <Label htmlFor="edit-car-dep">Deposit (AED)</Label>
+                    <Label>Deposit (AED)</Label>
                     <Input 
-                      id="edit-car-dep" 
                       type="number"
                       value={carFormData.depositAED}
                       onChange={e => setCarFormData({...carFormData, depositAED: Number(e.target.value)})}
@@ -878,12 +1095,49 @@ const VendorInventory = () => {
                   </div>
                 </div>
               </div>
+            ) : (
+              <div className="grid gap-4 py-4 text-xs">
+                <div className="space-y-1.5">
+                  <Label>Service Title</Label>
+                  <Input 
+                    value={genericFormData.title}
+                    onChange={e => setGenericFormData({...genericFormData, title: e.target.value})}
+                    required
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <Label>Description</Label>
+                  <Textarea 
+                    rows={2}
+                    value={genericFormData.description}
+                    onChange={e => setGenericFormData({...genericFormData, description: e.target.value})}
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="space-y-1.5">
+                    <Label>Unit Price (AED)</Label>
+                    <Input 
+                      type="number"
+                      value={genericFormData.unitPriceAED}
+                      onChange={e => setGenericFormData({...genericFormData, unitPriceAED: Number(e.target.value)})}
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label>Daily Capacity / Stock</Label>
+                    <Input 
+                      type="number"
+                      value={genericFormData.capacityOrStock}
+                      onChange={e => setGenericFormData({...genericFormData, capacityOrStock: Number(e.target.value)})}
+                    />
+                  </div>
+                </div>
+              </div>
+            )}
 
-              <DialogFooter>
-                <Button type="submit" className="w-full">Update Vehicle Model</Button>
-              </DialogFooter>
-            </form>
-          )}
+            <DialogFooter>
+              <Button type="submit" className="w-full">Update Offering</Button>
+            </DialogFooter>
+          </form>
         </DialogContent>
       </Dialog>
     </div>
