@@ -44,7 +44,8 @@ import {
   Fuel,
   Shield,
   Clock,
-  Sparkles
+  Sparkles,
+  X
 } from 'lucide-react';
 import { showSuccess, showError } from '@/utils/toast';
 import { ServiceCategory } from './VendorServices';
@@ -78,6 +79,7 @@ export interface GenericServiceItem {
   capacityOrStock: number;
   unitLabel: string; // e.g. "Per Trip", "Per Session", "Per Hour", "Per Item"
   badgeText?: string;
+  tags?: string[];
   durationText?: string; // Time taken for the service, e.g. "45 mins", "2 hours"
   isActive: boolean;
 }
@@ -97,6 +99,27 @@ export const EXACT_14_CATEGORIES: Array<{ id: ServiceCategory; label: string; ic
   { id: 'In-house catering', label: 'Catering', icon: Utensils },
   { id: 'Grocery', label: 'Grocery', icon: ShoppingBasket },
   { id: 'Food delivery', label: 'Food Delivery', icon: ShoppingBag }
+];
+
+export const PRESET_SERVICE_TAGS = [
+  'Eco-certified',
+  'Deep Cleaning',
+  'Sanitized & Sealed',
+  'Same-day Express',
+  'Zen Pool Eligible',
+  'DHA Licensed',
+  'VIP Experience',
+  'Michelin Starred Chef',
+  '24/7 Access',
+  'Organic Essential Oils',
+  'Personalized Menu',
+  'Serves 10 Guests',
+  'Farm Fresh',
+  '30-min Express',
+  'Panoramic Sea View',
+  'Instant Confirmation',
+  'Pet Friendly',
+  'Discreet Service'
 ];
 
 // Initial Catalogs
@@ -165,7 +188,7 @@ const initialGenericCatalog: GenericServiceItem[] = [
     unitPriceAED: 180.00,
     capacityOrStock: 40,
     unitLabel: 'Per Trip',
-    badgeText: 'Zen Pool Eligible',
+    tags: ['Zen Pool Eligible', 'VIP Experience'],
     durationText: '45 mins',
     isActive: true
   },
@@ -179,7 +202,7 @@ const initialGenericCatalog: GenericServiceItem[] = [
     unitPriceAED: 120.00,
     capacityOrStock: 30,
     unitLabel: 'Per Session',
-    badgeText: 'Eco-certified',
+    tags: ['Eco-certified', 'Sanitized & Sealed', 'Deep Cleaning'],
     durationText: '60 mins',
     isActive: true
   },
@@ -193,7 +216,7 @@ const initialGenericCatalog: GenericServiceItem[] = [
     unitPriceAED: 45.00,
     capacityOrStock: 100,
     unitLabel: 'Per Suit',
-    badgeText: 'Same-day Express',
+    tags: ['Same-day Express'],
     durationText: '24 hours',
     isActive: true
   },
@@ -207,7 +230,7 @@ const initialGenericCatalog: GenericServiceItem[] = [
     unitPriceAED: 350.00,
     capacityOrStock: 15,
     unitLabel: 'Per Visit',
-    badgeText: 'DHA Licensed',
+    tags: ['DHA Licensed', '24/7 Access'],
     durationText: '45 mins',
     isActive: true
   },
@@ -221,7 +244,7 @@ const initialGenericCatalog: GenericServiceItem[] = [
     unitPriceAED: 1200.00,
     capacityOrStock: 5,
     unitLabel: 'Per Hour',
-    badgeText: 'VIP Experience',
+    tags: ['VIP Experience', 'Panoramic Sea View'],
     durationText: '2 hours min',
     isActive: true
   },
@@ -235,7 +258,7 @@ const initialGenericCatalog: GenericServiceItem[] = [
     unitPriceAED: 450.00,
     capacityOrStock: 20,
     unitLabel: 'Per Guest',
-    badgeText: 'Michelin Starred Chef',
+    tags: ['Michelin Starred Chef', 'VIP Experience'],
     durationText: '2 hours',
     isActive: true
   },
@@ -249,7 +272,7 @@ const initialGenericCatalog: GenericServiceItem[] = [
     unitPriceAED: 85.00,
     capacityOrStock: 25,
     unitLabel: 'Per Day',
-    badgeText: '24/7 Access',
+    tags: ['24/7 Access', 'Instant Confirmation'],
     durationText: '1 Day',
     isActive: true
   },
@@ -263,7 +286,7 @@ const initialGenericCatalog: GenericServiceItem[] = [
     unitPriceAED: 290.00,
     capacityOrStock: 12,
     unitLabel: 'Per Session',
-    badgeText: 'Organic Essential Oils',
+    tags: ['Organic Essential Oils'],
     durationText: '90 mins',
     isActive: true
   },
@@ -277,7 +300,7 @@ const initialGenericCatalog: GenericServiceItem[] = [
     unitPriceAED: 650.00,
     capacityOrStock: 8,
     unitLabel: 'Per Event',
-    badgeText: 'Personalized Menu',
+    tags: ['Personalized Menu', 'VIP Experience'],
     durationText: '3 hours',
     isActive: true
   },
@@ -291,7 +314,7 @@ const initialGenericCatalog: GenericServiceItem[] = [
     unitPriceAED: 520.00,
     capacityOrStock: 15,
     unitLabel: 'Per Platter',
-    badgeText: 'Serves 10 Guests',
+    tags: ['Serves 10 Guests'],
     durationText: '2 hours',
     isActive: true
   },
@@ -305,7 +328,7 @@ const initialGenericCatalog: GenericServiceItem[] = [
     unitPriceAED: 145.00,
     capacityOrStock: 50,
     unitLabel: 'Per Basket',
-    badgeText: 'Farm Fresh',
+    tags: ['Farm Fresh', 'Eco-certified'],
     durationText: '30 mins delivery',
     isActive: true
   },
@@ -319,7 +342,7 @@ const initialGenericCatalog: GenericServiceItem[] = [
     unitPriceAED: 48.00,
     capacityOrStock: 80,
     unitLabel: 'Per Order',
-    badgeText: '30-min Express',
+    tags: ['30-min Express'],
     durationText: '30 mins',
     isActive: true
   },
@@ -333,7 +356,7 @@ const initialGenericCatalog: GenericServiceItem[] = [
     unitPriceAED: 2400.00,
     capacityOrStock: 2,
     unitLabel: 'Per Night',
-    badgeText: 'Panoramic Sea View',
+    tags: ['Panoramic Sea View', 'VIP Experience'],
     durationText: '24 hours',
     isActive: true
   }
@@ -351,6 +374,9 @@ const VendorInventory = () => {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   
+  // Custom tag input
+  const [customTagInput, setCustomTagInput] = useState('');
+
   // Car form data
   const [carFormData, setCarFormData] = useState<CarRentalItem>({
     id: '',
@@ -381,12 +407,33 @@ const VendorInventory = () => {
     unitPriceAED: 120,
     capacityOrStock: 20,
     unitLabel: 'Per Session',
-    badgeText: 'Eco-certified',
+    tags: ['Eco-certified', 'Sanitized & Sealed'],
     durationText: '60 mins',
     isActive: true
   });
 
   const [editingItemId, setEditingItemId] = useState<string | null>(null);
+
+  // Helper function to add a tag to form
+  const handleAddTag = (tagToAdd: string) => {
+    const trimmed = tagToAdd.trim();
+    if (!trimmed) return;
+    const currentTags = genericFormData.tags || [];
+    if (!currentTags.includes(trimmed)) {
+      setGenericFormData(prev => ({
+        ...prev,
+        tags: [...currentTags, trimmed]
+      }));
+    }
+  };
+
+  // Helper function to remove a tag from form
+  const handleRemoveTag = (tagToRemove: string) => {
+    setGenericFormData(prev => ({
+      ...prev,
+      tags: (prev.tags || []).filter(t => t !== tagToRemove)
+    }));
+  };
 
   // Reset generic form when category changes
   const handleCategoryChange = (category: ServiceCategory) => {
@@ -396,6 +443,7 @@ const VendorInventory = () => {
       ...prev,
       category,
       title: '',
+      tags: category === 'House keeping' ? ['Eco-certified', 'Sanitized & Sealed'] : ['Instant Confirmation'],
       durationText: category === 'House keeping' ? '60 mins' : '45 mins',
       sku: `SKU-${category.slice(0, 3).toUpperCase()}-${Math.floor(1000 + Math.random() * 9000)}`
     }));
@@ -455,7 +503,16 @@ const VendorInventory = () => {
     if (selectedCategory === 'Car rental') {
       setCarFormData(item as CarRentalItem);
     } else {
-      setGenericFormData(item as GenericServiceItem);
+      const genItem = item as GenericServiceItem;
+      // Convert legacy badgeText into tags array if needed
+      const initialTags = genItem.tags && genItem.tags.length > 0 
+        ? genItem.tags 
+        : (genItem.badgeText ? [genItem.badgeText] : []);
+      
+      setGenericFormData({
+        ...genItem,
+        tags: initialTags
+      });
     }
     setIsEditDialogOpen(true);
   };
@@ -562,7 +619,7 @@ const VendorInventory = () => {
                   <Plus className="w-4 h-4" /> Add {selectedCategory} Offering
                 </Button>
               </DialogTrigger>
-              <DialogContent className="sm:max-w-[550px]">
+              <DialogContent className="sm:max-w-[580px] max-h-[90vh] overflow-y-auto">
                 <form onSubmit={handleAddItem}>
                   <DialogHeader>
                     <DialogTitle className="flex items-center gap-2">
@@ -570,7 +627,7 @@ const VendorInventory = () => {
                       Add New {selectedCategory} Offering
                     </DialogTitle>
                     <DialogDescription>
-                      Configure pricing, time taken for service, vendor partner details, and capacity for this {selectedCategory} item.
+                      Configure pricing, time taken for service, tags, vendor partner details, and capacity for this {selectedCategory} item.
                     </DialogDescription>
                   </DialogHeader>
 
@@ -832,14 +889,92 @@ const VendorInventory = () => {
                         </div>
                       </div>
 
-                      <div className="space-y-1.5">
-                        <Label htmlFor="gen-badge">Special Tag / Badge (Optional)</Label>
-                        <Input 
-                          id="gen-badge" 
-                          placeholder="e.g. Express Delivery, DHA Certified, Eco-certified" 
-                          value={genericFormData.badgeText || ''}
-                          onChange={e => setGenericFormData({...genericFormData, badgeText: e.target.value})}
-                        />
+                      {/* MULTI-TAG SELECTOR & BADGES */}
+                      <div className="space-y-2 border p-3 rounded-lg bg-muted/20">
+                        <Label className="flex items-center justify-between font-bold text-foreground">
+                          <span className="flex items-center gap-1.5">
+                            <Sparkles className="w-3.5 h-3.5 text-primary" />
+                            Special Tags & Service Badges
+                          </span>
+                          <span className="text-[10px] text-muted-foreground font-normal">
+                            {(genericFormData.tags || []).length} selected
+                          </span>
+                        </Label>
+
+                        {/* Selected Tags Display */}
+                        <div className="flex flex-wrap gap-1.5 min-h-[32px] p-2 bg-background border rounded-md">
+                          {(genericFormData.tags || []).length === 0 ? (
+                            <span className="text-[11px] text-muted-foreground italic">No tags selected yet. Pick from dropdown below or type a custom tag.</span>
+                          ) : (
+                            (genericFormData.tags || []).map(tag => (
+                              <Badge key={tag} variant="secondary" className="text-[11px] gap-1 bg-primary/10 text-primary border-primary/20">
+                                {tag}
+                                <button 
+                                  type="button" 
+                                  onClick={() => handleRemoveTag(tag)}
+                                  className="ml-1 hover:text-destructive focus:outline-none"
+                                >
+                                  <X className="w-3 h-3" />
+                                </button>
+                              </Badge>
+                            ))
+                          )}
+                        </div>
+
+                        {/* Dropdown Select for Preset Tags */}
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
+                          <div className="space-y-1">
+                            <Label className="text-[10px] text-muted-foreground">Select Preset Tag</Label>
+                            <Select onValueChange={v => handleAddTag(v)}>
+                              <SelectTrigger className="h-8 text-xs">
+                                <SelectValue placeholder="-- Choose Tag from Dropdown --" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {PRESET_SERVICE_TAGS.map(tag => (
+                                  <SelectItem key={tag} value={tag} disabled={(genericFormData.tags || []).includes(tag)}>
+                                    {tag} {(genericFormData.tags || []).includes(tag) ? '✓' : ''}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </div>
+
+                          {/* Custom Tag Input */}
+                          <div className="space-y-1">
+                            <Label className="text-[10px] text-muted-foreground">Add Custom Tag</Label>
+                            <div className="flex gap-1.5">
+                              <Input 
+                                placeholder="Type tag name..." 
+                                value={customTagInput}
+                                onChange={e => setCustomTagInput(e.target.value)}
+                                className="h-8 text-xs"
+                                onKeyDown={e => {
+                                  if (e.key === 'Enter') {
+                                    e.preventDefault();
+                                    if (customTagInput.trim()) {
+                                      handleAddTag(customTagInput);
+                                      setCustomTagInput('');
+                                    }
+                                  }
+                                }}
+                              />
+                              <Button 
+                                type="button" 
+                                size="sm" 
+                                variant="outline"
+                                className="h-8 px-2.5 text-xs shrink-0"
+                                onClick={() => {
+                                  if (customTagInput.trim()) {
+                                    handleAddTag(customTagInput);
+                                    setCustomTagInput('');
+                                  }
+                                }}
+                              >
+                                Add
+                              </Button>
+                            </div>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   )}
@@ -1004,7 +1139,7 @@ const VendorInventory = () => {
                     <TableHead>Offering Title & Vendor</TableHead>
                     <TableHead>Time Taken</TableHead>
                     <TableHead>Description</TableHead>
-                    <TableHead>Tag / Badge</TableHead>
+                    <TableHead>Tags & Badges</TableHead>
                     <TableHead>Unit Price (AED)</TableHead>
                     <TableHead className="text-center">Daily Capacity / Stock</TableHead>
                     <TableHead className="text-right">Actions</TableHead>
@@ -1022,66 +1157,76 @@ const VendorInventory = () => {
                       </TableCell>
                     </TableRow>
                   ) : (
-                    filteredGenericItems.map(item => (
-                      <TableRow key={item.id} className="hover:bg-muted/50 transition-colors">
-                        <TableCell className="font-mono text-xs font-bold">{item.sku}</TableCell>
-                        <TableCell>
-                          <div>
-                            <p className="font-bold text-xs text-foreground">{item.title}</p>
-                            <p className="text-[10px] text-muted-foreground">{item.vendorName}</p>
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          {item.durationText ? (
-                            <Badge variant="secondary" className="text-[10px] gap-1 font-mono font-semibold">
-                              <Clock className="w-3 h-3 text-primary" />
-                              {item.durationText}
-                            </Badge>
-                          ) : (
-                            <span className="text-[10px] text-muted-foreground">-</span>
-                          )}
-                        </TableCell>
-                        <TableCell className="text-xs text-muted-foreground max-w-xs truncate">
-                          {item.description || 'Standard service offering'}
-                        </TableCell>
-                        <TableCell>
-                          {item.badgeText ? (
-                            <Badge variant="outline" className="text-[9px] bg-primary/10 text-primary border-primary/20">
-                              <Sparkles className="w-2.5 h-2.5 mr-1" />
-                              {item.badgeText}
-                            </Badge>
-                          ) : (
-                            <span className="text-[10px] text-muted-foreground">-</span>
-                          )}
-                        </TableCell>
-                        <TableCell className="text-xs font-bold text-foreground">
-                          AED {item.unitPriceAED.toFixed(2)} <span className="text-[10px] font-normal text-muted-foreground">/ {item.unitLabel}</span>
-                        </TableCell>
-                        <TableCell className="text-center font-mono text-xs font-bold">
-                          {item.capacityOrStock} units/day
-                        </TableCell>
-                        <TableCell className="text-right">
-                          <div className="flex justify-end items-center gap-1">
-                            <Button 
-                              variant="ghost" 
-                              size="icon" 
-                              className="h-7 w-7 text-muted-foreground hover:text-foreground"
-                              onClick={() => handleOpenEdit(item)}
-                            >
-                              <Edit2 className="w-3.5 h-3.5" />
-                            </Button>
-                            <Button 
-                              variant="ghost" 
-                              size="icon" 
-                              className="h-7 w-7 text-destructive hover:text-destructive"
-                              onClick={() => handleDeleteItem(item.id, item.title)}
-                            >
-                              <Trash2 className="w-3.5 h-3.5" />
-                            </Button>
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    ))
+                    filteredGenericItems.map(item => {
+                      const displayTags = item.tags && item.tags.length > 0 
+                        ? item.tags 
+                        : (item.badgeText ? [item.badgeText] : []);
+
+                      return (
+                        <TableRow key={item.id} className="hover:bg-muted/50 transition-colors">
+                          <TableCell className="font-mono text-xs font-bold">{item.sku}</TableCell>
+                          <TableCell>
+                            <div>
+                              <p className="font-bold text-xs text-foreground">{item.title}</p>
+                              <p className="text-[10px] text-muted-foreground">{item.vendorName}</p>
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            {item.durationText ? (
+                              <Badge variant="secondary" className="text-[10px] gap-1 font-mono font-semibold">
+                                <Clock className="w-3 h-3 text-primary" />
+                                {item.durationText}
+                              </Badge>
+                            ) : (
+                              <span className="text-[10px] text-muted-foreground">-</span>
+                            )}
+                          </TableCell>
+                          <TableCell className="text-xs text-muted-foreground max-w-xs truncate">
+                            {item.description || 'Standard service offering'}
+                          </TableCell>
+                          <TableCell>
+                            <div className="flex flex-wrap gap-1 max-w-xs">
+                              {displayTags.length > 0 ? (
+                                displayTags.map(tag => (
+                                  <Badge key={tag} variant="outline" className="text-[9px] bg-primary/10 text-primary border-primary/20 py-0">
+                                    <Sparkles className="w-2.5 h-2.5 mr-1" />
+                                    {tag}
+                                  </Badge>
+                                ))
+                              ) : (
+                                <span className="text-[10px] text-muted-foreground">-</span>
+                              )}
+                            </div>
+                          </TableCell>
+                          <TableCell className="text-xs font-bold text-foreground">
+                            AED {item.unitPriceAED.toFixed(2)} <span className="text-[10px] font-normal text-muted-foreground">/ {item.unitLabel}</span>
+                          </TableCell>
+                          <TableCell className="text-center font-mono text-xs font-bold">
+                            {item.capacityOrStock} units/day
+                          </TableCell>
+                          <TableCell className="text-right">
+                            <div className="flex justify-end items-center gap-1">
+                              <Button 
+                                variant="ghost" 
+                                size="icon" 
+                                className="h-7 w-7 text-muted-foreground hover:text-foreground"
+                                onClick={() => handleOpenEdit(item)}
+                              >
+                                <Edit2 className="w-3.5 h-3.5" />
+                              </Button>
+                              <Button 
+                                variant="ghost" 
+                                size="icon" 
+                                className="h-7 w-7 text-destructive hover:text-destructive"
+                                onClick={() => handleDeleteItem(item.id, item.title)}
+                              >
+                                <Trash2 className="w-3.5 h-3.5" />
+                              </Button>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })
                   )}
                 </TableBody>
               </Table>
@@ -1092,14 +1237,14 @@ const VendorInventory = () => {
 
       {/* Edit Offering Dialog */}
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-        <DialogContent className="sm:max-w-[550px]">
+        <DialogContent className="sm:max-w-[580px] max-h-[90vh] overflow-y-auto">
           <form onSubmit={handleUpdateItem}>
             <DialogHeader>
               <DialogTitle className="flex items-center gap-2">
                 <Edit2 className="w-4 h-4 text-primary" />
                 Edit {selectedCategory} Offering
               </DialogTitle>
-              <DialogDescription>Modify offering specs, duration, and price details.</DialogDescription>
+              <DialogDescription>Modify offering specs, duration, tags, and price details.</DialogDescription>
             </DialogHeader>
 
             {selectedCategory === 'Car rental' ? (
@@ -1188,6 +1333,94 @@ const VendorInventory = () => {
                       value={genericFormData.capacityOrStock}
                       onChange={e => setGenericFormData({...genericFormData, capacityOrStock: Number(e.target.value)})}
                     />
+                  </div>
+                </div>
+
+                {/* EDIT MULTI-TAG SELECTOR */}
+                <div className="space-y-2 border p-3 rounded-lg bg-muted/20">
+                  <Label className="flex items-center justify-between font-bold text-foreground">
+                    <span className="flex items-center gap-1.5">
+                      <Sparkles className="w-3.5 h-3.5 text-primary" />
+                      Special Tags & Service Badges
+                    </span>
+                    <span className="text-[10px] text-muted-foreground font-normal">
+                      {(genericFormData.tags || []).length} selected
+                    </span>
+                  </Label>
+
+                  {/* Selected Tags Display */}
+                  <div className="flex flex-wrap gap-1.5 min-h-[32px] p-2 bg-background border rounded-md">
+                    {(genericFormData.tags || []).length === 0 ? (
+                      <span className="text-[11px] text-muted-foreground italic">No tags selected. Pick from dropdown below.</span>
+                    ) : (
+                      (genericFormData.tags || []).map(tag => (
+                        <Badge key={tag} variant="secondary" className="text-[11px] gap-1 bg-primary/10 text-primary border-primary/20">
+                          {tag}
+                          <button 
+                            type="button" 
+                            onClick={() => handleRemoveTag(tag)}
+                            className="ml-1 hover:text-destructive focus:outline-none"
+                          >
+                            <X className="w-3 h-3" />
+                          </button>
+                        </Badge>
+                      ))
+                    )}
+                  </div>
+
+                  {/* Dropdown Select for Preset Tags */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
+                    <div className="space-y-1">
+                      <Label className="text-[10px] text-muted-foreground">Select Preset Tag</Label>
+                      <Select onValueChange={v => handleAddTag(v)}>
+                        <SelectTrigger className="h-8 text-xs">
+                          <SelectValue placeholder="-- Choose Tag from Dropdown --" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {PRESET_SERVICE_TAGS.map(tag => (
+                            <SelectItem key={tag} value={tag} disabled={(genericFormData.tags || []).includes(tag)}>
+                              {tag} {(genericFormData.tags || []).includes(tag) ? '✓' : ''}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    {/* Custom Tag Input */}
+                    <div className="space-y-1">
+                      <Label className="text-[10px] text-muted-foreground">Add Custom Tag</Label>
+                      <div className="flex gap-1.5">
+                        <Input 
+                          placeholder="Type tag name..." 
+                          value={customTagInput}
+                          onChange={e => setCustomTagInput(e.target.value)}
+                          className="h-8 text-xs"
+                          onKeyDown={e => {
+                            if (e.key === 'Enter') {
+                              e.preventDefault();
+                              if (customTagInput.trim()) {
+                                handleAddTag(customTagInput);
+                                setCustomTagInput('');
+                              }
+                            }
+                          }}
+                        />
+                        <Button 
+                          type="button" 
+                          size="sm" 
+                          variant="outline"
+                          className="h-8 px-2.5 text-xs shrink-0"
+                          onClick={() => {
+                            if (customTagInput.trim()) {
+                              handleAddTag(customTagInput);
+                              setCustomTagInput('');
+                            }
+                          }}
+                        >
+                          Add
+                        </Button>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
