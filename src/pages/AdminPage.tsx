@@ -4,6 +4,7 @@ import React from 'react';
 import { useLocation } from 'react-router-dom';
 import AdminLayout from '@/components/AdminLayout';
 import KPITracker from '@/components/dashboard/KPITracker';
+import CallCenter from '@/components/dashboard/CallCenter';
 import LogsTable from '@/components/dashboard/LogsTable';
 import SystemAlerts from '@/components/dashboard/SystemAlerts';
 import Communications from '@/components/dashboard/Communications';
@@ -39,6 +40,7 @@ const AdminPage = () => {
   const renderContent = () => {
     // Dashboard Section
     if (path === '/dashboard/kpi') return <KPITracker />;
+    if (path === '/dashboard/call-center') return <CallCenter />;
     if (path === '/dashboard/logs') return <LogsTable />;
     if (path === '/dashboard/alerts') return <SystemAlerts />;
     if (path === '/dashboard/comms') return <Communications />;
@@ -106,6 +108,7 @@ const AdminPage = () => {
   const getTitle = () => {
     const pathParts = path.split('/').filter(Boolean);
     if (pathParts.length === 0) return "Admin Panel";
+    if (path === '/dashboard/call-center') return "Call Center";
     
     const subSection = pathParts[1]?.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
     const section = pathParts[0]?.charAt(0).toUpperCase() + pathParts[0]?.slice(1);
@@ -114,6 +117,7 @@ const AdminPage = () => {
   };
 
   const getDescription = () => {
+    if (path === '/dashboard/call-center') return "Real-time softphone, inbound ACD queues, live transcription with AI Agent assist, and supervisor monitoring.";
     if (path.startsWith('/dashboard')) return "Overview of performance and operations for the Straizen team.";
     if (path.startsWith('/corporate')) return "Manage corporate accounts, policies, and travel auditing.";
     if (path.startsWith('/inventory')) return "Track unit availability, status, and PMS synchronization.";

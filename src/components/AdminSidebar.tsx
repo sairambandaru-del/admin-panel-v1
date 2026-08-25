@@ -35,7 +35,8 @@ import {
   Boxes,
   TrendingUp,
   PanelLeftClose,
-  PanelLeftOpen
+  PanelLeftOpen,
+  PhoneCall
 } from 'lucide-react';
 import { cn } from "@/lib/utils";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -77,10 +78,11 @@ const navigation: NavItem[] = [
     icon: LayoutDashboard,
     items: [
       { title: "KPI Tracker", href: "/dashboard/kpi", icon: BarChart3 },
-      { title: "Logs", href: "/dashboard/logs", icon: History },
-      { title: "System Alerts", href: "/dashboard/alerts", icon: AlertTriangle },
+      { title: "Call Center", href: "/dashboard/call-center", icon: PhoneCall },
       { title: "Communications", href: "/dashboard/comms", icon: MessageSquare },
       { title: "Bookings", href: "/dashboard/bookings", icon: CalendarCheck },
+      { title: "Logs", href: "/dashboard/logs", icon: History },
+      { title: "System Alerts", href: "/dashboard/alerts", icon: AlertTriangle },
     ]
   },
   {
