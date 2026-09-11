@@ -46,6 +46,7 @@ export interface ServiceException {
 export interface BookingCommsData {
   id: string;
   guestName: string;
+  guestEmail?: string;
   propertyName: string;
   serviceCategory: string;
   dates: string;
@@ -165,6 +166,9 @@ const GuestCommunicationModal: React.FC<GuestCommunicationModalProps> = ({
               <DialogDescription className="text-xs mt-1 flex items-center gap-3 flex-wrap">
                 <span className="font-semibold text-foreground flex items-center gap-1">
                   <User className="w-3.5 h-3.5 text-primary" /> {booking.guestName}
+                  {booking.guestEmail && (
+  <span className="font-normal text-muted-foreground">({booking.guestEmail})</span>
+)}
                 </span>
                 <span className="flex items-center gap-1">
                   <MapPin className="w-3.5 h-3.5 text-muted-foreground" /> {booking.propertyName}
