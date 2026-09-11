@@ -163,7 +163,8 @@ const BookingReport = () => {
       propertyName: booking.propertyName,
       serviceCategory: booking.category,
       dates: `${booking.checkIn} to ${booking.checkOut}`,
-      status: booking.status
+            status: booking.status,
+      totalAmount: booking.amount
     });
     setIsCommsOpen(true);
   };
