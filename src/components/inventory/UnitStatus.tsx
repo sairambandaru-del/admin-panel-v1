@@ -259,7 +259,7 @@ const UnitStatus = () => {
 
   const handleToggleMaintenance = () => {
     if (!selectedUnit) return;
-    const nextStatus = selectedUnit.status === 'Maintenance' ? 'Available' : 'Maintenance';
+    const nextStatus: UnitDetail['status'] = selectedUnit.status === 'Maintenance' ? 'Available' : 'Maintenance';
     const updated = { ...selectedUnit, status: nextStatus };
     setSelectedUnit(updated);
     setUnits(prev => prev.map(u => u.id === selectedUnit.id ? updated : u));
