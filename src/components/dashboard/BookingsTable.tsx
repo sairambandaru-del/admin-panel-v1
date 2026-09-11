@@ -92,7 +92,8 @@ const BookingsTable = () => {
       propertyName: booking.unitName,
       serviceCategory: booking.category,
       dates: booking.dates,
-      status: booking.status
+            status: booking.status,
+      totalAmount: booking.totalAmount
     });
     setIsCommsOpen(true);
   };
